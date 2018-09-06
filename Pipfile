@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ansible = "*"
+click = "*"
+"ruamel.yaml" = "*"
+"jinja2" = "*"
+"delegator.py" = "*"
+colorama = "*"
+
+[dev-packages]
+"flake8" = "*"
+pytest = "*"
+pytest-cov = "*"
+pylint = "*"
+
+[requires]
+python_version = "3.6"
+
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true

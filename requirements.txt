@@ -1,0 +1,22 @@
+-i https://pypi.org/simple
+--extra-index-url https://pypi.org/simple
+ansible==2.6.3
+asn1crypto==0.24.0
+bcrypt==3.1.4
+cffi==1.11.5
+click==6.7
+colorama==0.3.9
+cryptography==2.3.1
+delegator.py==0.1.0
+idna==2.7
+jinja2==2.10
+markupsafe==1.0
+paramiko==2.4.1
+pexpect==4.6.0
+ptyprocess==0.6.0
+pyasn1==0.4.4
+pycparser==2.18
+pynacl==1.2.1
+pyyaml==3.13
+ruamel.yaml==0.15.64
+six==1.11.0

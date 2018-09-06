@@ -1,0 +1,13 @@
+localhost ansible_connection=local
+
+[ubuntu]
+ubuntu01.zbuilder.local
+ubuntu02.zbuilder.local
+
+[centos]
+centos01.zbuilder.local
+centos02.zbuilder.local
+
+[environment:children]
+ubuntu
+centos

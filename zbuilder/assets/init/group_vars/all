@@ -1,0 +1,4 @@
+# To be used by zbuilder
+ZBUILDER_PUBKEY: "~/.ssh/id_rsa.pub"
+ZBUILDER_FORCE: TRUE
+ZBUILDER_ENV: DEV
