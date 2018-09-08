@@ -5,6 +5,7 @@ import ruamel.yaml
 import zbuilder.providers
 
 from ansible.cli import CLI
+from ansible.template import Templar
 
 
 def getHostsWithVars(subset):
@@ -15,6 +16,8 @@ def getHostsWithVars(subset):
     hostVars = {}
     for host in inventory.get_hosts():
         hvars = vm.get_vars(host=host, include_hostvars=True)
+        templar = Templar(loader=loader, variables=hvars)
+        hvars = templar.template(hvars)
         if 'ZBUILDER_PROVIDER' in hvars:
             hvars['ZBUILDER_PROVIDER']['VM_OPTIONS']['enabled'] = False
             hostVars[host] = hvars['ZBUILDER_PROVIDER']

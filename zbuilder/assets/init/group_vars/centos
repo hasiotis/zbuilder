@@ -4,6 +4,6 @@ ZBUILDER_PROVIDER:
   VM_OPTIONS:
     sysuser: 'vagrant'
     box: bento/centos-6.9
-    memory: 1024
+    memory: "{{ GLOBAL_MEMORY }}"
     vcpus: 1
     disks: 10

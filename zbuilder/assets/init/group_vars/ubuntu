@@ -4,6 +4,6 @@ ZBUILDER_PROVIDER:
   VM_OPTIONS:
     sysuser: 'vagrant'
     box: bento/ubuntu-16.04
-    memory: 1024
+    memory: "{{ GLOBAL_MEMORY }}"
     vcpus: 1
     disks: 10
