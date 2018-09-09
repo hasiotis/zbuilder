@@ -5,7 +5,7 @@ import click
 import zbuilder.config
 import zbuilder.providers
 
-from zbuilder.helpers import getHosts, playbook
+from zbuilder.helpers import getHosts, playbook, fixKeys
 from zbuilder.options import pass_state, common_options
 
 @click.group()
@@ -34,6 +34,9 @@ def up(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].up(vmProvider['hosts'])
+    click.echo("Fixing ssh keys VMs")
+    fixKeys(state)
+    click.echo("Running bootstrap.yml")
     playbook(state, "bootstrap.yml")
 
 
@@ -57,6 +60,15 @@ def destroy(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].destroy(vmProvider['hosts'])
+
+
+@cli.command()
+@common_options
+@pass_state
+def fixkeys(state):
+    """Fix ssh keys"""
+    click.echo("Fixing ssh keys VMs")
+    fixKeys(state)
 
 
 @cli.group()

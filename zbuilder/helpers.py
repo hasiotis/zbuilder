@@ -1,5 +1,6 @@
 import sys
 import click
+import socket
 import delegator
 import ruamel.yaml
 import zbuilder.providers
@@ -80,14 +81,25 @@ def dump_yaml(cfg):
     yaml.dump(cfg, sys.stdout)
 
 
-def runCmd(cmd, verbose=False, dry=False):
+def fixKeys(state):
+    vmProviders = getHosts(state)
+    for _, vmProvider in vmProviders.items():
+        for host in vmProvider['hosts']:
+            h = str(host)
+            click.echo("  - Host: {}".format(h))
+            ip = socket.gethostbyname(h)
+            runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
+            runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
+            runCmd("ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h), verbose=state.verbose, ignoreError=True)
+
+def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
     if verbose:
         click.echo("    CMD: [{}]".format(cmd))
     if not dry:
         status = delegator.run(cmd)
         if verbose:
             click.echo(click.style(status.out, fg='green'))
-        if status.return_code != 0:
+        if status.return_code != 0 and not ignoreError:
             errMsg = "    Failed [{}]".format(status.err)
             click.echo(click.style(errMsg, fg='red'))
 

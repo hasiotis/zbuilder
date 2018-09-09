@@ -6,11 +6,3 @@
   tasks:
     - name: bootstrap | Wait for ssh to become available
       local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=2
-    - name: bootstrap | Fetch ssh host key
-      local_action: shell ssh-keyscan "{{ inventory_hostname }}"
-      ignore_errors: yes
-      changed_when: False
-      failed_when: False
-      register: ssh_host_key
-    - name: bootstrap | Add new ssh host signature
-      local_action: known_hosts name="{{ inventory_hostname }}" key="{{ ssh_host_key.stdout }}"
