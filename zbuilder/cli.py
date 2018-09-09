@@ -5,9 +5,7 @@ import click
 import zbuilder.config
 import zbuilder.providers
 
-from ansible.cli.playbook import PlaybookCLI
-
-from zbuilder.helpers import getHosts
+from zbuilder.helpers import getHosts, playbook
 from zbuilder.options import pass_state, common_options
 
 @click.group()
@@ -36,6 +34,7 @@ def up(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].up(vmProvider['hosts'])
+    playbook(state, "bootstrap.yml")
 
 
 @cli.command()
@@ -102,9 +101,7 @@ def delete(state):
 @pass_state
 def play(state, playbook):
     """Play an ansible playbook"""
-    playbookCLI = PlaybookCLI(["ansible-playbook", "-i", "hosts", "-l", state.limit,  playbook])
-    playbookCLI.parse()
-    playbookCLI.run()
+    playbook(state, playbook)
 
 
 @cli.command()

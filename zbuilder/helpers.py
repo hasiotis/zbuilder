@@ -6,6 +6,7 @@ import zbuilder.providers
 
 from ansible.cli import CLI
 from ansible.template import Templar
+from ansible.cli.playbook import PlaybookCLI
 
 
 def getHostsWithVars(subset):
@@ -46,6 +47,12 @@ def getHosts(state):
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
 
     return vmProviders
+
+
+def playbook(state, pbook):
+    playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
+    playbookCLI.parse()
+    playbookCLI.run()
 
 
 def load_yaml(fname):
