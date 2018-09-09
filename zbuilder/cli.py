@@ -81,7 +81,8 @@ def snapshot():
 @common_options
 @pass_state
 def create(state):
-    """Crate a VM snapshot"""
+    """Create VM snapshots"""
+    click.echo("Creating VMs snapshots")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].snapCreate(vmProvider['hosts'])
@@ -91,7 +92,8 @@ def create(state):
 @common_options
 @pass_state
 def restore(state):
-    """Restore a VM snapshot"""
+    """Restore VM snapshots"""
+    click.echo("Restoring VMs snapshots")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].snapRestore(vmProvider['hosts'])
@@ -101,7 +103,8 @@ def restore(state):
 @common_options
 @pass_state
 def delete(state):
-    """Delete a VM snapshot"""
+    """Delete VM snapshots"""
+    click.echo("Deleting VMs snapshots")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].snapDelete(vmProvider['hosts'])
