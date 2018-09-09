@@ -1,6 +1,6 @@
 ---
 - hosts: environment
-  user: sysuser
+  user: sysadmin
   become: yes
   tasks:
     - action: ping
