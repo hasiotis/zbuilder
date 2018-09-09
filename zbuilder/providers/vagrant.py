@@ -14,7 +14,7 @@ class vmProvider(object):
 
     def init(self):
         this_dir, this_filename = os.path.split(__file__)
-        ASSETS_INIT_DIR = os.path.join(this_dir, '..', 'assets', 'init')
+        ASSETS_INIT_DIR = os.path.join(this_dir, '..', 'assets', 'vagrant', 'init')
 
         if os.path.exists('group_vars') or os.path.exists('hosts'):
             raise click.ClickException("This directory already contains relevant files")
@@ -59,7 +59,7 @@ class vmProvider(object):
 
     def setVagrantfile(self, pubkey, hosts):
         this_dir, this_filename = os.path.split(__file__)
-        ASSETS_DIR = os.path.join(this_dir, '..', 'assets')
+        ASSETS_DIR = os.path.join(this_dir, '..', 'assets', 'vagrant')
 
         templateLoader = jinja2.FileSystemLoader(searchpath=ASSETS_DIR)
         templateEnv = jinja2.Environment(loader=templateLoader, trim_blocks=True)

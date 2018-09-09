@@ -50,7 +50,7 @@ def getHosts(state):
     return vmProviders
 
 
-def playbook(state, pbook):
+def runPlaybook(state, pbook):
     playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
     playbookCLI.parse()
     playbookCLI.run()
@@ -90,7 +90,10 @@ def fixKeys(state):
             ip = socket.gethostbyname(h)
             runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
             runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
-            runCmd("ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h), verbose=state.verbose, ignoreError=True)
+            runCmd(
+                "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
+                verbose=state.verbose, ignoreError=True
+            )
 
 def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
     if verbose:

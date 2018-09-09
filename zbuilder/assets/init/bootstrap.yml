@@ -1,8 +1,0 @@
----
-- hosts: all:!localhost
-  gather_facts: False
-  become: false
-  remote_user: vagrant
-  tasks:
-    - name: bootstrap | Wait for ssh to become available
-      local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=2

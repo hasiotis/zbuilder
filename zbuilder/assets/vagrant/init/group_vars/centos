@@ -2,8 +2,8 @@ ZBUILDER_PROVIDER:
   DNS: vagrant
   CLOUD: vagrant
   VM_OPTIONS:
-    sysuser: 'vagrant'
+    sysuser: "{{ GLOBAL_SYSUSER }}"
     box: bento/centos-6.9
     memory: "{{ GLOBAL_MEMORY }}"
-    vcpus: 1
-    disks: 10
+    vcpus: "{{ GLOBAL_VCPUS }}"
+    disks: "{{ GLOBAL_DISKS }}"

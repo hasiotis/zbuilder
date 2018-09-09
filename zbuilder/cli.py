@@ -5,7 +5,7 @@ import click
 import zbuilder.config
 import zbuilder.providers
 
-from zbuilder.helpers import getHosts, playbook, fixKeys
+from zbuilder.helpers import getHosts, runPlaybook, fixKeys
 from zbuilder.options import pass_state, common_options
 
 @click.group()
@@ -37,7 +37,7 @@ def up(state):
     click.echo("Fixing ssh keys VMs")
     fixKeys(state)
     click.echo("Running bootstrap.yml")
-    playbook(state, "bootstrap.yml")
+    runPlaybook(state, "bootstrap.yml")
 
 
 @cli.command()
@@ -113,7 +113,7 @@ def delete(state):
 @pass_state
 def play(state, playbook):
     """Play an ansible playbook"""
-    playbook(state, playbook)
+    runPlaybook(state, playbook)
 
 
 @cli.command()
