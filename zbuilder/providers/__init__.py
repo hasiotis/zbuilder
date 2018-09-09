@@ -3,11 +3,10 @@ import importlib
 
 class vmProvider(object):
 
-    def __init__(self, factory, verbose):
+    def __init__(self, factory, state):
         self.factory = factory
-        self.verbose = verbose
         vmProviderClass = getattr(importlib.import_module("zbuilder.providers.%s" % factory), "vmProvider")
-        self.provider = vmProviderClass(verbose)
+        self.provider = vmProviderClass(state)
 
     def init(self):
         try:

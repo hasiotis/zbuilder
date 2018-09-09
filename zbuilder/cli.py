@@ -21,7 +21,7 @@ def cli():
 @pass_state
 def init(state, provider, dns):
     """Init an environment"""
-    vmProvider = zbuilder.providers.vmProvider(provider, state.verbose)
+    vmProvider = zbuilder.providers.vmProvider(provider, state)
     vmProvider.init()
 
 

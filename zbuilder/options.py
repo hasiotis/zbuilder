@@ -4,6 +4,7 @@ class State(object):
     def __init__(self):
         self.verbose = False
         self.limit = None
+        self.vars = None
 
 pass_state = click.make_pass_decorator(State, ensure=True)
 

@@ -9,8 +9,8 @@ from zbuilder.helpers import runCmd
 
 class vmProvider(object):
 
-    def __init__(self, verbose):
-        self.verbose = verbose
+    def __init__(self, state):
+        self.state = state
 
     def init(self):
         this_dir, this_filename = os.path.split(__file__)
@@ -24,11 +24,11 @@ class vmProvider(object):
 
 
     def _cmd(self, hosts, cmd):
-        self.setVagrantfile(pubkey='~/.ssh/id_rsa.pub', hosts=hosts)
+        self.setVagrantfile(pubkey=self.state.vars["ZBUILDER_PUBKEY"], hosts=hosts)
         for h in hosts:
             if hosts[h]['enabled']:
                 click.echo("  - Host: {}".format(h))
-                status = runCmd(cmd.format(host=h), verbose=self.verbose)
+                status = runCmd(cmd.format(host=h), verbose=self.state.verbose)
 
 
     def up(self, hosts):

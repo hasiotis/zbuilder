@@ -10,6 +10,21 @@ from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
 
 
+def getVars():
+    parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
+    options, args = parser.parse_args(["-i", "hosts"])
+    loader, inventory, vm = CLI._play_prereqs(options)
+    hosts = inventory.get_hosts(pattern='localhost')
+    tVars = vm.get_vars(host=hosts[0])
+    retValue = {}
+    for v in tVars:
+        if v == 'VM_OPTIONS':
+            next
+        if v.startswith('ZBUILDER_'):
+            retValue[v] = tVars[v]
+    return retValue
+
+
 def getHostsWithVars(subset):
     parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
     options, args = parser.parse_args(["-i", "hosts", "-l", subset.limit])
@@ -33,6 +48,7 @@ def getHostsWithVars(subset):
 
 
 def getHosts(state):
+    state.vars= getVars()
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
@@ -42,7 +58,7 @@ def getHosts(state):
         if curVMProvider not in vmProviders:
             vmProviders[curVMProvider] = {}
             vmProviders[curVMProvider]['dns'] = curDNSrovider
-            vmProviders[curVMProvider]['cloud'] = zbuilder.providers.vmProvider(curVMProvider, state.verbose)
+            vmProviders[curVMProvider]['cloud'] = zbuilder.providers.vmProvider(curVMProvider, state)
             vmProviders[curVMProvider]['hosts'] = {}
         hvars['VM_OPTIONS']['aliases'] = ''
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
