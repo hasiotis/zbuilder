@@ -5,6 +5,8 @@ import click
 import zbuilder.config
 import zbuilder.providers
 
+from ansible.cli.playbook import PlaybookCLI
+
 from zbuilder.helpers import getHosts
 from zbuilder.options import pass_state, common_options
 
@@ -95,10 +97,14 @@ def delete(state):
 
 
 @cli.command()
-@click.argument('name')
-def play(name):
+@click.argument('playbook')
+@common_options
+@pass_state
+def play(state, playbook):
     """Play an ansible playbook"""
-    pass
+    playbookCLI = PlaybookCLI(["ansible-playbook", "-i", "hosts", "-l", state.limit,  playbook])
+    playbookCLI.parse()
+    playbookCLI.run()
 
 
 @cli.command()
