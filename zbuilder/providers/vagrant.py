@@ -48,11 +48,11 @@ class vmProvider(object):
 
 
     def snapRestore(self, hosts):
-        click.echo("    Halting")
+        click.echo("  Halting")
         self._cmd(hosts, 'vagrant halt {host}')
-        click.echo("    Restoring")
+        click.echo("  Restoring")
         self._cmd(hosts, 'vboxmanage snapshot {host} restore zbuilder')
-        click.echo("    Booting up")
+        click.echo("  Booting up")
         self._cmd(hosts, 'vboxmanage startvm {host} --type headless')
 
 
