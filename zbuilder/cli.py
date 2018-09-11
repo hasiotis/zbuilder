@@ -5,6 +5,8 @@ import click
 import zbuilder.config
 import zbuilder.providers
 
+from click._bashcomplete import get_completion_script
+
 from zbuilder.helpers import getHosts, runPlaybook, fixKeys
 from zbuilder.options import pass_state, common_options
 
@@ -141,3 +143,10 @@ def view():
     """View configuration"""
     cfg = zbuilder.config.load("~/.zbuilder.yaml")
     zbuilder.config.view(cfg)
+
+
+@cli.command()
+@click.argument('shell', default='bash')
+def completion(shell):
+    """Autocomplete for bash"""
+    click.echo(get_completion_script('zbuilder', '_ZBUILDER_COMPLETE'))
