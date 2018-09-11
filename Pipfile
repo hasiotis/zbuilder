@@ -10,6 +10,7 @@ click = "*"
 "jinja2" = "*"
 "delegator.py" = "*"
 colorama = "*"
+python-digitalocean = "*"
 
 [dev-packages]
 "flake8" = "*"
