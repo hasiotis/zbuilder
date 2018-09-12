@@ -2,8 +2,8 @@
 import sys
 import click
 
-import zbuilder.config
-import zbuilder.providers
+import zbuilder.vm
+import zbuilder.cfg
 
 from click._bashcomplete import get_completion_script
 
@@ -17,13 +17,14 @@ def cli():
 
 
 @cli.command()
-@click.option('--provider', default='vagrant', help='VM provider')
-@click.option('--dns', default='vagrant', help='DNS provider')
+@click.option('--provider', default='devel', help='VM provider')
+@click.option('--dns', default='devel', help='DNS provider')
 @common_options
 @pass_state
 def init(state, provider, dns):
     """Init an environment"""
-    vmProvider = zbuilder.providers.vmProvider(provider, state)
+    state.cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
+    vmProvider = zbuilder.vm.vmProvider(provider, state, None)
     vmProvider.init()
 
 
@@ -141,8 +142,8 @@ def config():
 @config.command()
 def view():
     """View configuration"""
-    cfg = zbuilder.config.load("~/.zbuilder.yaml")
-    zbuilder.config.view(cfg)
+    cfg = zbuilder.cfg.load("~/.zbuilder.yaml")
+    zbuilder.cfg.view(cfg)
 
 
 @cli.command()

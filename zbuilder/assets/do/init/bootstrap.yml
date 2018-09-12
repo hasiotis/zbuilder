@@ -1,0 +1,44 @@
+---
+- hosts: all:!localhost
+  become: true
+  remote_user: vagrant
+  vars:
+    username: "{{ ZBUILDER_PROVIDER.VM_OPTIONS.sysuser }}"
+    ugid: 800
+  tasks:
+    - name: bootstrap | Wait for ssh to become available
+      local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=2
+
+    - name: bootstrap | Create "{{ username }}" group
+      group: name="{{ username }}" gid="{{ ugid }}" state=present
+
+    - name: bootstrap | Create "{{ username }}" user (Debian)
+      user:
+        name: "{{ username }}"
+        comment: "The Administrator user"
+        uid: "{{ ugid }}"
+        group: "{{ username }}"
+        groups: sudo
+        shell: '/bin/bash'
+      when: ansible_os_family == "Debian"
+
+    - name: bootstrap | Install libselinux-python (RedHat)
+      yum: name=libselinux-python state=present
+      when: ansible_os_family == "RedHat"
+
+    - name: bootstrap | Create "{{ username }}" user (RedHat)
+      user:
+        name: "{{ username }}"
+        comment: "The Administrator user"
+        uid: "{{ ugid }}"
+        group: "{{ username }}"
+        groups: wheel,vagrant
+        shell: '/bin/bash'
+      when: ansible_os_family == "RedHat"
+
+    - name: bootstrap | No password for user root
+      user: name=root password='*'
+
+    - name: bootstrap | Add custom key for "{{ username }}"
+      authorized_key: user="{{ username }}" key="{{ lookup('file', ZBUILDER_PUBKEY) }}"
+

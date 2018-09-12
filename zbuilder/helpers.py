@@ -3,7 +3,8 @@ import click
 import socket
 import delegator
 import ruamel.yaml
-import zbuilder.providers
+import zbuilder.vm
+import zbuilder.cfg
 
 from ansible.cli import CLI
 from ansible.template import Templar
@@ -48,17 +49,20 @@ def getHostsWithVars(subset):
 
 
 def getHosts(state):
-    state.vars= getVars()
+    state.vars = getVars()
+    state.cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
+    (curVMProvider, curDNSrovider, curCreds) = (None, None, None)
     for h, hvars in hosts.items():
-        curVMProvider = hvars['CLOUD']
-        curDNSrovider = hvars['DNS']
+        if 'CLOUD' in hvars:
+            curVMProvider = hvars['CLOUD']
+        if 'DNS' in hvars:
+            curDNSrovider = hvars['DNS']
         if curVMProvider not in vmProviders:
             vmProviders[curVMProvider] = {}
-            vmProviders[curVMProvider]['dns'] = curDNSrovider
-            vmProviders[curVMProvider]['cloud'] = zbuilder.providers.vmProvider(curVMProvider, state)
+            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(curVMProvider, state, curDNSrovider)
             vmProviders[curVMProvider]['hosts'] = {}
         hvars['VM_OPTIONS']['aliases'] = ''
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']

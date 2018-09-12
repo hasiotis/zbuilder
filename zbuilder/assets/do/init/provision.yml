@@ -1,0 +1,8 @@
+---
+- hosts: environment
+  user: sysadmin
+  become: yes
+  tasks:
+    - action: ping
+  tags:
+    - always

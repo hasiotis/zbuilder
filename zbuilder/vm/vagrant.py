@@ -2,25 +2,16 @@ import os
 import click
 import jinja2
 import shutil
-import distutils.dir_util
 
 from zbuilder.helpers import runCmd
 
 
 class vmProvider(object):
 
-    def __init__(self, state):
+    def __init__(self, state, dns, creds=None):
         self.state = state
-
-    def init(self):
-        this_dir, this_filename = os.path.split(__file__)
-        ASSETS_INIT_DIR = os.path.join(this_dir, '..', 'assets', 'vagrant', 'init')
-
-        if os.path.exists('group_vars') or os.path.exists('hosts'):
-            raise click.ClickException("This directory already contains relevant files")
-
-        click.echo("Initializing vagrant based zbuilder environment")
-        distutils.dir_util.copy_tree(ASSETS_INIT_DIR, os.getcwd())
+        self.creds = creds
+        self.dns = dns
 
 
     def _cmd(self, hosts, cmd):

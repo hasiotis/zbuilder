@@ -5,6 +5,7 @@ class State(object):
         self.verbose = False
         self.limit = None
         self.vars = None
+        self.cfg = None
 
 pass_state = click.make_pass_decorator(State, ensure=True)
 

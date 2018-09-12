@@ -1,18 +1,29 @@
+import os
 import click
 import importlib
+import zbuilder.dns
+import distutils.dir_util
 
 class vmProvider(object):
 
-    def __init__(self, factory, state):
-        self.factory = factory
-        vmProviderClass = getattr(importlib.import_module("zbuilder.providers.%s" % factory), "vmProvider")
-        self.provider = vmProviderClass(state)
+    def __init__(self, factory, state, dns):
+        cloud = state.cfg['providers'][factory]['type']
+        self.factory = cloud
+        vmProviderClass = getattr(importlib.import_module("zbuilder.vm.%s" % cloud), "vmProvider")
+        curDNS = None
+        if dns:
+            curDNS = zbuilder.dns.dnsProvider(dns, state)
+        self.provider = vmProviderClass(state, curDNS)
 
     def init(self):
-        try:
-            self.provider.init()
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        this_dir, this_filename = os.path.split(__file__)
+        ASSETS_INIT_DIR = os.path.join(this_dir, '..', 'assets', self.factory, 'init')
+
+        if os.path.exists('group_vars') or os.path.exists('hosts'):
+            raise click.ClickException("This directory already contains relevant files")
+
+        click.echo("Initializing {} based zbuilder environment".format(self.factory))
+        distutils.dir_util.copy_tree(ASSETS_INIT_DIR, os.getcwd())
 
 
     def up(self, hosts):
