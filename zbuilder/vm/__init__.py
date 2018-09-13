@@ -7,7 +7,7 @@ import distutils.dir_util
 class vmProvider(object):
 
     def __init__(self, factory, state, dns):
-        cloud = state.cfg['providers'][factory]['type']
+        cloud = state.cfg['type']
         self.factory = cloud
         vmProviderClass = getattr(importlib.import_module("zbuilder.vm.%s" % cloud), "vmProvider")
         curDNS = None

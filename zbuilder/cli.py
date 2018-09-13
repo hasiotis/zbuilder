@@ -23,7 +23,8 @@ def cli():
 @pass_state
 def init(state, provider, dns):
     """Init an environment"""
-    state.cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
+    cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
+    state.cfg = cfg['providers'][provider]
     vmProvider = zbuilder.vm.vmProvider(provider, state, None)
     vmProvider.init()
 

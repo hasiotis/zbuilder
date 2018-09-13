@@ -6,7 +6,6 @@ class vmProvider(object):
 
     def __init__(self, state, dns, creds=None):
         self.state = state
-        self.creds = creds
         self.dns = dns
 
 
@@ -16,6 +15,8 @@ class vmProvider(object):
             if hosts[h]['enabled']:
                 click.echo("  - Host: {}".format(h))
                 click.echo(hosts[h])
+        from zbuilder.helpers import dump_yaml
+        dump_yaml(self.state.cfg)
         exit(0)
         manager = digitalocean.Manager(token="secretspecialuniquesnowflake")
         my_droplets = manager.get_all_droplets()

@@ -8,7 +8,7 @@ class dnsProvider(object):
     def __init__(self, factory, state):
         if factory is None:
             return None
-        cloud = state.cfg['providers'][factory]['type']
+        cloud = state.cfg['type']
         self.factory = cloud
         dnsProviderClass = getattr(importlib.import_module("zbuilder.dns.%s" % cloud), "dnsProvider")
         self.provider = dnsProviderClass(state)

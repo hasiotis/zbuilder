@@ -50,7 +50,7 @@ def getHostsWithVars(subset):
 
 def getHosts(state):
     state.vars = getVars()
-    state.cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
+    cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
@@ -60,9 +60,10 @@ def getHosts(state):
             curVMProvider = hvars['CLOUD']
         if 'DNS' in hvars:
             curDNSrovider = hvars['DNS']
+        state.cfg = cfg['providers'][curVMProvider]
         if curVMProvider not in vmProviders:
             vmProviders[curVMProvider] = {}
-            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(curVMProvider, state, curDNSrovider)
+            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(state.cfg['type'], state, curDNSrovider)
             vmProviders[curVMProvider]['hosts'] = {}
         hvars['VM_OPTIONS']['aliases'] = ''
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
