@@ -8,9 +8,8 @@ from zbuilder.helpers import runCmd
 
 class vmProvider(object):
 
-    def __init__(self, state, dns, creds=None):
+    def __init__(self, state, dns):
         self.state = state
-        self.creds = creds
         self.dns = dns
 
 

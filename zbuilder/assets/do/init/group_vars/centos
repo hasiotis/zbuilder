@@ -2,6 +2,6 @@ ZBUILDER_PROVIDER:
   DNS: "{{ GLOBAL_PROVIDER }}"
   CLOUD: "{{ GLOBAL_PROVIDER }}"
   VM_OPTIONS:
-    sysuser: "{{ GLOBAL_SYSUSER }}"
     size_slug: "{{ GLOBAL_SIZE }}"
-    image: centos-6.9-x64
+    region: "{{ GLOBAL_REGION }}"
+    image: centos-6-x64

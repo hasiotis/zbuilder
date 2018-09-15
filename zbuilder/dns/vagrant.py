@@ -8,10 +8,13 @@ from zbuilder.helpers import runCmd
 
 class dnsProvider(object):
 
-    def __init__(self, state, creds=None):
+    def __init__(self, state):
         self.state = state
-        self.creds = creds
 
 
-    def action(self, hosts):
-        self._cmd(hosts, 'vagrant snapshot delete {host} zbuilder')
+    def update(self, ips):
+        pass
+
+
+    def remove(self, hosts):
+        pass

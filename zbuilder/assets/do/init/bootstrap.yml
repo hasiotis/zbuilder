@@ -1,9 +1,9 @@
 ---
 - hosts: all:!localhost
   become: true
-  remote_user: vagrant
+  remote_user: root
   vars:
-    username: "{{ ZBUILDER_PROVIDER.VM_OPTIONS.sysuser }}"
+    username: "{{ ZBUILDER_SYSUSER }}"
     ugid: 800
   tasks:
     - name: bootstrap | Wait for ssh to become available
@@ -32,7 +32,7 @@
         comment: "The Administrator user"
         uid: "{{ ugid }}"
         group: "{{ username }}"
-        groups: wheel,vagrant
+        groups: wheel
         shell: '/bin/bash'
       when: ansible_os_family == "RedHat"
 

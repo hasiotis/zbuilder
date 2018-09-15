@@ -38,12 +38,12 @@ def getHostsWithVars(subset):
         hvars = templar.template(hvars)
         if 'ZBUILDER_PROVIDER' in hvars:
             hvars['ZBUILDER_PROVIDER']['VM_OPTIONS']['enabled'] = False
-            hostVars[host] = hvars['ZBUILDER_PROVIDER']
+            hostVars[str(host)] = hvars['ZBUILDER_PROVIDER']
 
     inventory.subset(options.subset)
     for host in inventory.get_hosts():
-        if host in hostVars:
-            hostVars[host]['VM_OPTIONS']['enabled'] = True
+        if str(host) in hostVars:
+            hostVars[str(host)]['VM_OPTIONS']['enabled'] = True
 
     return hostVars
 
@@ -54,16 +54,18 @@ def getHosts(state):
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
-    (curVMProvider, curDNSrovider, curCreds) = (None, None, None)
+    (curVMProvider, curDNSrovider) = (None, None)
     for h, hvars in hosts.items():
         if 'CLOUD' in hvars:
             curVMProvider = hvars['CLOUD']
+        state.vmConfig = cfg['providers'][curVMProvider]
+        state.dnsConfig = None
         if 'DNS' in hvars:
             curDNSrovider = hvars['DNS']
-        state.cfg = cfg['providers'][curVMProvider]
+        state.dnsConfig = cfg['providers'][curDNSrovider]
         if curVMProvider not in vmProviders:
             vmProviders[curVMProvider] = {}
-            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(state.cfg['type'], state, curDNSrovider)
+            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(state.vmConfig['type'], state)
             vmProviders[curVMProvider]['hosts'] = {}
         hvars['VM_OPTIONS']['aliases'] = ''
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']

@@ -24,8 +24,9 @@ def cli():
 def init(state, provider, dns):
     """Init an environment"""
     cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
-    state.cfg = cfg['providers'][provider]
-    vmProvider = zbuilder.vm.vmProvider(provider, state, None)
+    state.vmConfig = cfg['providers'][provider]
+    state.dnsConfig = None
+    vmProvider = zbuilder.vm.vmProvider(provider, state)
     vmProvider.init()
 
 

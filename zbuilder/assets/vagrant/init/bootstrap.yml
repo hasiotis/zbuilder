@@ -3,7 +3,7 @@
   become: true
   remote_user: vagrant
   vars:
-    username: "{{ ZBUILDER_PROVIDER.VM_OPTIONS.sysuser }}"
+    username: "{{ ZBUILDER_SYSUSER }}"
     ugid: 800
   tasks:
     - name: bootstrap | Wait for ssh to become available
