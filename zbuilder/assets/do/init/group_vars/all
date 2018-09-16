@@ -1,9 +1,10 @@
 # To be used by zbuilder
-ZBUILDER_PUBKEY: "hasiotis@gmail.com"
+ZBUILDER_PUBKEY: "~/.ssh/id_rsa.pub"
 ZBUILDER_SYSUSER: sysadmin
 ZBUILDER_FORCE: TRUE
 ZBUILDER_ENV: DEV
 
 GLOBAL_PROVIDER: staging
+GLOBAL_SSHKEY: "hasiotis@gmail.com"
 GLOBAL_REGION: ams3
 GLOBAL_SIZE: 1gb

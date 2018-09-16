@@ -14,12 +14,6 @@ class vmProvider(object):
 
 
     def getDroplets(self, hosts):
-        pubkey = self.state.vars["ZBUILDER_PUBKEY"]
-        curkey = None
-        for curkey in self.manager.get_all_sshkeys():
-            if curkey.name == pubkey:
-                sshkey = curkey
-                continue
         retValue = {}
         droplets = self.manager.get_all_droplets()
         for h, v in hosts.items():
@@ -28,6 +22,10 @@ class vmProvider(object):
                     if droplet.name == h:
                         retValue[droplet.name] = droplet
                 if h not in retValue:
+                    for curkey in self.manager.get_all_sshkeys():
+                        if curkey.name == v['sshkey']:
+                            sshkey = curkey
+                            continue
                     droplet = digitalocean.Droplet(
                         token=self.token,
                         name=h,
