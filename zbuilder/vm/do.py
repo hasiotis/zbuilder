@@ -54,10 +54,12 @@ class vmProvider(object):
 
 
     def up(self, hosts):
+        ips = {}
         for k, d in self.getDroplets(hosts).items():
             if d.status == None:
                 click.echo("  - Creating host: {} ".format(d.name))
                 d.create()
+                ips[d.name] = None
             elif d.status == 'off':
                 click.echo("  - Booting host: {} ".format(d.name))
                 d.power_on()
@@ -68,9 +70,9 @@ class vmProvider(object):
 
         self.waitStatus(hosts, 'active')
 
-        ips = {}
         for k, d in self.getDroplets(hosts).items():
-            ips[d.name] = d.ip_address
+            if d.name in ips:
+                ips[d.name] = d.ip_address
 
         self.dns.update(ips)
 

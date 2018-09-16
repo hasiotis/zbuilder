@@ -34,10 +34,10 @@ class dnsProvider(object):
     def update(self, ips):
         for fqdn, record  in self.getRecords(ips).items():
             if not record.id:
-                click.echo("  - Creating record {}".format(fqdn))
+                click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, record.data))
                 record.create()
             else:
-                click.echo("  - Updating record {}".format(fqdn))
+                click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, record.data))
                 record.save()
 
 

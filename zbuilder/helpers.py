@@ -107,16 +107,16 @@ def dump_yaml(cfg):
 def fixKeys(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
-        for host in vmProvider['hosts']:
-            h = str(host)
-            click.echo("  - Host: {}".format(h))
-            ip = socket.gethostbyname(h)
-            runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
-            runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
-            runCmd(
-                "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
-                verbose=state.verbose, ignoreError=True
-            )
+        for h, v in vmProvider['hosts'].items():
+            if v['enabled']:
+                click.echo("  - Host: {}".format(h))
+                ip = socket.gethostbyname(h)
+                runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
+                runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
+                runCmd(
+                    "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
+                    verbose=state.verbose, ignoreError=True
+                )
 
 
 def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
