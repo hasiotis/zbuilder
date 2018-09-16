@@ -127,7 +127,6 @@ def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
         if verbose:
             click.echo(click.style(status.out, fg='green'))
         if status.return_code != 0 and not ignoreError:
-            errMsg = "    Failed [{}]".format(status.err)
-            click.echo(click.style(errMsg, fg='red'))
+            click.echo(click.style(status.err, fg='red'))
 
     return status.return_code
