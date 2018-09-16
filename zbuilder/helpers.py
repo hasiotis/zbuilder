@@ -118,6 +118,7 @@ def fixKeys(state):
                 verbose=state.verbose, ignoreError=True
             )
 
+
 def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
     if verbose:
         click.echo("    CMD: [{}]".format(cmd))

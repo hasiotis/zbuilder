@@ -3,6 +3,9 @@ import click
 import importlib
 import distutils.dir_util
 
+from zbuilder.wrappers import trywrap
+
+
 class dnsProvider(object):
 
     def __init__(self, factory, state):
@@ -13,20 +16,12 @@ class dnsProvider(object):
         self.provider = dnsProviderClass(state)
 
 
+    @trywrap
     def update(self, ips):
-        try:
-            self.provider.update(ips)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
-        except Exception as e:
-            click.echo("Provider [%s] failed with [%s]" % (self.factory, e))
+        self.provider.update(ips)
 
 
+    @trywrap
     def remove(self, hosts):
-        try:
-            self.provider.remove(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
-        except Exception as e:
-            click.echo("Provider [%s] failed with [%s]" % (self.factory, e))
+        self.provider.remove(hosts)
 

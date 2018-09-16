@@ -4,6 +4,8 @@ import importlib
 import zbuilder.dns
 import distutils.dir_util
 
+from zbuilder.wrappers import trywrap
+
 class vmProvider(object):
 
     def __init__(self, factory, state):
@@ -29,41 +31,31 @@ class vmProvider(object):
         distutils.dir_util.copy_tree(ASSETS_INIT_DIR, os.getcwd())
 
 
+    @trywrap
     def up(self, hosts):
-        try:
-            self.provider.up(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.up(hosts)
 
 
+    @trywrap
     def halt(self, hosts):
-        try:
-            self.provider.halt(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.halt(hosts)
 
 
+    @trywrap
     def destroy(self, hosts):
-        try:
-            self.provider.destroy(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.destroy(hosts)
 
+
+    @trywrap
     def snapCreate(self, hosts):
-        try:
-            self.provider.snapCreate(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.snapCreate(hosts)
 
+
+    @trywrap
     def snapRestore(self, hosts):
-        try:
-            self.provider.snapRestore(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.snapRestore(hosts)
 
 
+    @trywrap
     def snapDelete(self, hosts):
-        try:
-            self.provider.snapDelete(hosts)
-        except AttributeError as error:
-            click.echo("Provider [%s] does not implement this action" % (self.factory))
+        self.provider.snapDelete(hosts)
