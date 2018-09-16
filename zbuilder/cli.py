@@ -88,6 +88,34 @@ def fixkeys(state):
 
 
 @cli.group()
+def dns():
+    """DNS management"""
+    pass
+
+
+@dns.command()
+@common_options
+@pass_state
+def update(state):
+    """Update DNS records"""
+    click.echo("Updating DNS revcords")
+    vmProviders = getHosts(state)
+    for _, vmProvider in vmProviders.items():
+        vmProvider['cloud'].dnsupdate(vmProvider['hosts'])
+
+
+@dns.command()
+@common_options
+@pass_state
+def remove(state):
+    """Remove DNS records"""
+    click.echo("Removing DNS revcords")
+    vmProviders = getHosts(state)
+    for _, vmProvider in vmProviders.items():
+        vmProvider['cloud'].dnsremove(vmProvider['hosts'])
+
+
+@cli.group()
 def snapshot():
     """Manage VM snapshots"""
     pass

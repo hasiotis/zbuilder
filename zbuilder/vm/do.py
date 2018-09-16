@@ -117,6 +117,22 @@ class vmProvider(object):
         self.dns.remove(ips)
 
 
+    def dnsupdate(self, hosts):
+        ips = {}
+        for k, d in self.getDroplets(hosts).items():
+            if d.ip_address:
+                ips[d.name] = d.ip_address
+        self.dns.update(ips)
+
+
+    def dnsremove(self, hosts):
+        ips = {}
+        for h in hosts:
+            if hosts[h]['enabled']:
+                ips[h] = None
+        self.dns.remove(ips)
+
+
     def snapCreate(self, hosts):
         for d in self.getDroplets(hosts):
             click.echo("  - Host: {}".format(h))

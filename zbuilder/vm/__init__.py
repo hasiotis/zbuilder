@@ -52,6 +52,16 @@ class vmProvider(object):
 
 
     @trywrap
+    def dnsupdate(self, hosts):
+        self.provider.dnsupdate(hosts)
+
+
+    @trywrap
+    def dnsremove(self, hosts):
+        self.provider.dnsremove(hosts)
+
+
+    @trywrap
     def snapCreate(self, hosts):
         self.provider.snapCreate(hosts)
 
