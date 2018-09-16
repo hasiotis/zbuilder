@@ -37,6 +37,10 @@ class vmProvider(object):
         self._cmd(hosts, 'vagrant destroy --force {host}')
 
 
+    def dnsupdate(self, hosts):
+        self._cmd(hosts, 'vagrant hostmanager {host}')
+
+
     def snapCreate(self, hosts):
         self._cmd(hosts, 'vagrant snapshot save {host} zbuilder --force')
 
