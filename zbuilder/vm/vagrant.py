@@ -21,6 +21,10 @@ class vmProvider(object):
                 status = runCmd(cmd.format(host=h), verbose=self.state.verbose)
 
 
+    def build(self, hosts):
+        self._cmd(hosts, 'vagrant up {host}')
+
+
     def up(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')
 

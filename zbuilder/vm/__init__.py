@@ -32,6 +32,11 @@ class vmProvider(object):
 
 
     @trywrap
+    def build(self, hosts):
+        self.provider.build(hosts)
+
+
+    @trywrap
     def up(self, hosts):
         self.provider.up(hosts)
 

@@ -33,16 +33,27 @@ def init(state, provider, dns):
 @cli.command()
 @common_options
 @pass_state
-def up(state):
+def build(state):
     """Build the VMs"""
     click.echo("Building VMs")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
-        vmProvider['cloud'].up(vmProvider['hosts'])
+        vmProvider['cloud'].build(vmProvider['hosts'])
     click.echo("Fixing ssh keys VMs")
     fixKeys(state)
     click.echo("Running bootstrap.yml")
     runPlaybook(state, "bootstrap.yml")
+
+
+@cli.command()
+@common_options
+@pass_state
+def up(state):
+    """Boot the VMs"""
+    click.echo("Building VMs")
+    vmProviders = getHosts(state)
+    for _, vmProvider in vmProviders.items():
+        vmProvider['cloud'].up(vmProvider['hosts'])
 
 
 @cli.command()
