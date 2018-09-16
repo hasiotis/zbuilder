@@ -6,6 +6,7 @@ import ruamel.yaml
 import zbuilder.vm
 import zbuilder.cfg
 
+from retrying import retry
 from ansible.cli import CLI
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
@@ -104,13 +105,22 @@ def dump_yaml(cfg):
     yaml.dump(cfg, sys.stdout)
 
 
+@retry(stop_max_delay=10000)
+def getIP(hostname):
+    return socket.gethostbyname(hostname)
+
+
 def fixKeys(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         for h, v in vmProvider['hosts'].items():
             if v['enabled']:
+                try:
+                    ip = getIP(h)
+                except Exception as e:
+                    click.echo(click.style("  - Host: {} can't be resolved".format(h), fg='red'))
+                    continue
                 click.echo("  - Host: {}".format(h))
-                ip = socket.gethostbyname(h)
                 runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
                 runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
                 runCmd(

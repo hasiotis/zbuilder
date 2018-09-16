@@ -11,6 +11,7 @@ click = "*"
 "delegator.py" = "*"
 colorama = "*"
 python-digitalocean = "*"
+retrying = "*"
 
 [dev-packages]
 "flake8" = "*"
