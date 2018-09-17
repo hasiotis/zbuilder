@@ -48,7 +48,7 @@ class vmProvider(object):
             for k, d in self.getDroplets(hosts).items():
                 if d.status != status:
                     allStatus == False
-                    continue
+                    break
             click.echo(".")
             time.sleep(SLEEP_TIME)
 
@@ -134,18 +134,51 @@ class vmProvider(object):
 
 
     def snapCreate(self, hosts):
-        for d in self.getDroplets(hosts):
-            click.echo("  - Host: {}".format(h))
-            droplet.take_snapshot("zbuilder")
+        snapshots = self.manager.get_droplet_snapshots()
+        snaps = [s.name for s in snapshots]
+        for k, d in self.getDroplets(hosts).items():
+            if d.status != None:
+                snapshot_name = "zbuilder-{}".format(d.name)
+                if snapshot_name not in snaps:
+                    click.echo("  - Taking snapshot: {}".format(d.name))
+                    d.take_snapshot(snapshot_name)
+                else:
+                    click.echo("  - Snapshot already exists: {}".format(d.name))
 
 
     def snapRestore(self, hosts):
+        snapshots = self.manager.get_droplet_snapshots()
+        snaps = {}
+        for s in snapshots:
+            snaps[s.name] = s
+
         click.echo("  Halting")
+        self.halt(hosts)
+        self.waitStatus(hosts, 'off')
         click.echo("  Restoring")
+        for k, d in self.getDroplets(hosts).items():
+            if d.status == 'off':
+                snapshot_name = "zbuilder-{}".format(d.name)
+                if snapshot_name in snaps.keys():
+                    click.echo("  - Restoring from image: {} ".format(snapshot_name))
+                    d.restore(snaps[snapshot_name].id)
+                else:
+                    click.echo("  - No such snapshot: {}".format(snapshot_name))
         click.echo("  Booting up")
+        self.up(hosts)
+        self.waitStatus(hosts, 'active')
 
 
     def snapDelete(self, hosts):
-        for d in self.getDroplets(hosts):
-            click.echo("  - Host: {}".format(h))
-            droplet.take_snapshot("zbuilder")
+        snapshots = self.manager.get_droplet_snapshots()
+        snaps = {}
+        for s in snapshots:
+            snaps[s.name] = s
+        for h in hosts:
+            if hosts[h]['enabled']:
+                snapshot_name = "zbuilder-{}".format(h)
+                if snapshot_name in snaps.keys():
+                    click.echo("  - Deleting snapshot: {}".format(snapshot_name))
+                    snaps[snapshot_name].destroy()
+                else:
+                    click.echo("  - No such snapshot: {}".format(snapshot_name))
