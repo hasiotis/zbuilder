@@ -51,7 +51,7 @@ def getHostsWithVars(subset):
 
 def getHosts(state):
     state.vars = getVars()
-    cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
+    cfg  = zbuilder.cfg.load()
     hosts = getHostsWithVars(state)
 
     vmProviders = {}

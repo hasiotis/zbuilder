@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
 import sys
 import click
 
 import zbuilder.vm
 import zbuilder.cfg
+
+import distutils.dir_util
 
 from click._bashcomplete import get_completion_script
 
@@ -17,17 +20,21 @@ def cli():
 
 
 @cli.command()
-@click.option('--provider', default='devel', help='VM provider')
-@click.option('--dns', default='devel', help='DNS provider')
+@click.option('--template', default='devel', help='Environment template')
 @common_options
 @pass_state
-def init(state, provider, dns):
+def init(state, template):
     """Init an environment"""
-    cfg  = zbuilder.cfg.load("~/.zbuilder.yaml")
-    state.vmConfig = cfg['providers'][provider]
-    state.dnsConfig = None
-    vmProvider = zbuilder.vm.vmProvider(provider, state)
-    vmProvider.init()
+    if os.path.exists('group_vars') or os.path.exists('hosts'):
+        raise click.ClickException("This directory already contains relevant files")
+
+    TEMPLATE_PATH = os.path.expanduser("~/.config/zbuilder/assets/{}".format(template))
+    if os.path.exists(TEMPLATE_PATH):
+        click.echo("Initializing {} based zbuilder environment".format(template))
+        distutils.dir_util.copy_tree(TEMPLATE_PATH, os.getcwd())
+    else:
+        click.echo("Template path dose not exist: [{}]".format(TEMPLATE_PATH))
+        exit(1)
 
 
 @cli.command()
@@ -98,7 +105,7 @@ def dns():
 @pass_state
 def update(state):
     """Update DNS records"""
-    click.echo("Updating DNS revcords")
+    click.echo("Updating DNS records")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].dnsupdate(vmProvider['hosts'])
@@ -109,7 +116,7 @@ def update(state):
 @pass_state
 def remove(state):
     """Remove DNS records"""
-    click.echo("Removing DNS revcords")
+    click.echo("Removing DNS records")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].dnsremove(vmProvider['hosts'])
@@ -178,12 +185,17 @@ def summary():
 @cli.group()
 def config():
     """Zbuilder configuration"""
-    pass
+    cfg  = zbuilder.cfg.load()
+    for provider in providers:
+        state.vmConfig = cfg['providers'][provider]
+        state.dnsConfig = None
+        vmProvider = zbuilder.vm.vmProvider(provider, state)
+        vmProvider.config()
 
 @config.command()
 def view():
     """View configuration"""
-    cfg = zbuilder.cfg.load("~/.zbuilder.yaml")
+    cfg = zbuilder.cfg.load()
     zbuilder.cfg.view(cfg)
 
 
