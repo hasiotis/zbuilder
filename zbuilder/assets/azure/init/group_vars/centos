@@ -9,6 +9,7 @@ ZBUILDER_PROVIDER:
     offer: CentOS
     sku: 7.5
     version: latest
+    storageAccountType: Standard_LRS
     network:
       vnet: "{{ GLOBAL_NET_VNET }}"
       subnet: "{{ GLOBAL_NET_SUBNET }}"

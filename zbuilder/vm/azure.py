@@ -49,14 +49,15 @@ class vmProvider(object):
         pubkey_fname = os.path.expanduser(self.state.vars['ZBUILDER_PUBKEY'])
         pubkey = open(pubkey_fname, "r").read().rstrip('\n')
         datadisks = []
-        for i, disk in enumerate(v['data_disks']):
-            datadisks.append({
-                "lun": i,
-                "diskSizeGB": disk['diskSizeGB'],
-                "caching": disk['caching'],
-                "createOption": "Empty",
-                "managedDisk": { "storageAccountType": disk['storageAccountType'] }
-            })
+        if 'data_disks' in v:
+            for i, disk in enumerate(v['data_disks']):
+                datadisks.append({
+                    "lun": i,
+                    "diskSizeGB": disk['diskSizeGB'],
+                    "caching": disk['caching'],
+                    "createOption": "Empty",
+                    "managedDisk": { "storageAccountType": disk['storageAccountType'] }
+                })
         vmParams = {
             'location': v['location'],
             'os_profile': {
