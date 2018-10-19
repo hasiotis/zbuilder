@@ -57,7 +57,7 @@ def build(state):
 @pass_state
 def up(state):
     """Boot the VMs"""
-    click.echo("Building VMs")
+    click.echo("Booting VMs")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].up(vmProvider['hosts'])

@@ -123,6 +123,42 @@ class vmProvider(object):
         self.dns.update(ips)
 
 
+    def up(self, hosts):
+        for h, v in hosts.items():
+            if v['enabled']:
+                vm = None
+                try:
+                    vm = self.vmClient.virtual_machines.get(v['resource_group'], h, expand='instanceView')
+                    vmStatus = vm.instance_view.statuses[1].display_status
+                    if vmStatus == 'VM stopped':
+                        click.echo("  - Booting host: {} ".format(h))
+                        async_vm_start = self.vmClient.virtual_machines.start(v['resource_group'], h)
+                        async_vm_start.wait()
+                    else:
+                        click.echo("  - Status of host: {} is [{}]".format(h, vmStatus))
+                except CloudError as e:
+                    if str(e).startswith("Azure Error: ResourceNotFound"):
+                        click.echo("  - No such host: {} ".format(h))
+
+
+    def halt(self, hosts):
+        for h, v in hosts.items():
+            if v['enabled']:
+                vm = None
+                try:
+                    vm = self.vmClient.virtual_machines.get(v['resource_group'], h, expand='instanceView')
+                    vmStatus = vm.instance_view.statuses[1].display_status
+                    if vmStatus == 'VM running':
+                        click.echo("  - Halting host: {} ".format(h))
+                        async_vm_stop = self.vmClient.virtual_machines.power_off(v['resource_group'], h)
+                        async_vm_stop.wait()
+                    else:
+                        click.echo("  - Status of host: {} is [{}]".format(h, vmStatus))
+                except CloudError as e:
+                    if str(e).startswith("Azure Error: ResourceNotFound"):
+                        click.echo("  - No such host: {} ".format(h))
+
+
     def destroy(self, hosts):
         ips = {}
         for h, v in hosts.items():
