@@ -17,6 +17,7 @@ azure-mgmt-network = "*"
 azure-mgmt-compute = "*"
 haikunator = "*"
 azure-mgmt-dns = "*"
+requests = "*"
 
 [dev-packages]
 "flake8" = "*"
