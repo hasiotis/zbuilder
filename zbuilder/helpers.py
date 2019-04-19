@@ -55,10 +55,17 @@ def getHosts(state):
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
+    if cfg is None:
+        click.Abort("Config file seems to be empty")
+    if 'providers' not in cfg:
+        click.Abort("There is no 'providers' sections on config file")
+
     (curVMProvider, curDNSrovider) = (None, None)
     for h, hvars in hosts.items():
         if 'CLOUD' in hvars:
             curVMProvider = hvars['CLOUD']
+
+
         state.vmConfig = cfg['providers'][curVMProvider]
         state.dnsConfig = None
         if 'DNS' in hvars:
