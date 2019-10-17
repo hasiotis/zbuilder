@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
 import click
 
 import zbuilder.vm
@@ -12,6 +11,7 @@ from click._bashcomplete import get_completion_script
 
 from zbuilder.helpers import getHosts, runPlaybook, fixKeys
 from zbuilder.options import pass_state, common_options
+
 
 @click.group()
 @click.version_option()
@@ -185,12 +185,13 @@ def summary():
 @cli.group()
 def config():
     """Zbuilder configuration"""
-    cfg  = zbuilder.cfg.load()
+    cfg = zbuilder.cfg.load()
     for provider in providers:
         state.vmConfig = cfg['providers'][provider]
         state.dnsConfig = None
         vmProvider = zbuilder.vm.vmProvider(provider, state)
         vmProvider.config()
+
 
 @config.command()
 def view():
