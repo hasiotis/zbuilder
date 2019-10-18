@@ -6,6 +6,7 @@ import distutils.dir_util
 
 from zbuilder.wrappers import trywrap
 
+
 class vmProvider(object):
 
     def __init__(self, factory, state):
@@ -30,46 +31,37 @@ class vmProvider(object):
         click.echo("Initializing {} based zbuilder environment".format(self.factory))
         distutils.dir_util.copy_tree(ASSETS_INIT_DIR, os.getcwd())
 
-
     @trywrap
     def build(self, hosts):
         self.provider.build(hosts)
-
 
     @trywrap
     def up(self, hosts):
         self.provider.up(hosts)
 
-
     @trywrap
     def halt(self, hosts):
         self.provider.halt(hosts)
-
 
     @trywrap
     def destroy(self, hosts):
         self.provider.destroy(hosts)
 
-
     @trywrap
     def dnsupdate(self, hosts):
         self.provider.dnsupdate(hosts)
-
 
     @trywrap
     def dnsremove(self, hosts):
         self.provider.dnsremove(hosts)
 
-
     @trywrap
     def snapCreate(self, hosts):
         self.provider.snapCreate(hosts)
 
-
     @trywrap
     def snapRestore(self, hosts):
         self.provider.snapRestore(hosts)
-
 
     @trywrap
     def snapDelete(self, hosts):

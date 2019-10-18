@@ -1,8 +1,6 @@
 import os
 import click
 import jinja2
-import shutil
-
 from zbuilder.helpers import runCmd
 
 
@@ -12,38 +10,30 @@ class vmProvider(object):
         self.state = state
         self.dns = dns
 
-
     def _cmd(self, hosts, cmd):
         self.setVagrantfile(pubkey=self.state.vars["ZBUILDER_PUBKEY"], hosts=hosts)
         for h in hosts:
             if hosts[h]['enabled']:
                 click.echo("  - Host: {}".format(h))
-                status = runCmd(cmd.format(host=h), verbose=self.state.verbose)
-
+                runCmd(cmd.format(host=h), verbose=self.state.verbose)
 
     def build(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')
 
-
     def up(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')
-
 
     def halt(self, hosts):
         self._cmd(hosts, 'vagrant halt {host}')
 
-
     def destroy(self, hosts):
         self._cmd(hosts, 'vagrant destroy --force {host}')
-
 
     def dnsupdate(self, hosts):
         self._cmd(hosts, 'vagrant hostmanager {host}')
 
-
     def snapCreate(self, hosts):
         self._cmd(hosts, 'vagrant snapshot save {host} zbuilder --force')
-
 
     def snapRestore(self, hosts):
         click.echo("  Halting")
@@ -53,10 +43,8 @@ class vmProvider(object):
         click.echo("  Booting up")
         self._cmd(hosts, 'vboxmanage startvm {host} --type headless')
 
-
     def snapDelete(self, hosts):
         self._cmd(hosts, 'vagrant snapshot delete {host} zbuilder')
-
 
     def setVagrantfile(self, pubkey, hosts):
         this_dir, this_filename = os.path.split(__file__)
