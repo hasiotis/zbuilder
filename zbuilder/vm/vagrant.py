@@ -17,6 +17,9 @@ class vmProvider(object):
                 click.echo("  - Host: {}".format(h))
                 runCmd(cmd.format(host=h), verbose=self.state.verbose)
 
+    def parseOptions(self, options):
+        return None
+
     def build(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')
 
