@@ -1,5 +1,18 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
+
+## Initial zbuilder setup
+
+Assuming that you have two VM providers, one for development (vagrant)
+and one for staging (Digital Ocean), you will have to let zbuilder know
+about it.
+
+First setup the development provider:
+```
+$ zbuilder config provider --type vagrant devel
+$ zbuilder config provider --type do staging
+```
+
 Developer setup:
 
 ``` shell

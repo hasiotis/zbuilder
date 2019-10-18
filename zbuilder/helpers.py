@@ -51,7 +51,7 @@ def getHostsWithVars(subset):
 
 def getHosts(state):
     state.vars = getVars()
-    cfg  = zbuilder.cfg.load()
+    cfg = zbuilder.cfg.load()
     hosts = getHostsWithVars(state)
 
     vmProviders = {}
@@ -64,7 +64,6 @@ def getHosts(state):
     for h, hvars in hosts.items():
         if 'CLOUD' in hvars:
             curVMProvider = hvars['CLOUD']
-
 
         state.vmConfig = cfg['providers'][curVMProvider]
         state.dnsConfig = None
@@ -107,9 +106,12 @@ def load_yaml(fname):
     return value
 
 
-def dump_yaml(cfg):
+def dump_yaml(cfg, where=None):
     yaml = ruamel.yaml.YAML()
-    yaml.dump(cfg, sys.stdout)
+    if where:
+        yaml.dump(cfg, where)
+    else:
+        yaml.dump(cfg, sys.stdout)
 
 
 @retry(stop_max_delay=10000)
@@ -124,7 +126,7 @@ def fixKeys(state):
             if v['enabled']:
                 try:
                     ip = getIP(h)
-                except Exception as e:
+                except Exception:
                     click.echo(click.style("  - Host: {} can't be resolved".format(h), fg='red'))
                     continue
                 click.echo("  - Host: {}".format(h))

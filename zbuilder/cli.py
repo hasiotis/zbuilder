@@ -185,12 +185,7 @@ def summary():
 @cli.group()
 def config():
     """Zbuilder configuration"""
-    cfg = zbuilder.cfg.load()
-    for provider in providers:
-        state.vmConfig = cfg['providers'][provider]
-        state.dnsConfig = None
-        vmProvider = zbuilder.vm.vmProvider(provider, state)
-        vmProvider.config()
+    pass
 
 
 @config.command()
@@ -198,6 +193,16 @@ def view():
     """View configuration"""
     cfg = zbuilder.cfg.load()
     zbuilder.cfg.view(cfg)
+
+
+@config.command()
+@click.option('--type', 'provider_type')
+@click.argument('name')
+def provider(provider_type, name):
+    """Configure a provider"""
+    cfg = zbuilder.cfg.load(touch=True)
+    cfg['providers'][name] = {'type': provider_type}
+    zbuilder.cfg.save(cfg)
 
 
 @cli.command()
