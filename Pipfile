@@ -3,8 +3,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+
 [packages]
-ansible = "*"
+ansible = "==2.7.14"
 click = "*"
 "ruamel.yaml" = "*"
 "jinja2" = "*"
@@ -27,7 +31,3 @@ pylint = "*"
 
 [requires]
 python_version = "3.6"
-
-[[source]]
-url = "https://pypi.org/simple"
-verify_ssl = true
