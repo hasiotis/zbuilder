@@ -1,6 +1,13 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
 
+## Install zbuilder
+
+At the moment there is no pip package so you can try:
+```
+pip3 install --user git+https://github.com/hasiotis/zbuilder
+``
+
 ## Initial zbuilder setup
 
 Assuming that you have two VM providers, one for development (vagrant)
@@ -13,7 +20,9 @@ $ zbuilder config provider --type vagrant devel
 $ zbuilder config provider --type do staging
 ```
 
-Developer setup:
+## Developer setup:
+
+One way to setup development environment is:
 
 ``` shell
 git clone git@github.com:hasiotis/zbuilder.git --branch develop
@@ -28,12 +37,4 @@ Next time just:
 ``` shell
 cd zbuilder
 pipenv shell
-```
-
-User setup
-
-``` shell
-git clone git@github.com:Workable/zbuilder.git
-cd zbuilder
-python3 ./setup.py install --user
 ```
