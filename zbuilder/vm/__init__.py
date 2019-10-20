@@ -66,7 +66,3 @@ class vmProvider(object):
     @trywrap
     def snapDelete(self, hosts):
         self.provider.snapDelete(hosts)
-
-    @trywrap
-    def parseOptions(self, options):
-        return self.provider.parseOptions(options)

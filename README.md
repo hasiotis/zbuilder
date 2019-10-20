@@ -16,9 +16,9 @@ and one for staging (Digital Ocean), you will have to let zbuilder know
 about it.
 
 First setup the development provider:
-```
-$ zbuilder config provider --type vagrant devel
-$ zbuilder config provider --type do staging
+``` shell
+zbuilder config provider --type vagrant devel
+zbuilder config provider --type do --options token=SUPERSECRETTOKEN
 ```
 
 ## Developer setup:

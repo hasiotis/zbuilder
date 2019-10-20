@@ -4,6 +4,7 @@ import digitalocean
 
 SLEEP_TIME = 5
 
+
 class vmProvider(object):
 
     def __init__(self, state, dns):
@@ -11,7 +12,6 @@ class vmProvider(object):
         self.dns = dns
         self.token = self.state.vmConfig['token']
         self.manager = digitalocean.Manager(token=self.token)
-
 
     def getDroplets(self, hosts):
         retValue = {}
@@ -40,23 +40,21 @@ class vmProvider(object):
 
         return retValue
 
-
     def waitStatus(self, hosts, status):
         allStatus = True
         while not allStatus:
             allStatus = True
             for k, d in self.getDroplets(hosts).items():
                 if d.status != status:
-                    allStatus == False
+                    allStatus = False
                     break
             click.echo(".")
             time.sleep(SLEEP_TIME)
 
-
     def build(self, hosts):
         ips = {}
         for k, d in self.getDroplets(hosts).items():
-            if d.status == None:
+            if d.status is None:
                 click.echo("  - Creating host: {} ".format(d.name))
                 d.create()
                 ips[d.name] = None
@@ -76,10 +74,9 @@ class vmProvider(object):
 
         self.dns.update(ips)
 
-
     def up(self, hosts):
         for k, d in self.getDroplets(hosts).items():
-            if d.status == None:
+            if d.status is None:
                 click.echo("  - No such host: {} ".format(d.name))
             elif d.status == 'off':
                 click.echo("  - Booting host: {} ".format(d.name))
@@ -88,7 +85,6 @@ class vmProvider(object):
                 click.echo("  - Already up host: {} ".format(d.name))
             else:
                 click.echo("  - Status of host: {} is {}".format(d.name, d.status))
-
 
     def halt(self, hosts):
         for k, d in self.getDroplets(hosts).items():
@@ -100,10 +96,9 @@ class vmProvider(object):
 
         self.waitStatus(hosts, 'off')
 
-
     def destroy(self, hosts):
         for k, d in self.getDroplets(hosts).items():
-            if d.status != None:
+            if d.status is not None:
                 click.echo("  - Destroying host: {} ".format(d.name))
                 d.destroy()
             else:
@@ -116,14 +111,12 @@ class vmProvider(object):
                 ips[h] = None
         self.dns.remove(ips)
 
-
     def dnsupdate(self, hosts):
         ips = {}
         for k, d in self.getDroplets(hosts).items():
             if d.ip_address:
                 ips[d.name] = d.ip_address
         self.dns.update(ips)
-
 
     def dnsremove(self, hosts):
         ips = {}
@@ -132,19 +125,17 @@ class vmProvider(object):
                 ips[h] = None
         self.dns.remove(ips)
 
-
     def snapCreate(self, hosts):
         snapshots = self.manager.get_droplet_snapshots()
         snaps = [s.name for s in snapshots]
         for k, d in self.getDroplets(hosts).items():
-            if d.status != None:
+            if d.status is not None:
                 snapshot_name = "zbuilder-{}".format(d.name)
                 if snapshot_name not in snaps:
                     click.echo("  - Taking snapshot: {}".format(d.name))
                     d.take_snapshot(snapshot_name)
                 else:
                     click.echo("  - Snapshot already exists: {}".format(d.name))
-
 
     def snapRestore(self, hosts):
         snapshots = self.manager.get_droplet_snapshots()
@@ -167,7 +158,6 @@ class vmProvider(object):
         click.echo("  Booting up")
         self.up(hosts)
         self.waitStatus(hosts, 'active')
-
 
     def snapDelete(self, hosts):
         snapshots = self.manager.get_droplet_snapshots()

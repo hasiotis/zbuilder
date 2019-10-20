@@ -197,19 +197,16 @@ def view():
 
 @config.command()
 @click.option('--type', 'provider_type')
-@click.option('--options', default='')
+@click.option('--options', default=None)
 @click.argument('name')
 @pass_state
 def provider(state, provider_type, options, name):
     """Configure a provider"""
     cfg = zbuilder.cfg.load(touch=True)
-    state.vmConfig = {'type': provider_type}
-    state.dnsConfig = None
-    vmProvider = zbuilder.vm.vmProvider(provider_type, state)
-    cfg['providers'][name] = {
-        'type': provider_type,
-        'options': vmProvider.parseOptions(options)
-    }
+    cfg['providers'][name] = {}
+    if options:
+        cfg['providers'][name] = dict(o.split('=') for o in options.split(' '))
+    cfg['providers'][name]['type'] = provider_type
     zbuilder.cfg.save(cfg)
 
 
