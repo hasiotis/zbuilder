@@ -1,6 +1,7 @@
 import os
 import click
 import importlib
+import zbuilder
 import zbuilder.dns
 import distutils.dir_util
 
@@ -22,14 +23,13 @@ class vmProvider(object):
         self.provider = vmProviderClass(state, curDNS)
 
     def init(self):
-        this_dir, this_filename = os.path.split(__file__)
-        ASSETS_INIT_DIR = os.path.join(this_dir, '..', 'assets', self.factory, 'init')
+        ASSETS_DIR = os.path.join(zbuilder.__path__[0], 'assets')
 
         if os.path.exists('group_vars') or os.path.exists('hosts'):
             raise click.ClickException("This directory already contains relevant files")
 
         click.echo("Initializing {} based zbuilder environment".format(self.factory))
-        distutils.dir_util.copy_tree(ASSETS_INIT_DIR, os.getcwd())
+        distutils.dir_util.copy_tree(ASSETS_DIR, os.getcwd())
 
     @trywrap
     def build(self, hosts):
