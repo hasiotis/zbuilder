@@ -1,5 +1,4 @@
 import os
-import time
 import click
 
 
@@ -7,25 +6,22 @@ from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
-from azure.mgmt.compute.models import DiskCreateOption
 from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
 
 class vmProvider(object):
-
     def __init__(self, state, dns):
         self.state = state
         self.dns = dns
         self.credentials = ServicePrincipalCredentials(
-            client_id = state.vmConfig['client_id'],
-            secret = state.vmConfig['client_secret'],
-            tenant = state.vmConfig['tenant_id']
+            client_id=state.vmConfig['client_id'],
+            secret=state.vmConfig['client_secret'],
+            tenant=state.vmConfig['tenant_id']
         )
         self.rgroupClient = ResourceManagementClient(self.credentials, state.vmConfig['subscription_id'])
         self.netClient = NetworkManagementClient(self.credentials, state.vmConfig['subscription_id'])
         self.vmClient = ComputeManagementClient(self.credentials, state.vmConfig['subscription_id'])
-
 
     def create_nic(self, h, v):
         subnet = self.netClient.subnets.get(v['network']['group'], v['network']['vnet'], v['network']['subnet'])
@@ -43,7 +39,6 @@ class vmProvider(object):
         nic = self.netClient.network_interfaces.create_or_update(v['resource_group'], nicName, nicParams)
         return nic.result()
 
-
     def create_vm(self, h, v, nic):
         sysuser = self.state.vars['ZBUILDER_SYSUSER']
         pubkey_fname = os.path.expanduser(self.state.vars['ZBUILDER_PUBKEY'])
@@ -56,7 +51,7 @@ class vmProvider(object):
                     "diskSizeGB": disk['diskSizeGB'],
                     "caching": disk['caching'],
                     "createOption": "Empty",
-                    "managedDisk": { "storageAccountType": disk['storageAccountType'] }
+                    "managedDisk": {"storageAccountType": disk['storageAccountType']}
                 })
         vmParams = {
             'location': v['location'],
@@ -86,7 +81,7 @@ class vmProvider(object):
                 "osDisk": {
                     "createOption": "fromImage",
                     "caching": "ReadWrite",
-                    "managedDisk": { "storageAccountType": v['storageAccountType'] }
+                    "managedDisk": {"storageAccountType": v['storageAccountType']}
                 },
                 "dataDisks": datadisks
             },
@@ -98,7 +93,6 @@ class vmProvider(object):
         }
         result = self.vmClient.virtual_machines.create_or_update(v['resource_group'], h, vmParams)
         return result.result()
-
 
     def build(self, hosts):
         ips = {}
@@ -122,7 +116,6 @@ class vmProvider(object):
 
         self.dns.update(ips)
 
-
     def up(self, hosts):
         for h, v in hosts.items():
             if v['enabled']:
@@ -140,7 +133,6 @@ class vmProvider(object):
                     if str(e).startswith("Azure Error: ResourceNotFound"):
                         click.echo("  - No such host: {} ".format(h))
 
-
     def halt(self, hosts):
         for h, v in hosts.items():
             if v['enabled']:
@@ -157,7 +149,6 @@ class vmProvider(object):
                 except CloudError as e:
                     if str(e).startswith("Azure Error: ResourceNotFound"):
                         click.echo("  - No such host: {} ".format(h))
-
 
     def destroy(self, hosts):
         ips = {}
@@ -199,7 +190,6 @@ class vmProvider(object):
 
         self.dns.remove(ips)
 
-
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in hosts.items():
@@ -212,7 +202,6 @@ class vmProvider(object):
                 ips[vm.name] = thing[0].private_ip_address
 
         self.dns.update(ips)
-
 
     def dnsremove(self, hosts):
         ips = {}

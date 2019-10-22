@@ -1,5 +1,6 @@
 import click
 
+
 class State(object):
     def __init__(self):
         self.verbose = False
@@ -7,7 +8,9 @@ class State(object):
         self.vars = None
         self.cfg = None
 
+
 pass_state = click.make_pass_decorator(State, ensure=True)
+
 
 def verbose_option(f):
     def callback(ctx, param, value):

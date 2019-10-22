@@ -9,7 +9,6 @@ class dnsProvider(object):
         self.token = self.state.dnsConfig['token']
         self.manager = digitalocean.Manager(token=self.token)
 
-
     def getRecords(self, ips):
         retValue = {}
         for fqdn, ip in ips.items():
@@ -21,18 +20,18 @@ class dnsProvider(object):
                     continue
             if fqdn not in retValue:
                 record = digitalocean.Record(
-                    token = self.token,
-                    domain_name = domain,
-                    name = shortname,
-                    type = 'A',
-                    data = ip
+                    token=self.token,
+                    domain_name=domain,
+                    name=shortname,
+                    type='A',
+                    data=ip
                 )
                 retValue[fqdn] = record
 
         return retValue
 
     def update(self, ips):
-        for fqdn, record  in self.getRecords(ips).items():
+        for fqdn, record in self.getRecords(ips).items():
             if not record.id:
                 click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, record.data))
                 record.create()
@@ -40,9 +39,8 @@ class dnsProvider(object):
                 click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, record.data))
                 record.save()
 
-
     def remove(self, hosts):
-        for fqdn, record  in self.getRecords(hosts).items():
+        for fqdn, record in self.getRecords(hosts).items():
             if record.id:
                 click.echo("  - Removing record {}".format(fqdn))
                 record.destroy()

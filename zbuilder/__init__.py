@@ -1,6 +1,7 @@
 import os
 import site
 
+
 def getAssetsDir():
     USER_BASE = os.path.join(site.getuserbase(), 'zbuilder', 'assets')
     if os.path.exists(USER_BASE):
