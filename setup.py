@@ -28,9 +28,10 @@ setup(
     url='https://github.com/hasiotis/zbuilder',
     license=license,
     install_requires=requirements,
-    packages=find_packages(exclude=('tests', 'docs')),
     entry_points={
         'console_scripts': ['zbuilder=zbuilder.cli:cli'],
     },
-    data_files=assets_files
+    packages=find_packages(exclude=('tests', 'docs')),
+    include_package_data=True,
+    package_data={'zbuilder': ['assets/*']}
 )
