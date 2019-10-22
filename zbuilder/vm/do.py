@@ -41,14 +41,13 @@ class vmProvider(object):
         return retValue
 
     def waitStatus(self, hosts, status):
-        allStatus = True
+        allStatus = False
         while not allStatus:
             allStatus = True
             for k, d in self.getDroplets(hosts).items():
-                if d.status != status:
+                if d.status != status and d.status is not None:
                     allStatus = False
                     break
-            click.echo(".")
             time.sleep(SLEEP_TIME)
 
     def build(self, hosts):
@@ -103,13 +102,7 @@ class vmProvider(object):
                 d.destroy()
             else:
                 click.echo("  - Host does not exists : {}".format(d.name))
-
-        self.waitStatus(hosts, 'off')
-        ips = {}
-        for h in hosts:
-            if hosts[h]['enabled']:
-                ips[h] = None
-        self.dns.remove(ips)
+        self.dnsremove(hosts)
 
     def dnsupdate(self, hosts):
         ips = {}
