@@ -1,8 +1,9 @@
 import os
+import sys
 import click
 import jinja2
-import zbuilder
 
+from zbuilder import getAssetsDir
 from zbuilder.helpers import runCmd
 
 
@@ -49,7 +50,7 @@ class vmProvider(object):
         self._cmd(hosts, 'vagrant snapshot delete {host} zbuilder')
 
     def setVagrantfile(self, pubkey, hosts):
-        ASSETS_DIR = os.path.join(zbuilder.__path__[0], 'assets', 'vagrant')
+        ASSETS_DIR = os.path.join(getAssetsDir(), 'vagrant')
 
         templateLoader = jinja2.FileSystemLoader(searchpath=ASSETS_DIR)
         templateEnv = jinja2.Environment(loader=templateLoader, trim_blocks=True)

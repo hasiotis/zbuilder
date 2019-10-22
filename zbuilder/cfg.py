@@ -1,8 +1,7 @@
 import os
 
 from pathlib import Path
-from zbuilder.helpers import load_yaml
-from zbuilder.helpers import dump_yaml
+from zbuilder.helpers import load_yaml, dump_yaml
 
 CONFIG_PATH = "~/.config/zbuilder/zbuilder.yaml"
 CONFIG_EMPTY = """# ZBuilder configuration
