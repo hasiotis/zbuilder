@@ -1,5 +1,5 @@
 VAGRANTFILE_API_VERSION = "2"
-VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:" | cut -d":" -f 2 | sed 's/\s*//g'`
+VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
 
 publickey = File.read(File.expand_path('{{ pubkey }}'))
 
