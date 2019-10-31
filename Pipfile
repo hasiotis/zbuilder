@@ -22,6 +22,7 @@ haikunator = "*"
 azure-mgmt-dns = "*"
 requests = "*"
 python-digitalocean = "*"
+google-api-python-client = "*"
 
 [dev-packages]
 "flake8" = "*"
