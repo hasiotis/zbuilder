@@ -23,6 +23,7 @@ azure-mgmt-dns = "*"
 requests = "*"
 python-digitalocean = "*"
 google-api-python-client = "*"
+google-cloud-dns = "*"
 
 [dev-packages]
 "flake8" = "*"
