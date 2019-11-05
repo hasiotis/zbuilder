@@ -24,6 +24,7 @@ requests = "*"
 python-digitalocean = "*"
 google-api-python-client = "*"
 google-cloud-dns = "*"
+dnspython = "*"
 
 [dev-packages]
 "flake8" = "*"
