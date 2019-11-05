@@ -3,7 +3,7 @@ import click
 
 from google.cloud import dns
 
-DNS_TTL = 60 * 60 # 1 hour
+DNS_TTL = 60 * 10 # 10 mins
 
 
 class dnsProvider(object):
@@ -46,6 +46,7 @@ class dnsProvider(object):
             while changes.status != 'done':
                 time.sleep(5)
                 changes.reload()
+            time.sleep(5)
 
     def remove(self, hosts):
         for h in hosts:

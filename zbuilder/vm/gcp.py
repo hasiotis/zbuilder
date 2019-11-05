@@ -1,3 +1,4 @@
+import os
 import click
 import googleapiclient.discovery
 
@@ -37,6 +38,12 @@ class vmProvider(object):
                     image_response = self.compute.images().getFromFamily(project=v['image']['project'], family=v['image']['family']).execute()
                     source_disk_image = image_response['selfLink']
 
+                    fname = os.path.expanduser(v['sshkey'])
+                    sshkey = ''
+                    if os.path.isfile(fname):
+                        with open(fname, "r") as f:
+                            sshkey = f.read().rstrip('\n')
+
                     retValue[h]['insert'] = self.compute.instances().insert(
                         project=v['project'],
                         zone=v['zone'],
@@ -58,6 +65,14 @@ class vmProvider(object):
                                     {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}
                                 ]
                             }],
+                            "metadata": {
+                                "items": [
+                                    {
+                                        "key": "ssh-keys",
+                                        "value": "root:" + sshkey
+                                    }
+                                ]
+                            },
                         }
                     )
 
