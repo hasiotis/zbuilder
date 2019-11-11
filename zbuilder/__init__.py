@@ -5,7 +5,7 @@ import site
 def getAssetsDir():
     try:
         USER_BASE = os.path.join(site.getuserbase(), 'zbuilder', 'assets')
-    except Exception as e:
+    except Exception:
         this_dir, _ = os.path.split(__file__)
         USER_BASE = os.path.join(this_dir, 'assets')
 

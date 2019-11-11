@@ -28,14 +28,21 @@ def waitDNS(hostname, ip):
             click.echo(e)
 
 
+def getProvider(zone, cfg):
+    for p, v in cfg.items():
+        if 'dns' in v and 'zones' in v['dns'] and zone in v['dns']['zones']:
+            return dnsProvider(cfg[p]['type'], cfg[p])
+    return None
+
+
 def dnsUpdate(ips):
     cfg = zbuilder.cfg.load()
     waitList = {}
     for hostname, ip in ips.items():
         zone = hostname.partition('.')[2]
         host = hostname.partition('.')[0]
-        if zone in cfg['providers']:
-            provider = dnsProvider(cfg['providers'][zone]['type'], cfg['providers'][zone])
+        provider = getProvider(zone, cfg['providers'])
+        if provider:
             provider.update(host, zone, ip)
             waitList[hostname] = ip
         else:
@@ -50,8 +57,8 @@ def dnsRemove(hosts):
     for hostname in hosts:
         zone = hostname.partition('.')[2]
         host = hostname.partition('.')[0]
-        if zone in cfg['providers']:
-            provider = dnsProvider(cfg['providers'][zone]['type'], cfg['providers'][zone])
+        provider = getProvider(zone, cfg['providers'])
+        if provider:
             provider.remove(host, zone)
         else:
             click.echo("No DNS provider found for zone [{}]".format(zone))

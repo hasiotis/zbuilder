@@ -12,7 +12,8 @@ class vmProvider(object):
             try:
                 self.compute = googleapiclient.discovery.build('compute', 'v1')
             except Exception as e:
-                click.Abort("Login failed: [{}]".format(e))
+                click.echo("Login failed: [{}]".format(e))
+                raise click.Abort()
 
     def _waitDone(self, ops, msg=None):
         for h, op in ops.items():
