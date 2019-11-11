@@ -1,8 +1,6 @@
 import os
 import click
 import importlib
-import zbuilder
-import zbuilder.dns
 import distutils.dir_util
 
 from zbuilder import getAssetsDir
@@ -11,17 +9,11 @@ from zbuilder.wrappers import trywrap
 
 class vmProvider(object):
 
-    def __init__(self, factory, state):
-        cloud = state.vmConfig['type']
-        self.factory = cloud
-        vmProviderClass = getattr(importlib.import_module("zbuilder.vm.%s" % cloud), "vmProvider")
-
-        curDNS = None
-        if state.dnsConfig:
-            dns = state.dnsConfig['type']
-            curDNS = zbuilder.dns.dnsProvider(dns, state)
-
-        self.provider = vmProviderClass(state, curDNS)
+    def __init__(self, factory, cfg=None):
+        self.factory = factory
+        self.cfg = cfg
+        vmProviderClass = getattr(importlib.import_module("zbuilder.vm.%s" % factory), "vmProvider")
+        self.provider = vmProviderClass(cfg)
 
     def init(self):
         ASSETS_DIR = getAssetsDir()

@@ -60,20 +60,19 @@ def getHosts(state):
     if 'providers' not in cfg:
         click.Abort("There is no 'providers' sections on config file")
 
-    (curVMProvider, curDNSrovider) = (None, None)
     for h, hvars in hosts.items():
         if 'CLOUD' in hvars:
             curVMProvider = hvars['CLOUD']
+        else:
+            next
 
-        state.vmConfig = cfg['providers'][curVMProvider]
-        state.dnsConfig = None
-        if 'DNS' in hvars:
-            curDNSrovider = hvars['DNS']
-        state.dnsConfig = cfg['providers'][curDNSrovider]
         if curVMProvider not in vmProviders:
-            vmProviders[curVMProvider] = {}
-            vmProviders[curVMProvider]['cloud'] = zbuilder.vm.vmProvider(state.vmConfig['type'], state)
-            vmProviders[curVMProvider]['hosts'] = {}
+            provider_cfg = cfg['providers'][curVMProvider]
+            vmProviders[curVMProvider] = {
+                'cloud': zbuilder.vm.vmProvider(provider_cfg['type'], provider_cfg),
+                'hosts': {}
+            }
+
         hvars['VM_OPTIONS']['aliases'] = ''
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
 

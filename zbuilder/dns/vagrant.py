@@ -1,9 +1,9 @@
 class dnsProvider(object):
-    def __init__(self, state):
-        self.state = state
+    def __init__(self, cfg):
+        self.cfg = cfg
 
-    def update(self, ips):
+    def update(self, host, zone, ip):
         pass
 
-    def remove(self, hosts):
+    def remove(self, host, zone):
         pass

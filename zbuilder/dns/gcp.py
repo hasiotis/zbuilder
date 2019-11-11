@@ -9,14 +9,11 @@ DNS_TTL = 60 * 10   # 10 mins
 
 
 class dnsProvider(object):
-
-    def __init__(self, state):
-        self.state = state
+    def __init__(self, cfg):
+        self.cfg = cfg
         self.dns = dns.Client(project="zbuilder-devel")
 
-    def _getZoneInfo(self, hostname):
-        zone = hostname.partition('.')[2]
-        host = hostname.partition('.')[0]
+    def _getZoneInfo(self, host, zone):
         zones = self.dns.list_zones()
         mzone = None
         for z in zones:
@@ -24,47 +21,44 @@ class dnsProvider(object):
                 mzone = z
                 break
 
-        return(zone, host, mzone)
+        return mzone
 
-    def update(self, ips):
-        for hostname, ip in ips.items():
-            (zone, host, mzone) = self._getZoneInfo(hostname)
-
-            try:
-                changes = mzone.changes()
-                changes.delete_record_set(mzone.resource_record_set(hostname + '.', 'A', DNS_TTL, [ip]))
-                changes.create()
-                while changes.status != 'done':
-                    time.sleep(5)
-                    changes.reload()
-                click.echo("  - Updating record [{}] with ip [{}]".format(hostname, ip))
-            except Exception:
-                click.echo("  - Creating record [{}] with ip [{}]".format(hostname, ip))
-
+    def update(self, host, zone, ip):
+        mzone = self._getZoneInfo(host, zone)
+        try:
             changes = mzone.changes()
-            changes.add_record_set(mzone.resource_record_set(hostname + '.', 'A', DNS_TTL, [ip]))
+            changes.delete_record_set(mzone.resource_record_set("{}.{}.".format(host, zone), 'A', DNS_TTL, [ip]))
             changes.create()
             while changes.status != 'done':
                 time.sleep(5)
                 changes.reload()
+            click.echo("  - Updating record [{}.{}] with ip [{}]".format(host, zone, ip))
+        except Exception:
+            click.echo("  - Creating record [{}.{}] with ip [{}]".format(host, zone, ip))
+
+        changes = mzone.changes()
+        changes.add_record_set(mzone.resource_record_set("{}.{}.".format(host, zone), 'A', DNS_TTL, [ip]))
+        changes.create()
+        while changes.status != 'done':
             time.sleep(5)
+            changes.reload()
+        time.sleep(5)
 
-    def remove(self, hosts):
-        for h in hosts:
-            (zone, host, mzone) = self._getZoneInfo(h)
-            records = mzone.list_resource_record_sets()
-            found = False
-            for r in records:
-                if r.name == h + '.' and r.record_type in ['A', 'CNAME']:
-                    found = True
-                    click.echo("  - Removing record [{}]".format(h))
-                    changes = mzone.changes()
-                    changes.delete_record_set(mzone.resource_record_set(r.name, r.record_type, r.ttl, r.rrdatas))
-                    changes.create()
-                    while changes.status != 'done':
-                        time.sleep(5)
-                        changes.reload()
-                    break
+    def remove(self, host, zone):
+        mzone = self._getZoneInfo(host, zone)
+        records = mzone.list_resource_record_sets()
+        found = False
+        for r in records:
+            if r.name == "{}.{}.".format(host, zone) and r.record_type in ['A', 'CNAME']:
+                found = True
+                click.echo("  - Removing record [{}.{}]".format(host, zone))
+                changes = mzone.changes()
+                changes.delete_record_set(mzone.resource_record_set(r.name, r.record_type, r.ttl, r.rrdatas))
+                changes.create()
+                while changes.status != 'done':
+                    time.sleep(5)
+                    changes.reload()
+                break
 
-            if not found:
-                click.echo("  - No such record [{}]".format(h))
+        if not found:
+            click.echo("  - No such record [{}.{}]".format(host, zone))

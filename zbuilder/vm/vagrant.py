@@ -7,17 +7,15 @@ from zbuilder.helpers import runCmd
 
 
 class vmProvider(object):
-
-    def __init__(self, state, dns):
-        self.state = state
-        self.dns = dns
+    def __init__(self, cfg):
+        self.cfg = cfg
 
     def _cmd(self, hosts, cmd):
-        self.setVagrantfile(pubkey=self.state.vars["ZBUILDER_PUBKEY"], hosts=hosts)
+        self.setVagrantfile(pubkey=self.cfg.vars["ZBUILDER_PUBKEY"], hosts=hosts)
         for h in hosts:
             if hosts[h]['enabled']:
                 click.echo("  - Host: {}".format(h))
-                runCmd(cmd.format(host=h), verbose=self.state.verbose)
+                runCmd(cmd.format(host=h), verbose=self.cfg.verbose)
 
     def build(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')

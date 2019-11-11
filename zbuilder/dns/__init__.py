@@ -3,11 +3,13 @@ import click
 import importlib
 import dns.resolver
 
+import zbuilder.cfg
 from zbuilder.wrappers import trywrap
 
 
 def waitDNS(hostname, ip):
     synced = False
+    click.echo("  - Waiting for host [{}] DNS to sync".format(hostname))
     while not synced:
         try:
             answers = dns.resolver.query(hostname, 'A')
@@ -20,26 +22,51 @@ def waitDNS(hostname, ip):
                 click.echo("  - Host [{}] is not synced with ip [{} != {}], sleeping for [{}]".format(hostname, ip, rip, ttl+1))
                 time.sleep(ttl + 1)
         except dns.resolver.NXDOMAIN:
+            click.echo("    Sleeping 20s due to NXDOMAIN")
             time.sleep(20)
         except Exception as e:
             click.echo(e)
 
 
-class dnsProvider(object):
+def dnsUpdate(ips):
+    cfg = zbuilder.cfg.load()
+    waitList = {}
+    for hostname, ip in ips.items():
+        zone = hostname.partition('.')[2]
+        host = hostname.partition('.')[0]
+        if zone in cfg['providers']:
+            provider = dnsProvider(cfg['providers'][zone]['type'], cfg['providers'][zone])
+            provider.update(host, zone, ip)
+            waitList[hostname] = ip
+        else:
+            click.echo("No DNS provider found for zone [{}]".format(zone))
 
-    def __init__(self, factory, state):
-        if factory is None:
-            return None
+    for hostname, ip in waitList.items():
+        waitDNS(hostname, ip)
+
+
+def dnsRemove(hosts):
+    cfg = zbuilder.cfg.load()
+    for hostname in hosts:
+        zone = hostname.partition('.')[2]
+        host = hostname.partition('.')[0]
+        if zone in cfg['providers']:
+            provider = dnsProvider(cfg['providers'][zone]['type'], cfg['providers'][zone])
+            provider.remove(host, zone)
+        else:
+            click.echo("No DNS provider found for zone [{}]".format(zone))
+
+
+class dnsProvider(object):
+    def __init__(self, factory, cfg=None):
         self.factory = factory
         dnsProviderClass = getattr(importlib.import_module("zbuilder.dns.%s" % factory), "dnsProvider")
-        self.provider = dnsProviderClass(state)
+        self.provider = dnsProviderClass(cfg)
 
     @trywrap
-    def update(self, ips):
-        self.provider.update(ips)
-        for hostname, ip in ips.items():
-            waitDNS(hostname, ip)
+    def update(self, host, zone, ip):
+        self.provider.update(host, zone, ip)
 
     @trywrap
-    def remove(self, hosts):
-        self.provider.remove(hosts)
+    def remove(self, host, zone):
+        self.provider.remove(host, zone)

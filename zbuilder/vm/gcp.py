@@ -2,13 +2,17 @@ import os
 import click
 import googleapiclient.discovery
 
+from zbuilder.dns import dnsUpdate, dnsRemove
+
 
 class vmProvider(object):
-
-    def __init__(self, state, dns):
-        self.state = state
-        self.dns = dns
-        self.compute = googleapiclient.discovery.build('compute', 'v1')
+    def __init__(self, cfg):
+        if cfg:
+            self.cfg = cfg
+            try:
+                self.compute = googleapiclient.discovery.build('compute', 'v1')
+            except Exception as e:
+                click.Abort("Login failed: [{}]".format(e))
 
     def _waitDone(self, ops, msg=None):
         for h, op in ops.items():
@@ -69,7 +73,7 @@ class vmProvider(object):
                                 "items": [
                                     {
                                         "key": "ssh-keys",
-                                        "value": "root:" + sshkey
+                                        "value": "gcpadmin:" + sshkey
                                     }
                                 ]
                             },
@@ -100,7 +104,7 @@ class vmProvider(object):
             if h in ips:
                 ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
 
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def up(self, hosts):
         for h, v in self._getVMs(hosts).items():
@@ -135,21 +139,22 @@ class vmProvider(object):
                 click.echo("  - Host does not exists : {}".format(h))
 
         self._waitDone(ops, "  - Host {} destroyed")
-        self.dnsremove(hosts)
+        dnsRemove(hosts)
 
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
             ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
 
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def dnsremove(self, hosts):
         ips = {}
         for h in hosts:
             if hosts[h]['enabled']:
                 ips[h] = None
-        self.dns.remove(ips)
+
+        dnsRemove(hosts)
 
     def snapCreate(self, hosts):
         pass

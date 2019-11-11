@@ -207,6 +207,8 @@ def provider(state, provider_type, options, name):
     if options:
         cfg['providers'][name] = dict(o.split('=') for o in options.split(' '))
     cfg['providers'][name]['type'] = provider_type
+
+    vmProvider = zbuilder.vm.vmProvider(provider_type)
     zbuilder.cfg.save(cfg)
 
 
