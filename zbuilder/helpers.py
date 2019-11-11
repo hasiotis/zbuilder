@@ -68,6 +68,7 @@ def getHosts(state):
 
         if curVMProvider not in vmProviders:
             provider_cfg = cfg['providers'][curVMProvider]
+            provider_cfg['state'] = state
             vmProviders[curVMProvider] = {
                 'cloud': zbuilder.vm.vmProvider(provider_cfg['type'], provider_cfg),
                 'hosts': {}

@@ -11,11 +11,11 @@ class vmProvider(object):
         self.cfg = cfg
 
     def _cmd(self, hosts, cmd):
-        self.setVagrantfile(pubkey=self.cfg.vars["ZBUILDER_PUBKEY"], hosts=hosts)
+        self.setVagrantfile(pubkey=self.cfg['state'].vars["ZBUILDER_PUBKEY"], hosts=hosts)
         for h in hosts:
             if hosts[h]['enabled']:
                 click.echo("  - Host: {}".format(h))
-                runCmd(cmd.format(host=h), verbose=self.cfg.verbose)
+                runCmd(cmd.format(host=h), verbose=self.cfg['state'].verbose)
 
     def build(self, hosts):
         self._cmd(hosts, 'vagrant up {host}')
