@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import click
+import dpath.util
 
 import zbuilder.vm
 import zbuilder.cfg
@@ -196,19 +197,20 @@ def view():
 
 
 @config.command()
-@click.option('--type', 'provider_type')
-@click.option('--options', default=None)
-@click.argument('name')
+@click.argument('args', nargs=2)
 @pass_state
-def provider(state, provider_type, options, name):
+def provider(state, args):
     """Configure a provider"""
     cfg = zbuilder.cfg.load(touch=True)
-    cfg['providers'][name] = {}
-    if options:
-        cfg['providers'][name] = dict(o.split('=') for o in options.split(' '))
-    cfg['providers'][name]['type'] = provider_type
 
-    vmProvider = zbuilder.vm.vmProvider(provider_type)
+    base_path = args[0].replace('.', '/')
+    sub_path, value = args[1].split('=')
+    if ',' in value:
+        value = value.split(',')
+    cfg_path = "providers/{}/{}".format(base_path, sub_path)
+
+    click.echo("Setting config /{} to {}".format(cfg_path, value))
+    dpath.util.new(cfg, cfg_path, value)
     zbuilder.cfg.save(cfg)
 
 
