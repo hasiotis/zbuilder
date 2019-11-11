@@ -1,9 +1,11 @@
 import time
 import click
 
+
 from google.cloud import dns
 
-DNS_TTL = 60 * 10 # 10 mins
+
+DNS_TTL = 60 * 10   # 10 mins
 
 
 class dnsProvider(object):
@@ -24,7 +26,6 @@ class dnsProvider(object):
 
         return(zone, host, mzone)
 
-
     def update(self, ips):
         for hostname, ip in ips.items():
             (zone, host, mzone) = self._getZoneInfo(hostname)
@@ -37,7 +38,7 @@ class dnsProvider(object):
                     time.sleep(5)
                     changes.reload()
                 click.echo("  - Updating record [{}] with ip [{}]".format(hostname, ip))
-            except Exception as e:
+            except Exception:
                 click.echo("  - Creating record [{}] with ip [{}]".format(hostname, ip))
 
             changes = mzone.changes()
