@@ -50,6 +50,10 @@ class vmProvider(object):
                         with open(fname, "r") as f:
                             sshkey = f.read().rstrip('\n')
 
+                    network = "global/networks/{v[network]}".format(v=v)
+                    if '/' in v['network']:
+                        network = v['network']
+
                     retValue[h]['insert'] = self.compute.instances().insert(
                         project=v['project'],
                         zone=v['zone'],
@@ -66,7 +70,7 @@ class vmProvider(object):
                                 }
                             ],
                             'networkInterfaces': [{
-                                'network': "global/networks/{v[network]}".format(v=v),
+                                'network': network,
                                 'subnetwork': "regions/{v[region]}/subnetworks/{v[subnet]}".format(v=v),
                                 'accessConfigs': [
                                     {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}
