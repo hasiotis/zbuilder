@@ -54,6 +54,10 @@ class vmProvider(object):
                     if '/' in v['network']:
                         network = v['network']
 
+                    subnetwork = "regions/{v[region]}/subnetworks/{v[subnet]}".format(v=v)
+                    if '/' in v['subnet']:
+                        subnetwork = v['subnet']
+
                     retValue[h]['insert'] = self.compute.instances().insert(
                         project=v['project'],
                         zone=v['zone'],
@@ -71,7 +75,7 @@ class vmProvider(object):
                             ],
                             'networkInterfaces': [{
                                 'network': network,
-                                'subnetwork': "regions/{v[region]}/subnetworks/{v[subnet]}".format(v=v),
+                                'subnetwork': subnetwork,
                                 'accessConfigs': [
                                     {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}
                                 ]
