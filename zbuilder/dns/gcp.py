@@ -11,7 +11,7 @@ DNS_TTL = 60 * 10   # 10 mins
 class dnsProvider(object):
     def __init__(self, cfg):
         self.cfg = cfg
-        self.dns = dns.Client(project="zbuilder-devel")
+        self.dns = dns.Client(project=self.cfg['dns']['project'])
 
     def _getZoneInfo(self, host, zone):
         zones = self.dns.list_zones()
