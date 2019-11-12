@@ -29,10 +29,11 @@ class vmProvider(object):
         retValue = {}
         for h, v in hosts.items():
             if hosts[h]['enabled']:
+                shortname = h.partition('.')[0]
                 result = self.compute.instances().list(
                     project=v['project'],
                     zone=v['zone'],
-                    filter="name=\"{}\"".format(h.replace('.', '-'))
+                    filter="name=\"{}\"".format(shortname)
                 ).execute()
                 items = result.get('items', [])
                 if items:
@@ -53,7 +54,7 @@ class vmProvider(object):
                         project=v['project'],
                         zone=v['zone'],
                         body={
-                            'name': h.replace('.', '-'),
+                            'name': shortname,
                             'machineType': "zones/{v[zone]}/machineTypes/{v[size]}".format(v=v),
                             'disks': [
                                 {
