@@ -66,7 +66,8 @@ class vmProvider(object):
                                 }
                             ],
                             'networkInterfaces': [{
-                                'network': 'global/networks/default',
+                                'network': "global/networks/{v[network]}".format(v=v),
+                                'subnetwork': "regions/{v[region]}/subnetworks/{v[subnet]}".format(v=v),
                                 'accessConfigs': [
                                     {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}
                                 ]
