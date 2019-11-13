@@ -27,6 +27,7 @@ google-cloud-dns = "*"
 dnspython = "*"
 dpath = "*"
 google-auth-oauthlib = "*"
+massedit = "*"
 
 [dev-packages]
 "flake8" = "*"

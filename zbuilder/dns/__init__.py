@@ -48,8 +48,9 @@ def dnsUpdate(ips):
         else:
             click.echo("No DNS provider found for zone [{}]".format(zone))
 
-    for hostname, ip in waitList.items():
-        waitDNS(hostname, ip)
+    if provider.factory != 'ansible':
+        for hostname, ip in waitList.items():
+            waitDNS(hostname, ip)
 
 
 def dnsRemove(hosts):
