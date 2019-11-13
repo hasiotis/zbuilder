@@ -1,16 +1,53 @@
 import os
 import click
+import pickle
 import googleapiclient.discovery
 
 from zbuilder.dns import dnsUpdate, dnsRemove
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+
+def auth(cfg):
+    CONFIG_PATH = "~/.config/zbuilder/"
+    SCOPES = [
+        'https://www.googleapis.com/auth/compute',
+        'https://www.googleapis.com/auth/ndev.clouddns.readwrite'
+    ]
+    creds = None
+
+    secretFilename = os.path.expanduser("{}/{}".format(CONFIG_PATH, cfg['client-secret']))
+    if not os.path.exists(secretFilename):
+        click.echo("Unable to authenticate due to missing client secret [{}]".format(secretFilename))
+        raise click.Abort()
+
+    tokenFilename = os.path.expanduser("{}/{}".format(CONFIG_PATH, cfg.get('creds-file', '')))
+    if os.path.exists(tokenFilename):
+        with open(tokenFilename, 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(secretFilename, SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open(tokenFilename, 'wb') as token:
+            pickle.dump(creds, token)
+
+    return creds
 
 
 class vmProvider(object):
     def __init__(self, cfg):
         if cfg:
             self.cfg = cfg
+            creds = None
+            if 'client-secret' in cfg and 'creds-file' in cfg:
+                creds = auth(self.cfg)
+
             try:
-                self.compute = googleapiclient.discovery.build('compute', 'v1')
+                self.compute = googleapiclient.discovery.build('compute', 'v1', credentials=creds)
             except Exception as e:
                 click.echo("Login failed: [{}]".format(e))
                 raise click.Abort()

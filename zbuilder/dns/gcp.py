@@ -2,6 +2,7 @@ import time
 import click
 
 
+from zbuilder.vm.gcp import auth
 from google.cloud import dns
 
 
@@ -10,8 +11,17 @@ DNS_TTL = 60 * 10   # 10 mins
 
 class dnsProvider(object):
     def __init__(self, cfg):
-        self.cfg = cfg
-        self.dns = dns.Client(project=self.cfg['dns']['project'])
+        if cfg:
+            self.cfg = cfg
+            creds = None
+            if 'client-secret' in cfg and 'creds-file' in cfg:
+                creds = auth(self.cfg)
+
+            try:
+                self.dns = dns.Client(project=self.cfg['dns']['project'], credentials=creds)
+            except Exception as e:
+                click.echo("Login failed: [{}]".format(e))
+                raise click.Abort()
 
     def _getZoneInfo(self, host, zone):
         zones = self.dns.list_zones()

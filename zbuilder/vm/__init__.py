@@ -8,7 +8,6 @@ from zbuilder.wrappers import trywrap
 
 
 class vmProvider(object):
-
     def __init__(self, factory, cfg=None):
         self.factory = factory
         self.cfg = cfg

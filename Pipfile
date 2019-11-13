@@ -26,6 +26,7 @@ google-api-python-client = "*"
 google-cloud-dns = "*"
 dnspython = "*"
 dpath = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 "flake8" = "*"
