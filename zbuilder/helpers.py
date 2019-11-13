@@ -41,6 +41,9 @@ def getHostsWithVars(subset):
             hvars['ZBUILDER_PROVIDER']['VM_OPTIONS']['enabled'] = False
             hostVars[str(host)] = hvars['ZBUILDER_PROVIDER']
 
+        if 'ansible_host' in hvars:
+            hostVars[str(host)]['ansible_host'] = hvars['ansible_host']
+
     inventory.subset(options.subset)
     for host in inventory.get_hosts():
         if str(host) in hostVars:
@@ -75,6 +78,9 @@ def getHosts(state):
             }
 
         hvars['VM_OPTIONS']['aliases'] = ''
+        if 'ansible_host' in hvars:
+            hvars['VM_OPTIONS']['ansible_host'] = hvars['ansible_host']
+
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
 
     return vmProviders
@@ -124,16 +130,23 @@ def fixKeys(state):
     for _, vmProvider in vmProviders.items():
         for h, v in vmProvider['hosts'].items():
             if v['enabled']:
-                try:
-                    ip = getIP(h)
-                except Exception:
-                    click.echo(click.style("  - Host: {} can't be resolved".format(h), fg='red'))
-                    continue
+                if 'ansible_host' in v:
+                    ip = v['ansible_host']
+                else:
+                    try:
+                        ip = getIP(h)
+                    except Exception:
+                        click.echo(click.style("  - Host: {} can't be resolved".format(h), fg='red'))
+                        continue
                 click.echo("  - Host: {}".format(h))
                 runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
                 runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
                 runCmd(
                     "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
+                    verbose=state.verbose, ignoreError=True
+                )
+                runCmd(
+                    "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(ip),
                     verbose=state.verbose, ignoreError=True
                 )
 

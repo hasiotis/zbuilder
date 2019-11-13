@@ -150,7 +150,8 @@ class vmProvider(object):
         self._waitDone(ops, "  - Host {} created")
         for h, v in self._getVMs(hosts).items():
             if h in ips:
-                ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+                # ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+                ips[h] = v['networkInterfaces'][0]['networkIP']
 
         dnsUpdate(ips)
 
@@ -192,7 +193,8 @@ class vmProvider(object):
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
-            ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            # ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            ips[h] = v['networkInterfaces'][0]['networkIP']
 
         dnsUpdate(ips)
 
