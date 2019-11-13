@@ -95,6 +95,10 @@ class vmProvider(object):
                     if '/' in v['subnet']:
                         subnetwork = v['subnet']
 
+                    accessConfigs = []
+                    if v.get('external', False):
+                        accessConfigs = [ {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'} ]
+
                     retValue[h]['insert'] = self.compute.instances().insert(
                         project=v['project'],
                         zone=v['zone'],
@@ -113,9 +117,7 @@ class vmProvider(object):
                             'networkInterfaces': [{
                                 'network': network,
                                 'subnetwork': subnetwork,
-                                'accessConfigs': [
-                                    {'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}
-                                ]
+                                'accessConfigs': accessConfigs
                             }],
                             "metadata": {
                                 "items": [
