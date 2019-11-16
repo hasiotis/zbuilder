@@ -10,7 +10,7 @@ import distutils.dir_util
 
 from click._bashcomplete import get_completion_script
 
-from zbuilder.helpers import getHosts, runPlaybook, fixKeys
+from zbuilder.helpers import getHosts, runPlaybook, fixKeys, runCmd
 from zbuilder.options import pass_state, common_options
 
 
@@ -18,6 +18,7 @@ from zbuilder.options import pass_state, common_options
 @click.version_option()
 def cli():
     """ZBuilder is a tool to create VMs ready to be transfered to ansible."""
+
 
 
 @cli.command()
@@ -29,7 +30,9 @@ def init(state, template):
     if os.path.exists('group_vars') or os.path.exists('hosts'):
         raise click.ClickException("This directory already contains relevant files")
 
-    TEMPLATE_PATH = os.path.expanduser("~/.config/zbuilder/assets/{}".format(template))
+    cfg = zbuilder.cfg.load(touch=True)
+    tmpl_path = dpath.util.get(cfg, '/main/templates/path')
+    TEMPLATE_PATH = os.path.join(os.path.expanduser(tmpl_path), template)
     if os.path.exists(TEMPLATE_PATH):
         click.echo("Initializing {} based zbuilder environment".format(template))
         distutils.dir_util.copy_tree(TEMPLATE_PATH, os.getcwd())
@@ -199,6 +202,24 @@ def view():
 @config.command()
 @click.argument('args', nargs=2)
 @pass_state
+def main(state, args):
+    """Configure main parameters"""
+    cfg = zbuilder.cfg.load(touch=True)
+
+    base_path = args[0].replace('.', '/')
+    sub_path, value = args[1].split('=')
+    if ',' in value:
+        value = value.split(',')
+    cfg_path = "main/{}/{}".format(base_path, sub_path)
+
+    click.echo("Setting config /{} to {}".format(cfg_path, value))
+    dpath.util.new(cfg, cfg_path, value)
+    zbuilder.cfg.save(cfg)
+
+
+@config.command()
+@click.argument('args', nargs=2)
+@pass_state
 def provider(state, args):
     """Configure a provider"""
     cfg = zbuilder.cfg.load(touch=True)
@@ -212,6 +233,21 @@ def provider(state, args):
     click.echo("Setting config /{} to {}".format(cfg_path, value))
     dpath.util.new(cfg, cfg_path, value)
     zbuilder.cfg.save(cfg)
+
+
+@config.command()
+@click.option('--yes', is_flag=True)
+@pass_state
+def update(state, yes):
+    """Update configuration components"""
+    if not yes:
+        click.confirm('Do you want to update?', abort=True)
+    cfg = zbuilder.cfg.load(touch=True)
+    tmpl_repo = dpath.util.get(cfg, '/main/templates/repo')
+    tmpl_path = dpath.util.get(cfg, '/main/templates/path')
+    if tmpl_repo and tmpl_path:
+        click.echo("Updating templates")
+        runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
 
 
 @cli.command()

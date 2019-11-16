@@ -29,4 +29,4 @@ pipenv shell
 
 ## Usage
 
-For vagrant provider check [here](docs/Vagrant.md)
+For vagrant provider check [here](docs/Vagrant.md).
