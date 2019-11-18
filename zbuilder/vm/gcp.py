@@ -82,7 +82,7 @@ class vmProvider(object):
                     retValue[h]['values'] = v
                 else:
                     retValue[h] = {'status': None}
-                    retValue[h] = {'values': v}
+                    retValue[h]['values'] = v
 
                     image_response = self.compute.images().getFromFamily(project=v['image']['project'], family=v['image']['family']).execute()
                     source_disk_image = image_response['selfLink']
