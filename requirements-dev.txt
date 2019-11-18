@@ -16,10 +16,10 @@ pluggy==0.13.0
 py==1.8.0
 pycodestyle==2.5.0
 pyflakes==2.1.1
-pylint==2.4.3
+pylint==2.4.4
 pyparsing==2.4.5
 pytest-cov==2.8.1
-pytest==5.2.2
+pytest==5.2.4
 six==1.13.0
 typed-ast==1.4.0 ; implementation_name == 'cpython' and python_version < '3.8'
 wcwidth==0.1.7

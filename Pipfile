@@ -28,6 +28,7 @@ dnspython = "*"
 dpath = "*"
 google-auth-oauthlib = "*"
 massedit = "*"
+tabulate = "*"
 
 [dev-packages]
 "flake8" = "*"

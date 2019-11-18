@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import click
+import tabulate
 import dpath.util
 
 import zbuilder.vm
@@ -18,7 +19,6 @@ from zbuilder.options import pass_state, common_options
 @click.version_option()
 def cli():
     """ZBuilder is a tool to create VMs ready to be transfered to ansible."""
-
 
 
 @cli.command()
@@ -104,10 +104,10 @@ def dns():
     pass
 
 
-@dns.command()
+@dns.command(name="update")
 @common_options
 @pass_state
-def update(state):
+def dns_update(state):
     """Update DNS records"""
     click.echo("Updating DNS records")
     vmProviders = getHosts(state)
@@ -175,15 +175,15 @@ def play(state, playbook):
 
 
 @cli.command()
-def status():
-    """Display environment status"""
-    pass
-
-
-@cli.command()
-def summary():
+@pass_state
+def summary(state):
     """Display environment summary"""
-    pass
+    vmProviders = getHosts(state)
+    data = []
+    for _, vmProvider in vmProviders.items():
+        for h, v in vmProvider['hosts'].items():
+            data.append([vmProvider['cloud'].factory, h, v])
+    click.echo(tabulate.tabulate(data, headers=["Provider", "Host", 'Parameters'], tablefmt="psql"))
 
 
 @cli.group()
