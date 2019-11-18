@@ -79,8 +79,10 @@ class vmProvider(object):
                 items = result.get('items', [])
                 if items:
                     retValue[h] = items[0]
+                    retValue[h]['values'] = v
                 else:
                     retValue[h] = {'status': None}
+                    retValue[h] = {'values': v}
 
                     image_response = self.compute.images().getFromFamily(project=v['image']['project'], family=v['image']['family']).execute()
                     source_disk_image = image_response['selfLink']
@@ -100,7 +102,7 @@ class vmProvider(object):
                         subnetwork = v['subnet']
 
                     accessConfigs = []
-                    if v.get('external', False):
+                    if v.get('net_external', False):
                         accessConfigs = [{'type': 'ONE_TO_ONE_NAT', 'name': 'External NAT'}]
 
                     retValue[h]['insert'] = self.compute.instances().insert(
@@ -155,8 +157,9 @@ class vmProvider(object):
 
         self._waitDone(ops, "  - Host {} created")
         for h, v in self._getVMs(hosts).items():
-            if h in ips:
-                # ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            if v['values'].get('dns_external', False):
+                ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            else:
                 ips[h] = v['networkInterfaces'][0]['networkIP']
 
         dnsUpdate(ips)
@@ -199,8 +202,10 @@ class vmProvider(object):
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
-            # ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
-            ips[h] = v['networkInterfaces'][0]['networkIP']
+            if v['values'].get('dns_external', False):
+                ips[h] = v['networkInterfaces'][0]['accessConfigs'][0]['natIP']
+            else:
+                ips[h] = v['networkInterfaces'][0]['networkIP']
 
         dnsUpdate(ips)
 
