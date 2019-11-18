@@ -254,4 +254,4 @@ def update(state, yes):
 @click.argument('shell', default='bash')
 def completion(shell):
     """Autocomplete for bash"""
-    click.echo(get_completion_script('zbuilder', '_ZBUILDER_COMPLETE'))
+    click.echo(get_completion_script('zbuilder', '_ZBUILDER_COMPLETE', shell))
