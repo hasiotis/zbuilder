@@ -1,8 +1,0 @@
-ZBUILDER_PROVIDER:
-  DNS: "{{ GLOBAL_PROVIDER }}"
-  CLOUD: "{{ GLOBAL_PROVIDER }}"
-  VM_OPTIONS:
-    size_slug: "{{ GLOBAL_SIZE }}"
-    region: "{{ GLOBAL_REGION }}"
-    sshkey: "{{ GLOBAL_SSHKEY }}"
-    image: ubuntu-18-04-x64

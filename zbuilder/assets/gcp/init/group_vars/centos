@@ -1,9 +1,0 @@
-ZBUILDER_PROVIDER:
-  DNS: "{{ GLOBAL_PROVIDER }}"
-  CLOUD: "{{ GLOBAL_PROVIDER }}"
-  VM_OPTIONS:
-    project: "{{ GLOBAL_PROJECT }}"
-    zone: "{{ GLOBAL_ZONE }}"
-    bucket: "{{ GLOBAL_BUCKET }}"
-    size: "{{ GLOBAL_SIZE }}"
-    family: centos-7

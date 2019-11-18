@@ -1,8 +1,0 @@
-ZBUILDER_PROVIDER:
-  DNS: "{{ GLOBAL_PROVIDER }}"
-  CLOUD: "{{ GLOBAL_PROVIDER }}"
-  VM_OPTIONS:
-    memory: "{{ GLOBAL_MEMORY }}"
-    vcpus: "{{ GLOBAL_VCPUS }}"
-    disks: "{{ GLOBAL_DISKS }}"
-    box: bento/ubuntu-16.04
