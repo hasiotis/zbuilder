@@ -248,12 +248,19 @@ def update(state, yes):
     """Update configuration components"""
     if not yes:
         click.confirm('Do you want to update?', abort=True)
+
     cfg = zbuilder.cfg.load(touch=True)
     tmpl_repo = dpath.util.get(cfg, '/main/templates/repo')
     tmpl_path = dpath.util.get(cfg, '/main/templates/path')
     if tmpl_repo and tmpl_path:
         click.echo("Updating templates")
         runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
+
+    roles_repo = dpath.util.get(cfg, '/main/roles/repo')
+    roles_path = dpath.util.get(cfg, '/main/roles/path')
+    if tmpl_repo and tmpl_path:
+        click.echo("Updating templates")
+        runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=roles_repo, path=roles_path))
 
 
 @cli.command()
