@@ -227,4 +227,4 @@ class vmProvider(object):
         pass
 
     def params(self, params):
-        return { k: params[k] for k in ['size', 'image']}
+        return {k: params[k] for k in ['size', 'image']}
