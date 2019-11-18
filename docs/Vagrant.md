@@ -1,4 +1,4 @@
-## Initial zbuilder setup
+# Initial zbuilder setup
 
 Make sure you have installed the following on your system:
 
@@ -6,7 +6,7 @@ Make sure you have installed the following on your system:
 * vagrant-hostmanager plugin
 * VirtualBox
 
-# Main configuration
+## Main configuration
 
 Configure the source of your templates:
 ```
@@ -15,7 +15,7 @@ zbuilder config main templates path=~/.config/zbuilder/templates
 zbuilder config update --yes
 ```
 
-# Provider configuration
+## Provider configuration
 
 Define *local* as a provider of type vagrant
 ```
@@ -23,7 +23,7 @@ zbuilder config provider local type=vagrant
 zbuilder config view
 ```
 
-# Create your environment
+## Create your environment
 
 Now create and environment from a vagrant template:
 ```
@@ -32,6 +32,8 @@ cd ZBUILDER_VAGRANT_DEMO
 zbuilder init --template vagrant
 zbuilder build
 ```
+
+## Cleanup the environment
 
 To remove all VMs run:
 ```

@@ -1,11 +1,11 @@
-## Initial zbuilder setup
+# Initial zbuilder setup
 
 Make sure you have installed the following on your system:
 
 * gcloud (Google Cloud SDK)
 
 
-# Main configuration
+## Main configuration
 
 Configure the source of your templates:
 ```
@@ -14,7 +14,7 @@ zbuilder config main templates path=~/.config/zbuilder/templates
 zbuilder config update --yes
 ```
 
-# Create google resources needed
+## Create google resources needed
 
 First you need to create a gcp project in order to create your service account and auth key:
 ```
@@ -35,7 +35,7 @@ Create a dns zone to be managed by zbuilder:
 gcloud dns managed-zones create gcp-hasiotis-dev --project zbuilder-demo --dns-name gcp.hasiotis.dev. --description "ZBuilder managed gcp zone"
 ```
 
-# Provider configuration
+## Provider configuration
 
 Define *google* as a provider of type gcp:
 ```
@@ -51,8 +51,7 @@ zbuilder config view
 ```
 For this to work you need to have your dns zone managed by google cloud DNS.
 
-
-# Create your environment
+## Create your environment
 
 Now create and environment from a vagrant template:
 ```
@@ -61,6 +60,8 @@ cd ZBUILDER_GCP_DEMO
 zbuilder init --template gcp
 zbuilder build
 ```
+
+## Cleanup the environment
 
 To remove all VMs run:
 ```
