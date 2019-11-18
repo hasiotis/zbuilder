@@ -1,3 +1,4 @@
+import os
 import sys
 import click
 import socket
@@ -8,6 +9,7 @@ import zbuilder.cfg
 
 from retrying import retry
 from ansible.cli import CLI
+from ansible.errors import AnsibleError
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
 
@@ -87,9 +89,12 @@ def getHosts(state):
 
 
 def runPlaybook(state, pbook):
-    playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
-    playbookCLI.parse()
-    playbookCLI.run()
+    try:
+        playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
+        playbookCLI.parse()
+        playbookCLI.run()
+    except AnsibleError as e:
+        click.echo(e)
 
 
 def load_yaml(fname):
