@@ -225,3 +225,6 @@ class vmProvider(object):
 
     def snapDelete(self, hosts):
         pass
+
+    def params(self, params):
+        return { k: params[k] for k in ['size', 'image']}

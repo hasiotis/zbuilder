@@ -58,3 +58,7 @@ class vmProvider(object):
     @trywrap
     def snapDelete(self, hosts):
         self.provider.snapDelete(hosts)
+
+    @trywrap
+    def params(self, v):
+        return self.provider.params(v)

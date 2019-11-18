@@ -182,7 +182,7 @@ def summary(state):
     data = []
     for _, vmProvider in vmProviders.items():
         for h, v in vmProvider['hosts'].items():
-            data.append([vmProvider['cloud'].factory, h, v])
+            data.append([vmProvider['cloud'].factory, h, vmProvider['cloud'].params(v)])
     click.echo(tabulate.tabulate(data, headers=["Provider", "Host", 'Parameters'], tablefmt="psql"))
 
 
