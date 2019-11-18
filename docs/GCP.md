@@ -16,15 +16,23 @@ zbuilder config update --yes
 
 # Create google resources needed
 
-First you need to create a gcp project in order to create your auth key:
+First you need to create a gcp project in order to create your service account and auth key:
 ```
 gcloud projects create zbuilder-demo --name="ZBUILDER demo"
+```
 
+Create the service account and the auth key:
+```
 gcloud iam service-accounts create zbuilder-account --project zbuilder-demo --display-name ZBuilder
 gcloud iam service-accounts keys create ~/.config/zbuilder/zbuilder-key.json --iam-account=zbuilder-account@zbuilder-demo.iam.gserviceaccount.com
 
 gcloud projects add-iam-policy-binding zbuilder-demo --member serviceAccount:zbuilder-account@zbuilder-demo.iam.gserviceaccount.com --role roles/compute.admin
 gcloud projects add-iam-policy-binding zbuilder-demo --member serviceAccount:zbuilder-account@zbuilder-demo.iam.gserviceaccount.com --role roles/dns.admin
+```
+
+Create a dns zone to be managed by zbuilder:
+```
+gcloud dns managed-zones create gcp-hasiotis-dev --project zbuilder-demo --dns-name gcp.hasiotis.dev. --description "ZBuilder managed gcp zone"
 ```
 
 # Provider configuration
