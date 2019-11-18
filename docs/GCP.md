@@ -40,12 +40,13 @@ gcloud dns managed-zones create gcp-hasiotis-dev --project zbuilder-demo --dns-n
 Define *google* as a provider of type gcp:
 ```
 zbuilder config provider google type=gcp
-zbuilder config provider google service-key=client-secret.json
+zbuilder config provider google service-key=zbuilder-key.json
 ```
 
 Let zbuilder know that google provider will also handle the *gcp.hasiotis.dev* zone:
 ```
 zbuilder config provider google.dns zones=gcp.hasiotis.dev
+zbuilder config provider google.dns project=zbuilder-demo
 zbuilder config view
 ```
 For this to work you need to have your dns zone managed by google cloud DNS.
