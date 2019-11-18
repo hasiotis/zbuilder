@@ -3,16 +3,15 @@ import os
 import click
 import tabulate
 import dpath.util
+import distutils.dir_util
 
 import zbuilder.vm
 import zbuilder.cfg
 
-import distutils.dir_util
-
-from click._bashcomplete import get_completion_script
-
 from zbuilder.helpers import getHosts, runPlaybook, fixKeys, runCmd
 from zbuilder.options import pass_state, common_options
+
+from click._bashcomplete import get_completion_script
 
 
 @click.group()
@@ -197,6 +196,13 @@ def view():
     """View configuration"""
     cfg = zbuilder.cfg.load()
     zbuilder.cfg.view(cfg)
+
+
+@config.command()
+def edit():
+    """Edit configuration"""
+    fname = os.path.expanduser(zbuilder.cfg.CONFIG_PATH)
+    click.edit(filename=fname)
 
 
 @config.command()
