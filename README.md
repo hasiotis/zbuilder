@@ -29,5 +29,5 @@ pipenv shell
 
 ## Usage
 
-For vagrant provider check [here](docs/Vagrant.md).
-For GCP provider check [here](docs/GCP.md).
+* For vagrant provider check [here](docs/Vagrant.md).
+* For GCP provider check [here](docs/GCP.md).
