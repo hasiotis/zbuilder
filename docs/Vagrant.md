@@ -23,6 +23,7 @@ Now create and environment from a vagrant template:
 ```
 mkdir ZBUILDER_VAGRANT_DEMO
 cd ZBUILDER_VAGRANT_DEMO
+zbuilder init --template vagrant
 zbuilder build
 ```
 
