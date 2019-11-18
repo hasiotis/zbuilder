@@ -6,11 +6,7 @@ Make sure you have installed the following on your system:
 * vagrant-hostmanager plugin
 * VirtualBox
 
-Define *local* as a provider of type vagrant
-```
-zbuilder config provider --type vagrant local
-zbuilder config view
-```
+# Main configuration
 
 Configure the source of your templates:
 ```
@@ -18,6 +14,16 @@ zbuilder config main templates repo=https://github.com/hasiotis/zbuilder-templat
 zbuilder config main templates path=~/.config/zbuilder/templates
 zbuilder config update --yes
 ```
+
+# Provider configuration
+
+Define *local* as a provider of type vagrant
+```
+zbuilder config provider local type=vagrant
+zbuilder config view
+```
+
+# Create your environment
 
 Now create and environment from a vagrant template:
 ```
