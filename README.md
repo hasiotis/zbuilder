@@ -12,7 +12,7 @@ pip3 install --user git+https://github.com/hasiotis/zbuilder
 
 One way to setup development environment is:
 
-``` shell
+```
 git clone git@github.com:hasiotis/zbuilder.git --branch develop
 cd zbuilder
 pipenv --three
@@ -22,7 +22,7 @@ make init
 
 Next time just:
 
-``` shell
+```
 cd zbuilder
 pipenv shell
 ```
