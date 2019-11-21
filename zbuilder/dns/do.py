@@ -3,46 +3,41 @@ import digitalocean
 
 
 class dnsProvider(object):
+    def __init__(self, cfg):
+        if cfg:
+            self.cfg = cfg
+            self.apikey = self.cfg['apikey']
+            self.manager = digitalocean.Manager(token=self.apikey)
 
-    def __init__(self, state):
-        self.state = state
-        self.token = self.state.dnsConfig['token']
-        self.manager = digitalocean.Manager(token=self.token)
+    def getRecord(self, host, zone, ip=None):
+        retValue = None
 
-    def getRecords(self, ips):
-        retValue = {}
-        for fqdn, ip in ips.items():
-            (shortname, _, domain) = fqdn.partition('.')
-            doDomain = self.manager.get_domain(domain)
-            for record in doDomain.get_records():
-                if shortname == record.name:
-                    retValue[fqdn] = record
-                    continue
-            if fqdn not in retValue:
-                record = digitalocean.Record(
-                    token=self.token,
-                    domain_name=domain,
-                    name=shortname,
-                    type='A',
-                    data=ip
-                )
-                retValue[fqdn] = record
+        doDomain = self.manager.get_domain(zone)
+        for record in doDomain.get_records():
+            if host == record.name:
+                retValue = record
+                continue
+
+        if ip and not retValue:
+            retValue = digitalocean.Record(token=self.apikey, domain_name=zone, name=host, type='A', data=ip)
 
         return retValue
 
-    def update(self, ips):
-        for fqdn, record in self.getRecords(ips).items():
-            if not record.id:
-                click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, record.data))
-                record.create()
-            else:
-                click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, record.data))
-                record.save()
+    def update(self, host, zone, ip):
+        fqdn = "{}.{}".format(host, zone)
+        record = self.getRecord(host, zone, ip)
+        if not record.id:
+            click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, record.data))
+            record.create()
+        else:
+            click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, record.data))
+            record.save()
 
-    def remove(self, hosts):
-        for fqdn, record in self.getRecords(hosts).items():
-            if record.id:
-                click.echo("  - Removing record {}".format(fqdn))
-                record.destroy()
-            else:
-                click.echo("  - No such record {}".format(fqdn))
+    def remove(self, host, zone):
+        fqdn = "{}.{}".format(host, zone)
+        record = self.getRecord(host, zone)
+        if record:
+            click.echo("  - Removing record {}".format(fqdn))
+            record.destroy()
+        else:
+            click.echo("  - No such record {}".format(fqdn))

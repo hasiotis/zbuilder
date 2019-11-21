@@ -26,6 +26,7 @@ def waitDNS(hostname, ip):
             time.sleep(20)
         except Exception as e:
             click.echo(e)
+            exit()
 
 
 def getProvider(zone, cfg):
@@ -38,6 +39,7 @@ def getProvider(zone, cfg):
 def dnsUpdate(ips):
     cfg = zbuilder.cfg.load()
     waitList = {}
+    provider = None
     for hostname, ip in ips.items():
         zone = hostname.partition('.')[2]
         host = hostname.partition('.')[0]
@@ -48,7 +50,7 @@ def dnsUpdate(ips):
         else:
             click.echo("No DNS provider found for zone [{}]".format(zone))
 
-    if provider.factory != 'ansible':
+    if provider and provider.factory != 'ansible':
         for hostname, ip in waitList.items():
             waitDNS(hostname, ip)
 

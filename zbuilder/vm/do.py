@@ -2,16 +2,18 @@ import time
 import click
 import digitalocean
 
+from zbuilder.dns import dnsUpdate, dnsRemove
+
+
 SLEEP_TIME = 5
 
 
 class vmProvider(object):
-
-    def __init__(self, state, dns):
-        self.state = state
-        self.dns = dns
-        self.token = self.state.vmConfig['token']
-        self.manager = digitalocean.Manager(token=self.token)
+    def __init__(self, cfg):
+        if cfg:
+            self.cfg = cfg
+            self.apikey = self.cfg['apikey']
+            self.manager = digitalocean.Manager(token=self.apikey)
 
     def getDroplets(self, hosts):
         retValue = {}
@@ -27,7 +29,7 @@ class vmProvider(object):
                             sshkey = curkey
                             continue
                     droplet = digitalocean.Droplet(
-                        token=self.token,
+                        token=self.apikey,
                         name=h,
                         region=v['region'],
                         image=v['image'],
@@ -66,12 +68,11 @@ class vmProvider(object):
                 click.echo("  - Status of host: {} is {}".format(d.name, d.status))
 
         self.waitStatus(hosts, 'active')
-
         for k, d in self.getDroplets(hosts).items():
-            if d.name in ips:
+            if d.ip_address:
                 ips[d.name] = d.ip_address
 
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def up(self, hosts):
         for k, d in self.getDroplets(hosts).items():
@@ -102,21 +103,21 @@ class vmProvider(object):
                 d.destroy()
             else:
                 click.echo("  - Host does not exists : {}".format(d.name))
-        self.dnsremove(hosts)
+        dnsRemove(hosts)
 
     def dnsupdate(self, hosts):
         ips = {}
         for k, d in self.getDroplets(hosts).items():
             if d.ip_address:
                 ips[d.name] = d.ip_address
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def dnsremove(self, hosts):
         ips = {}
         for h in hosts:
             if hosts[h]['enabled']:
                 ips[h] = None
-        self.dns.remove(ips)
+        dnsRemove(hosts)
 
     def snapCreate(self, hosts):
         snapshots = self.manager.get_droplet_snapshots()
