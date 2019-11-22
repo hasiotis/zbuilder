@@ -250,17 +250,23 @@ def update(state, yes):
         click.confirm('Do you want to update?', abort=True)
 
     cfg = zbuilder.cfg.load(touch=True)
-    tmpl_repo = dpath.util.search(cfg, '/main/templates/repo')
-    tmpl_path = dpath.util.search(cfg, '/main/templates/path')
-    if tmpl_repo and tmpl_path:
-        click.echo("Updating templates")
-        runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
+    try:
+        tmpl_repo = dpath.util.get(cfg, '/main/templates/repo')
+        tmpl_path = dpath.util.get(cfg, '/main/templates/path')
+        if tmpl_repo and tmpl_path:
+            click.echo(" * Updating templates")
+            runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
+    except Exception:
+        pass
 
-    roles_repo = dpath.util.search(cfg, '/main/roles/repo')
-    roles_path = dpath.util.search(cfg, '/main/roles/path')
-    if tmpl_repo and tmpl_path:
-        click.echo(" * Updating roles")
-        runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=roles_repo, path=roles_path))
+    try:
+        roles_repo = dpath.util.get(cfg, '/main/roles/repo')
+        roles_path = dpath.util.get(cfg, '/main/roles/path')
+        if tmpl_repo and tmpl_path:
+            click.echo(" * Updating roles")
+            runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=roles_repo, path=roles_path))
+    except Exception:
+        pass
 
 
 @cli.command()
