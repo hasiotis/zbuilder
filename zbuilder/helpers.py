@@ -38,17 +38,21 @@ def getHostsWithVars(subset):
         hvars = vm.get_vars(host=host, include_hostvars=True)
         templar = Templar(loader=loader, variables=hvars)
         hvars = templar.template(hvars)
+
         if 'ZBUILDER_PROVIDER' in hvars:
             hvars['ZBUILDER_PROVIDER']['VM_OPTIONS']['enabled'] = False
-            hostVars[str(host)] = hvars['ZBUILDER_PROVIDER']
-
-        if 'ansible_host' in hvars:
-            hostVars[str(host)]['ansible_host'] = hvars['ansible_host']
+            hostVars[host.name] = hvars['ZBUILDER_PROVIDER']
+            if 'ansible_host' in hvars:
+                hostVars[host.name]['ansible_host'] = hvars['ansible_host']
+            if 'ZBUILDER_PUBKEY' in hvars:
+                hostVars[host.name]['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
+            if 'ZBUILDER_SYSUSER' in hvars:
+                hostVars[host.name]['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
 
     inventory.subset(options.subset)
     for host in inventory.get_hosts():
-        if str(host) in hostVars:
-            hostVars[str(host)]['VM_OPTIONS']['enabled'] = True
+        if host.name in hostVars:
+            hostVars[host.name]['VM_OPTIONS']['enabled'] = True
 
     return hostVars
 
@@ -81,6 +85,10 @@ def getHosts(state):
         hvars['VM_OPTIONS']['aliases'] = ''
         if 'ansible_host' in hvars:
             hvars['VM_OPTIONS']['ansible_host'] = hvars['ansible_host']
+        if 'ZBUILDER_PUBKEY' in hvars:
+            hvars['VM_OPTIONS']['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
+        if 'ZBUILDER_SYSUSER' in hvars:
+            hvars['VM_OPTIONS']['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
 
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
 

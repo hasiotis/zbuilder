@@ -1,6 +1,7 @@
 import os
 import click
 
+from zbuilder.dns import dnsUpdate, dnsRemove
 
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.resource import ResourceManagementClient
@@ -11,17 +12,16 @@ from msrestazure.tools import parse_resource_id
 
 
 class vmProvider(object):
-    def __init__(self, state, dns):
-        self.state = state
-        self.dns = dns
-        self.credentials = ServicePrincipalCredentials(
-            client_id=state.vmConfig['client_id'],
-            secret=state.vmConfig['client_secret'],
-            tenant=state.vmConfig['tenant_id']
-        )
-        self.rgroupClient = ResourceManagementClient(self.credentials, state.vmConfig['subscription_id'])
-        self.netClient = NetworkManagementClient(self.credentials, state.vmConfig['subscription_id'])
-        self.vmClient = ComputeManagementClient(self.credentials, state.vmConfig['subscription_id'])
+    def __init__(self, cfg):
+        if cfg:
+            self.credentials = ServicePrincipalCredentials(
+                client_id=cfg['client_id'],
+                secret=cfg['client_secret'],
+                tenant=cfg['tenant_id']
+            )
+            self.rgroupClient = ResourceManagementClient(self.credentials, cfg['subscription_id'])
+            self.netClient = NetworkManagementClient(self.credentials, cfg['subscription_id'])
+            self.vmClient = ComputeManagementClient(self.credentials, cfg['subscription_id'])
 
     def create_nic(self, h, v):
         subnet = self.netClient.subnets.get(v['network']['group'], v['network']['vnet'], v['network']['subnet'])
@@ -40,8 +40,8 @@ class vmProvider(object):
         return nic.result()
 
     def create_vm(self, h, v, nic):
-        sysuser = self.state.vars['ZBUILDER_SYSUSER']
-        pubkey_fname = os.path.expanduser(self.state.vars['ZBUILDER_PUBKEY'])
+        sysuser = v['ZBUILDER_SYSUSER']
+        pubkey_fname = os.path.expanduser(v['ZBUILDER_PUBKEY'])
         pubkey = open(pubkey_fname, "r").read().rstrip('\n')
         datadisks = []
         if 'data_disks' in v:
@@ -114,7 +114,7 @@ class vmProvider(object):
                 thing = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
                 ips[vm.name] = thing[0].private_ip_address
 
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def up(self, hosts):
         for h, v in hosts.items():
@@ -188,24 +188,24 @@ class vmProvider(object):
                 except CloudError as e:
                     click.echo("    Error while removing disk: {}".format(e))
 
-        self.dns.remove(ips)
+        dnsRemove(hosts)
 
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in hosts.items():
             if hosts[h]['enabled']:
                 vm = self.vmClient.virtual_machines.get(v['resource_group'], h)
-
                 interface = vm.network_profile.network_interfaces[0]
                 nicInfo = parse_resource_id(interface.id)
                 thing = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
                 ips[vm.name] = thing[0].private_ip_address
 
-        self.dns.update(ips)
+        dnsUpdate(ips)
 
     def dnsremove(self, hosts):
         ips = {}
         for h in hosts:
             if hosts[h]['enabled']:
                 ips[h] = None
-        self.dns.remove(ips)
+
+        dnsRemove(hosts)
