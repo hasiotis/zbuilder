@@ -46,8 +46,6 @@ zbuilder config provider azure client_id=<appId>
 zbuilder config provider azure client_secret=<password>
 zbuilder config provider azure tenant_id=<tenant>
 zbuilder config provider azure subscription_id=<subscriptionId>
-
-zbuilder config provider azure.dns zones=azure.hasiotis.dev
 ```
 
 Let zbuilder know that azure provider will also handle the *azure.hasiotis.dev* zone:
