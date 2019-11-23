@@ -32,3 +32,4 @@ pipenv shell
 * For vagrant provider check [here](docs/Vagrant.md).
 * For GCP provider check [here](docs/GCP.md).
 * For Digital Ocean provider check [here](docs/DO.md).
+* For Azure provider check [here](docs/Azure.md).
