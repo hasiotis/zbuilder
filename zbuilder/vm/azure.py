@@ -224,16 +224,20 @@ class vmProvider(object):
         ips = {}
         for h, v in hosts.items():
             if hosts[h]['enabled']:
-                vm = self.vmClient.virtual_machines.get(v['resource_group'], h)
-                interface = vm.network_profile.network_interfaces[0]
-                nicInfo = parse_resource_id(interface.id)
-                ip_configurations = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
-                if v.get('external_dns', False):
-                    pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
-                    pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
-                    ips[vm.name] = pip.ip_address
-                else:
-                    ips[vm.name] = ip_configurations[0].private_ip_address
+                try:
+                    vm = self.vmClient.virtual_machines.get(v['resource_group'], h)
+                    interface = vm.network_profile.network_interfaces[0]
+                    nicInfo = parse_resource_id(interface.id)
+                    ip_configurations = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
+                    if v.get('external_dns', False):
+                        pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
+                        pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
+                        ips[vm.name] = pip.ip_address
+                    else:
+                        ips[vm.name] = ip_configurations[0].private_ip_address
+                except CloudError as e:
+                    if str(e).startswith("Azure Error: ResourceNotFound"):
+                        pass
 
         dnsUpdate(ips)
 
