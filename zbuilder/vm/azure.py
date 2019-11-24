@@ -26,16 +26,28 @@ class vmProvider(object):
     def create_nic(self, h, v):
         subnet = self.netClient.subnets.get(v['network']['group'], v['network']['vnet'], v['network']['subnet'])
         nicName = "nic_{}".format(h)
-        ipConfigName = "ip_config_{}".format(h)
         nicParams = {
             'location': v['location'],
             'ip_configurations': [{
-                'name': ipConfigName,
+                'name': nicName,
                 'subnet': {
                     'id': subnet.id
                 }
             }]
         }
+
+        if v['network'].get('external', False):
+            pipName = "public_ip_{}".format(h)
+            pipParams = {
+                'location': v['location'],
+                'public_ip_allocation_method': 'dynamic',
+            }
+            pip_poller = self.netClient.public_ip_addresses.create_or_update(
+                v['resource_group'], pipName, pipParams
+            )
+            pip = pip_poller.result()
+            nicParams['ip_configurations'][0]['public_ip_address'] = {'id': pip.id}
+
         nic = self.netClient.network_interfaces.create_or_update(v['resource_group'], nicName, nicParams)
         return nic.result()
 
@@ -111,8 +123,14 @@ class vmProvider(object):
 
                 interface = vm.network_profile.network_interfaces[0]
                 nicInfo = parse_resource_id(interface.id)
-                thing = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
-                ips[vm.name] = thing[0].private_ip_address
+                ip_configurations = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
+
+                if v.get('external_dns', False):
+                    pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
+                    pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
+                    ips[vm.name] = pip.ip_address
+                else:
+                    ips[vm.name] = ip_configurations[0].private_ip_address
 
         dnsUpdate(ips)
 
@@ -160,8 +178,7 @@ class vmProvider(object):
 
                     interface = vm.network_profile.network_interfaces[0]
                     nicInfo = parse_resource_id(interface.id)
-                    thing = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
-                    ips[vm.name] = thing[0].private_ip_address
+                    ip_configurations = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
                     click.echo("  - Destroying host: {} ".format(vm.name))
 
                     async_vm_delete = self.vmClient.virtual_machines.delete(v['resource_group'], h)
@@ -170,6 +187,19 @@ class vmProvider(object):
                     click.echo("    Removing nic: {} ".format(nicInfo['resource_name']))
                     net_del_poller = self.netClient.network_interfaces.delete(nicInfo['resource_group'], nicInfo['resource_name'])
                     net_del_poller.wait()
+
+                    pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
+                    pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
+                    if pip.ip_address:
+                        click.echo("    Removing public ip: {} ".format(pip.ip_address))
+                        ip_del_poller = self.netClient.public_ip_addresses.delete(pipInfo['resource_group'], pipInfo['resource_name'])
+                        ip_del_poller.wait()
+
+                    if v.get('external_dns', False):
+                        ips[vm.name] = pip.ip_address
+                    else:
+                        ips[vm.name] = ip_configurations[0].private_ip_address
+
                 except CloudError as e:
                     if str(e).startswith("Azure Error: ResourceNotFound"):
                         click.echo("  - Host does not exists : {}".format(h))
@@ -197,8 +227,13 @@ class vmProvider(object):
                 vm = self.vmClient.virtual_machines.get(v['resource_group'], h)
                 interface = vm.network_profile.network_interfaces[0]
                 nicInfo = parse_resource_id(interface.id)
-                thing = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
-                ips[vm.name] = thing[0].private_ip_address
+                ip_configurations = self.netClient.network_interfaces.get(nicInfo['resource_group'], nicInfo['resource_name']).ip_configurations
+                if v.get('external_dns', False):
+                    pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
+                    pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
+                    ips[vm.name] = pip.ip_address
+                else:
+                    ips[vm.name] = ip_configurations[0].private_ip_address
 
         dnsUpdate(ips)
 
