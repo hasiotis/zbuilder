@@ -190,8 +190,8 @@ class vmProvider(object):
 
                     pipInfo = parse_resource_id(ip_configurations[0].public_ip_address.id)
                     pip = self.netClient.public_ip_addresses.get(pipInfo['resource_group'], pipInfo['resource_name'])
-                    if pip.ip_address:
-                        click.echo("    Removing public ip: {} ".format(pip.ip_address))
+                    if pip.id:
+                        click.echo("    Removing public ip: {} ".format(pip.name))
                         ip_del_poller = self.netClient.public_ip_addresses.delete(pipInfo['resource_group'], pipInfo['resource_name'])
                         ip_del_poller.wait()
 
@@ -218,7 +218,7 @@ class vmProvider(object):
                 except CloudError as e:
                     click.echo("    Error while removing disk: {}".format(e))
 
-        dnsRemove(hosts)
+        dnsRemove(ips)
 
     def dnsupdate(self, hosts):
         ips = {}
@@ -243,4 +243,4 @@ class vmProvider(object):
             if hosts[h]['enabled']:
                 ips[h] = None
 
-        dnsRemove(hosts)
+        dnsRemove(ips)
