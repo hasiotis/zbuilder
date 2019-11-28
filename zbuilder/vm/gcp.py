@@ -87,7 +87,7 @@ class vmProvider(object):
                     image_response = self.compute.images().getFromFamily(project=v['image']['project'], family=v['image']['family']).execute()
                     source_disk_image = image_response['selfLink']
 
-                    fname = os.path.expanduser(v['sshkey'])
+                    fname = os.path.expanduser(v['ZBUILDER_PUBKEY'])
                     sshkey = ''
                     if os.path.isfile(fname):
                         with open(fname, "r") as f:
