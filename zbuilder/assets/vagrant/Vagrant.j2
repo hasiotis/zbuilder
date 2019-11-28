@@ -33,7 +33,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.cpus = zparam[:vcpus]
         v.customize ["modifyvm", :id, "--vram", "16"]
         v.customize ["modifyvm", :id, "--vrde", "off"]
-        v.customize ["modifyvm", :id, "--nictype1", "virtio"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
         v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
         zparam[:disks].split(",").map { |s| s.to_i }.each_with_index do |size, i|
