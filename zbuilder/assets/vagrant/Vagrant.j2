@@ -34,6 +34,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.customize ["modifyvm", :id, "--vram", "16"]
         v.customize ["modifyvm", :id, "--vrde", "off"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--nictype1", "virtio"]
+        v.customize ["modifyvm", :id, "--nictype2", "virtio"]
         v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
         zparam[:disks].split(",").map { |s| s.to_i }.each_with_index do |size, i|
             disk_fname = File.join(VBOX_ROOT, zname.to_s, "disk#{i+2}_#{zname}.vmdk")
