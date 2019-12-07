@@ -35,6 +35,7 @@ tabulate = "*"
 pytest = "*"
 pytest-cov = "*"
 pylint = "*"
+twine = "*"
 
 [requires]
 python_version = "3.6"
