@@ -36,6 +36,7 @@ pytest = "*"
 pytest-cov = "*"
 pylint = "*"
 twine = "*"
+sphinx = "*"
 
 [requires]
 python_version = "3.6"
