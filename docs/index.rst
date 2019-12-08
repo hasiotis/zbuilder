@@ -7,7 +7,6 @@ way it achieves high integration with ansible.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
 
    install
    vagrant
