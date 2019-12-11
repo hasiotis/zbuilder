@@ -15,7 +15,7 @@ jobs:
         python-version: 3.6
     - name: Install dependencies
       run: |
-        apt-get install -y make
+        sudo apt-get install -y make
         python -m pip install --upgrade pip
         make init
     - name: Lint with flake8
