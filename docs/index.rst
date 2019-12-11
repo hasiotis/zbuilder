@@ -13,4 +13,5 @@ way it achieves high integration with ansible.
    gcp
    do
    azure
+   ganeti
 
