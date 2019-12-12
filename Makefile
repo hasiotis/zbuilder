@@ -1,8 +1,3 @@
-LASTTAG = v$(shell cat VERSION)
-VERSION = $(shell git describe --tags)
-BUILD   = $(shell git rev-parse HEAD)
-DATE    = $(shell git show -s --format=%ci ${BUILD})
-
 .PHONY: help ## Print this help
 help:
 	@grep -E '^\.PHONY: [a-zA-Z_-]+ .*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = "(: |##)"}; {printf "\033[36m%-30s\033[0m %s\n", $$2, $$3}'
@@ -37,4 +32,4 @@ clean:
 
 .PHONY: release  ## Make release
 release:
-	echo "Not yet"
+	bumpversion --commit --tag patch zbuilder/__init__.py

@@ -2,6 +2,8 @@
 import os.path
 
 from setuptools import setup, find_packages
+from zbuilder import __version__
+
 
 base_dir = os.path.dirname(__file__)
 
@@ -12,9 +14,6 @@ with open(os.path.join(base_dir, "requirements.txt")) as f:
         if '==' in req:
             requirements.append(req)
 
-with open(os.path.join(base_dir, "VERSION")) as f:
-    version = f.read()
-
 with open(os.path.join(base_dir, "README.md")) as f:
     long_description = f.read()
 
@@ -23,7 +22,7 @@ assets_files = [(d, [os.path.join(d, f) for f in files]) for d, folders, files i
 
 setup(
     name='zbuilder',
-    version=version.rstrip(),
+    version=__version__,
     description='Create VMs',
     long_description=long_description,
     long_description_content_type='text/markdown',
