@@ -32,4 +32,4 @@ clean:
 
 .PHONY: release  ## Make release
 release:
-	echo "Not yet"
+	bumpversion --commit --tag patch zbuilder/__init__.py
