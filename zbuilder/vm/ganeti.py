@@ -91,14 +91,12 @@ class vmProvider(object):
 
         return retValue
 
-
     def _findIP(self, nics):
         for nic in nics:
             try:
                 return str(ipaddress.ip_address(nic))
             except Exception:
                 pass
-
 
     def build(self, hosts):
         ips = {}
