@@ -18,7 +18,10 @@ Define *ganeti* as a provider of type ganeti::
   zbuilder config provider ganeti type=ganeti
   zbuilder config provider ganeti user=YOURUSER
   zbuilder config provider ganeti apikey=SUPERDUPERSECRET
+  zbuilder config provider ganeti url=https://yourhost.fqdn:5080
+  zbuilder config provider ganeti verify=false
   zbuilder config view
+
 
 Since ganeti is not a DNS provider we will use ansible for the DNS (poor man's DNS)::
 
