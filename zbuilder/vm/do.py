@@ -97,13 +97,16 @@ class vmProvider(object):
         self.waitStatus(hosts, 'off')
 
     def destroy(self, hosts):
+        updateHosts = {}
         for k, d in self.getDroplets(hosts).items():
             if d.status is not None:
                 click.echo("  - Destroying host: {} ".format(d.name))
                 d.destroy()
+                updateHosts[d.name] = {}
             else:
                 click.echo("  - Host does not exists : {}".format(d.name))
-        dnsRemove(hosts)
+
+        dnsRemove(updateHosts)
 
     def dnsupdate(self, hosts):
         ips = {}

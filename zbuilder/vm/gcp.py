@@ -187,17 +187,19 @@ class vmProvider(object):
                 click.echo("  - Status of host: {} is {}".format(h, v['status']))
 
     def destroy(self, hosts):
+        updateHosts = {}
         ops = {}
         for h, v in self._getVMs(hosts).items():
             if v['status'] is not None:
                 click.echo("  - Destroying host: {} ".format(h))
                 r = self.compute.instances().delete(project=hosts[h]['project'], zone=hosts[h]['zone'], instance=v['name']).execute()
                 ops[h] = {'name': r['name'], 'project': hosts[h]['project'], 'zone': hosts[h]['zone']}
+                updateHosts[h] = {}
             else:
                 click.echo("  - Host does not exists : {}".format(h))
 
         self._waitDone(ops, "  - Host {} destroyed")
-        dnsRemove(hosts)
+        dnsRemove(updateHosts)
 
     def dnsupdate(self, hosts):
         ips = {}
