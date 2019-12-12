@@ -49,7 +49,6 @@ def build(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
         vmProvider['cloud'].build(vmProvider['hosts'])
-    vmProviders = getHosts(state)
     click.echo("Fixing ssh keys VMs")
     fixKeys(state)
     click.echo("Running bootstrap.yml")
