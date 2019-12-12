@@ -234,6 +234,10 @@ def provider(state, args):
     sub_path, value = args[1].split('=')
     if ',' in value:
         value = value.split(',')
+    if value in ['True', 'true']:
+        value = True
+    if value in ['False', 'false']:
+        value = False
     cfg_path = "providers/{}/{}".format(base_path, sub_path)
 
     click.echo("Setting config /{} to {}".format(cfg_path, value))
