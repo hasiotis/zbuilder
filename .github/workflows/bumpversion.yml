@@ -26,6 +26,6 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         make release
-        git push
+        git push origin HEAD:master --tags
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
