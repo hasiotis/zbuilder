@@ -11,10 +11,10 @@
 import os
 import sys
 
-from zbuilder import __version__
-
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('..'))
 base_dir = os.path.dirname(__file__)
+
+from zbuilder import __version__
 
 
 # -- Project information -----------------------------------------------------
