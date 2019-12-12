@@ -11,6 +11,8 @@
 import os
 import sys
 
+from zbuilder import __version__
+
 sys.path.insert(0, os.path.abspath('.'))
 base_dir = os.path.dirname(__file__)
 
@@ -22,10 +24,8 @@ copyright = '2019, Nikos Chasiotis'
 author = 'Nikos Chasiotis'
 
 # The full version, including alpha/beta/rc tags
-with open(os.path.join(base_dir, "..", "VERSION")) as f:
-    fversion = f.read()
-version = fversion
-release = fversion
+version = __version__
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
