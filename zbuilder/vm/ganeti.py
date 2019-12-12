@@ -91,11 +91,21 @@ class vmProvider(object):
 
         return retValue
 
+
+    def _findIP(self, nics):
+        for nic in nics:
+            try:
+                return str(ipaddress.ip_address(nic))
+            except Exception:
+                pass
+
+
     def build(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
             if v['found']:
                 click.echo("  - Status of host: {} is {}".format(h, v['run_state']))
+                ips[h] = self._findIP(v['nics'][0])
             else:
                 click.echo("  - Creating host: {} ".format(h))
                 url = "{}/2/instances".format(self.url)
@@ -106,12 +116,8 @@ class vmProvider(object):
 
                 jobid = r.text.rstrip('\n')
                 j = self._getJob(jobid)
-
-                for nic in j['opresult'][0][h]['nics'][0]:
-                    try:
-                        ips[h] = str(ipaddress.ip_address(nic))
-                    except Exception:
-                        pass
+                j = self._getInfoVM(h)
+                ips[h] = self._findIP(j['nics'][0])
 
         dnsUpdate(ips)
 
@@ -122,18 +128,24 @@ class vmProvider(object):
         pass
 
     def destroy(self, hosts):
+        updateHosts = {}
         for h, v in self._getVMs(hosts).items():
             if v['found']:
                 click.echo("  - Destroying host: {} ".format(h))
+                updateHosts[h] = {}
                 url = "{}/2/instances/{}".format(self.url, h)
                 r = requests.delete(url, auth=(self.user, self.apikey), verify=self.verify)
+
+                jobid = r.text.rstrip('\n')
+                j = self._getJob(jobid)
+
                 if r.status_code != requests.codes.ok:
                     j = r.json()
                     click.echo('Failed: [{v[message]} :: {v[explain]}]'.format(v=j))
             else:
                 click.echo("  - Host does not exists : {}".format(h))
 
-        dnsRemove(hosts)
+        dnsRemove(updateHosts)
 
     def dnsupdate(self, hosts):
         ips = {}
@@ -150,4 +162,4 @@ class vmProvider(object):
         dnsRemove(hosts)
 
     def params(self, params):
-        return {k: params[k] for k in ['beparams', 'disks', 'os_type']}
+        return {k: params[k] for k in ['beparams', 'disks', 'os_type', 'nics']}
