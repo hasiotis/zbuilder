@@ -42,9 +42,11 @@ release:
 	bumpversion --commit --tag patch zbuilder/__init__.py
 	python setup.py sdist bdist_wheel
 	#twine upload dist/*
+	rm -rf dist/*
 
 
 .PHONY: release-test  ## Make release on test pypi
 release-test:
 	python setup.py sdist bdist_wheel
-	twine upload --repository-url https://test.pypi.org/legacy/ --repository zbuilder dist/*
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	rm -rf dist/*
