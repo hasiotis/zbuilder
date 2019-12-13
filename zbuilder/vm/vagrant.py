@@ -55,7 +55,11 @@ class vmProvider(object):
         templateLoader = jinja2.FileSystemLoader(searchpath=ASSETS_DIR)
         templateEnv = jinja2.Environment(loader=templateLoader, trim_blocks=True)
         template = templateEnv.get_template('Vagrant.j2')
-        outputText = template.render(pubkey=pubkey, hosts=hosts)
+        privkey = pubkey
+        if privkey.endswith('.pub'):
+            privkey = privkey[:-4]
+
+        outputText = template.render(privkey=privkey, pubkey=pubkey, hosts=hosts)
 
         f = open('Vagrantfile', 'w')
         f.write(outputText)
