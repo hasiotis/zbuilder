@@ -57,5 +57,6 @@ typed-ast==1.4.0 ; implementation_name == 'cpython' and python_version < '3.8'
 urllib3==1.25.7
 wcwidth==0.1.7
 webencodings==0.5.1
+wheel==0.33.6
 wrapt==1.11.2
 zipp==0.6.0

@@ -38,6 +38,7 @@ pylint = "*"
 twine = "*"
 sphinx = "*"
 bumpversion = "*"
+wheel = "*"
 
 [requires]
 python_version = "3.6"
