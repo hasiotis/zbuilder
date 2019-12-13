@@ -43,6 +43,10 @@ release:
 	python setup.py sdist bdist_wheel
 	twine upload -u "__token__" dist/*
 	rm -rf dist/*
+	curl -X POST -s -o /dev/null -w "%{http_code}"      \
+		-H "Authorization: Token ${READTHEDOCS_TOKEN}"  \
+		-H "Content-Type: application/json"             \
+		https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
 
 
 .PHONY: pre-release  ## Make pre release
@@ -58,4 +62,4 @@ doc-devel:
 	curl -X POST -s -o /dev/null -w "%{http_code}"      \
 		-H "Authorization: Token ${READTHEDOCS_TOKEN}"  \
 		-H "Content-Type: application/json"             \
-		https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
+		https://readthedocs.org/api/v3/projects/zbuilder/versions/develop/builds/ -d ""
