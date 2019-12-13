@@ -25,6 +25,9 @@ jobs:
         make style
     - name: Pre release
       run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
         make pre-release
+        git push https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git HEAD:master --tags
       env:
         TWINE_PASSWORD: ${{ secrets.TWINE_TEST_PASSWORD }}
