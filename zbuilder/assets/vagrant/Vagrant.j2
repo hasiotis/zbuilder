@@ -7,7 +7,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.ignore_private_ip = true
-  config.hostmanager.include_offline = false
+  config.hostmanager.include_offline = true
   config.ssh.insert_key = false
   config.ssh.private_key_path = ["{{ pubkey }}", "~/.vagrant.d/insecure_private_key"]
 
