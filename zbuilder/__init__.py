@@ -1,7 +1,7 @@
 import os
 import site
 
-__version__ = '0.0.6'
+__version__ = '0.0.6.dev1'
 
 
 def getAssetsDir():
