@@ -1,4 +1,4 @@
-name: Bump Version
+name: Master merge pipeline
 
 on:
   pull_request:
