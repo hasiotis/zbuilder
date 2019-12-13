@@ -41,7 +41,7 @@ clean:
 release:
 	bumpversion --commit --tag patch zbuilder/__init__.py
 	python setup.py sdist bdist_wheel
-	#twine upload dist/*
+	twine upload -u "__token__" dist/*
 	rm -rf dist/*
 
 
