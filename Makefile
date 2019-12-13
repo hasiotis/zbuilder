@@ -45,8 +45,9 @@ release:
 	rm -rf dist/*
 
 
-.PHONY: release-test  ## Make release on test pypi
-release-test:
+.PHONY: pre-release  ## Make pre release
+pre-release:
+	bumpversion --commit --tag dev zbuilder/__init__.py
 	python setup.py sdist bdist_wheel
-	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+	twine upload -u "__token__" --repository-url https://test.pypi.org/legacy/ dist/*
 	rm -rf dist/*
