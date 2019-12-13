@@ -6,7 +6,7 @@ Install zbuilder
 
 Install and update using::
 
- pip3 install --user -U zbuilder
+ pip3 install --user --upgrade zbuilder
 
 Developer setup
 ---------------

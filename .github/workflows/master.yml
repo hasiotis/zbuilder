@@ -30,3 +30,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        READTHEDOCS_TOKEN: ${{ secrets.READTHEDOCS_TOKEN }}
