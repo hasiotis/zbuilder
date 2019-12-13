@@ -23,3 +23,8 @@ jobs:
     - name: Check our style
       run: |
         make style
+    - name: Publish documentation
+      run: |
+        make doc-devel
+      env:
+        READTHEDOCS_TOKEN: ${{ secrets.READTHEDOCS_TOKEN }}

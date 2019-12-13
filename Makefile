@@ -51,3 +51,11 @@ pre-release:
 	python setup.py sdist bdist_wheel
 	twine upload -u "__token__" --repository-url https://test.pypi.org/legacy/ dist/*
 	rm -rf dist/*
+
+
+.PHONY: doc-devel  ## Make docs for develop
+doc-devel:
+	curl -X POST -s -o /dev/null -w "%{http_code}"      \
+		-H "Authorization: Token ${READTHEDOCS_TOKEN}"  \
+		-H "Content-Type: application/json"             \
+		https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
