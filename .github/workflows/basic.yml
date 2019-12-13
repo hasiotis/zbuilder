@@ -23,3 +23,8 @@ jobs:
     - name: Check our style
       run: |
         make style
+    - name: Pre release
+      run: |
+        make pre-release
+      env:
+        TWINE_PASSWORD: ${{ secrets.TWINE_TEST_PASSWORD }}
