@@ -1,6 +1,6 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
-[![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=latest)](https://zbuilder.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=develop)](https://zbuilder.readthedocs.io/en/develop/?badge=develop)
 
 ZBuilder is a tool to help you build VMs ready to be transfered to ansible.
 By using ansible as a library, it has access to all ansible variables. This
