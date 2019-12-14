@@ -1,7 +1,7 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
 [![PyPi version](https://pypip.in/v/zbuilder/badge.png)](https://pypi.org/project/zbuilder/)
-[![PyPi downloads](https://pypip.in/d/zbuilder/badge.png)](https://pypi.org/project/zbuilder/)
+[![PyPi downloads](https://pypip.in/d/zbuilder/badge.png)](https://pypistats.org/packages/zbuilder)
 [![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=develop)](https://zbuilder.readthedocs.io/en/develop/?badge=develop)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/hasiotis/zbuilder/blob/master/LICENSE)
 
@@ -13,7 +13,7 @@ way it achieves high integration with ansible.
 
 Install and update using:
 ```
-pip3 install --user -U zbuilder
+pip3 install --user --upgrade zbuilder
 ```
 
 ## Links
