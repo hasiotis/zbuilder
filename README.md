@@ -1,5 +1,7 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
+[![PyPi version](https://pypip.in/v/zbuilder/badge.png)](https://pypi.org/project/zbuilder/)
+[![PyPi downloads](https://pypip.in/d/zbuilder/badge.png)](https://pypi.org/project/zbuilder/)
 [![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=develop)](https://zbuilder.readthedocs.io/en/develop/?badge=develop)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/hasiotis/zbuilder/blob/master/LICENSE)
 
