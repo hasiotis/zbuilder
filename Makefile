@@ -5,7 +5,7 @@ help:
 
 .PHONY: tests ## Run unit tests
 tests:
-	pytest --junit-xml=results.xml --cov=zbuilder --cov-fail-under=30 --color=yes tests/
+	pytest tests/
 
 
 .PHONY: style  ## Run unit tests
@@ -33,7 +33,7 @@ docs:
 
 .PHONY: clean ## Cleanup generated files
 clean:
-	rm -rf *.egg-info build dist docs/_build zbuilder/zbuilder.1
+	rm -rf *.egg-info build dist docs/_build .coverage
 	find . -type d -name __pycache__ -exec rm -r {} \+
 
 
