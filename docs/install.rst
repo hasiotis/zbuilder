@@ -8,6 +8,10 @@ Install and update using::
 
  pip3 install --user --upgrade zbuilder
 
+If you wish to not mesh with your ansible installation, try::
+
+ pipx install zbuilder
+
 Developer setup
 ---------------
 
