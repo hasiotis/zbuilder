@@ -4,13 +4,13 @@ help:
 
 
 .PHONY: tests ## Run unit tests
-tests:
-	pytest tests/
+tests: style
+	@pytest tests/
 
 
 .PHONY: style  ## Run unit tests
 style:
-	flake8 zbuilder
+	@flake8 zbuilder
 
 
 .PHONY: init ## Initialize pipenv for development
@@ -18,6 +18,7 @@ init:
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
 	python setup.py develop
+	cp pre-commit.hook .git/hooks/pre-commit
 
 
 .PHONY: lock ## Lock requirements

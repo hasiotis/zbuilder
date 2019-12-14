@@ -1,0 +1,13 @@
+#!/bin/bash
+
+MODIFY=`git diff --cached --name-only | wc -l`
+if [[ $MODIFY == 0 ]]; then
+    echo "No modifications!"
+    exit 1
+fi
+
+make tests
+if [[ $? != 0 ]]; then
+    echo "Tests failed!"
+    exit 1
+fi

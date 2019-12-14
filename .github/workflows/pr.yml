@@ -22,7 +22,7 @@ jobs:
         make init
     - name: Check our style
       run: |
-        make style
+        make tests
     - name: Publish documentation
       run: |
         make doc-devel
