@@ -1,9 +1,9 @@
-name: PR Pipeline
+name: Build status
 
 on:
-  pull_request:
+  push:
     branches:
-      - master
+      - develop
 
 jobs:
   build:
