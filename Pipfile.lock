@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a4dfcf4945c515b5eef6df4fb64eb2eb539c0f4a284d44f809aeac4767677165"
+            "sha256": "83de46324c867eaf1d3d6942f825b62ff354127d3746f6fa9adb237fdd2900d3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -29,10 +29,10 @@
         },
         "ansible": {
             "hashes": [
-                "sha256:6a52f43b5e4446aa04f3907a750010fbbf41eb050cb726065c6c877ed3a98d02"
+                "sha256:99bf683d069b3f73704182ece95b6618ae2090594a66e146f4d286c0cac858ce"
             ],
             "index": "pypi",
-            "version": "==2.7.14"
+            "version": "==2.7.15"
         },
         "azure-common": {
             "hashes": [
