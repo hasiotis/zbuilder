@@ -47,7 +47,10 @@ class vmProvider(object):
         self._cmd(hosts, 'vagrant snapshot delete {host} zbuilder')
 
     def params(self, params):
-        return {k: params[k] for k in ['box', 'vcpus', 'memory', 'disks']}
+        if 'disks' in params.keys():
+            return {k: params[k] for k in ['box', 'vcpus', 'memory', 'disks']}
+        else:
+            return {k: params[k] for k in ['box', 'vcpus', 'memory']}
 
     def setVagrantfile(self, pubkey, hosts):
         ASSETS_DIR = os.path.join(getAssetsDir(), 'vagrant')
