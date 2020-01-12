@@ -29,6 +29,7 @@ dpath = "*"
 google-auth-oauthlib = "*"
 massedit = "*"
 tabulate = "*"
+pyvmomi = "*"
 
 [dev-packages]
 "flake8" = "*"
