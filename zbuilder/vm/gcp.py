@@ -71,11 +71,15 @@ class vmProvider(object):
         for h, v in hosts.items():
             if hosts[h]['enabled']:
                 shortname = h.partition('.')[0]
-                result = self.compute.instances().list(
-                    project=v['project'],
-                    zone=v['zone'],
-                    filter="name=\"{}\"".format(shortname)
-                ).execute()
+                try:
+                    result = self.compute.instances().list(
+                        project=v['project'],
+                        zone=v['zone'],
+                        filter="name=\"{}\"".format(shortname)
+                    ).execute()
+                except Exception as e:
+                    click.echo("Error [{}]".format(e))
+                    exit()
                 items = result.get('items', [])
                 if items:
                     retValue[h] = items[0]
