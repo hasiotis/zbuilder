@@ -1,3 +1,7 @@
+import time
+import click
+import arrow
+
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, SmartConnectNoSSL
 
@@ -23,6 +27,21 @@ class vmProvider(object):
                 obj = c
                 break
         return obj
+
+    def _wait_for_task(self, task, reportTime=False):
+        task_done = False
+        while not task_done:
+            if task.info.state == 'success':
+                if reportTime:
+                    elapsed = arrow.get(task.info.completeTime) - arrow.get(task.info.startTime)
+                    click.echo("  Task [%s] completed in [%s seconds]" % (task, elapsed.seconds))
+                task_done = True
+            if task.info.state == 'error':
+                click.echo("  Task [%s] failed: [%s]" % (task, task.info.error.msg))
+                task_done = True
+            time.sleep(1)
+
+        return task.info.state
 
     def build(self, hosts):
         content = self.conn.RetrieveContent()
@@ -71,23 +90,12 @@ class vmProvider(object):
                 scsi_ctr.device.scsiCtlrUnitNumber = 7
                 devices.append(scsi_ctr)
 
-                if templateDisk:
-                    destDir = "[{}] {}".format(root_datastore, h)
-                    destDisk = "[{}] {}/{}_disk0.vmdk".format(root_datastore, h, h)
-                    templateDiskRaw = templateDisk.replace('.vmdk', '-flat.vmdk')
-                    destDiskRaw = "[{}] {}/{}_disk0-flat.vmdk".format(root_datastore, h, h)
-                    try:
-                        content.fileManager.MakeDirectory(name=destDir)
-                        content.fileManager.CopyDatastoreFile_Task(sourceName=templateDisk, destinationName=destDisk, force=True)
-                        content.fileManager.CopyDatastoreFile_Task(sourceName=templateDiskRaw, destinationName=destDiskRaw, force=True)
-                    except Exception as e:
-                        print(e)
-
                 unit_number = 0
                 controller = scsi_ctr.device
                 disk_spec = vim.vm.device.VirtualDeviceSpec()
                 disk_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
                 disk_spec.device = vim.vm.device.VirtualDisk()
+                disk_spec.fileOperation = "create"
                 disk_spec.device.backing = vim.vm.device.VirtualDisk.FlatVer2BackingInfo()
                 disk_spec.device.backing.diskMode = 'persistent'
                 disk_spec.device.backing.fileName = "[{}] {}/{}_disk0.vmdk".format(root_datastore, h, h)
@@ -101,9 +109,20 @@ class vmProvider(object):
                 pool = self._get_obj(content, [vim.ResourcePool], "")
 
                 try:
-                    folder.CreateVM_Task(config=config, pool=pool)
+                    task = folder.CreateVM_Task(config=config, pool=pool)
+                    self._wait_for_task(task)
                 except Exception as e:
                     print(e)
+
+                if templateDisk:
+                    templateDiskRaw = templateDisk.replace('.vmdk', '-flat.vmdk')
+                    destDiskRaw = "[{}] {}/{}_disk0-flat.vmdk".format(root_datastore, h, h)
+                    try:
+                        task = content.fileManager.CopyDatastoreFile_Task(sourceName=templateDiskRaw, destinationName=destDiskRaw, force=True)
+                        self._wait_for_task(task, reportTime=True)
+                    except Exception as e:
+                        print(e)
+
         exit()
 
     def up(self, hosts):

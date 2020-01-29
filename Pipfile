@@ -30,6 +30,7 @@ google-auth-oauthlib = "*"
 massedit = "*"
 tabulate = "*"
 pyvmomi = "*"
+arrow = "*"
 
 [dev-packages]
 "flake8" = "*"
