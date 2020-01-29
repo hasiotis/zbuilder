@@ -4,6 +4,7 @@ import arrow
 
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, SmartConnectNoSSL
+from zbuilder.dns import dnsRemove
 
 
 class vmProvider(object):
@@ -34,10 +35,10 @@ class vmProvider(object):
             if task.info.state == 'success':
                 if reportTime:
                     elapsed = arrow.get(task.info.completeTime) - arrow.get(task.info.startTime)
-                    click.echo("  Task [%s] completed in [%s seconds]" % (task, elapsed.seconds))
+                    click.echo("    Task completed in [%s seconds]" % (elapsed.seconds))
                 task_done = True
             if task.info.state == 'error':
-                click.echo("  Task [%s] failed: [%s]" % (task, task.info.error.msg))
+                click.echo("    Task [%s] failed: [%s]" % (task, task.info.error.msg))
                 task_done = True
             time.sleep(1)
 
@@ -49,6 +50,7 @@ class vmProvider(object):
         for h, v in hosts.items():
             vmFound = self._get_obj(content, [vim.VirtualMachine], h)
             if not vmFound:
+                click.echo("  - Creating host: {} ".format(h))
                 template = self._get_obj(content, [vim.VirtualMachine], v['template'])
                 templateDisk = None
                 for device in template.config.hardware.device:
@@ -122,8 +124,8 @@ class vmProvider(object):
                         self._wait_for_task(task, reportTime=True)
                     except Exception as e:
                         print(e)
-
-        exit()
+            else:
+                click.echo("  - Already running host: {} ".format(h))
 
     def up(self, hosts):
         pass
@@ -132,7 +134,29 @@ class vmProvider(object):
         pass
 
     def destroy(self, hosts):
-        pass
+        updateHosts = {}
+        content = self.conn.RetrieveContent()
+        for h, v in hosts.items():
+            vmFound = self._get_obj(content, [vim.VirtualMachine], h)
+            if vmFound:
+                click.echo("  - Destroying host: {} ".format(h))
+                if vmFound.runtime.powerState == "poweredOn":
+                    try:
+                        task = vmFound.PowerOffVM_Task()
+                        self._wait_for_task(task)
+                    except Exception as e:
+                        click.echo("  Attempting to power off failed [%s]" % e)
+
+                try:
+                    task = vmFound.Destroy_Task()
+                    self._wait_for_task(task)
+                    click.echo("    Destroyed")
+                except Exception as e:
+                    click.echo("        Attempting to destroy failed [%s]" % e)
+            else:
+                click.echo("  - Host does not exists : {}".format(h))
+
+        dnsRemove(updateHosts)
 
     def dnsupdate(self, hosts):
         pass
