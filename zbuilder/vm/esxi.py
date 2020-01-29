@@ -48,6 +48,7 @@ class vmProvider(object):
         content = self.conn.RetrieveContent()
 
         for h, v in hosts.items():
+            zone = h.partition('.')[2]
             vmFound = self._get_obj(content, [vim.VirtualMachine], h)
             if not vmFound:
                 click.echo("  - Creating host: {} ".format(h))
@@ -58,6 +59,18 @@ class vmProvider(object):
                         templateDisk = device.backing.fileName
 
                 root_datastore, root_size = v['root_disk'].split(':', 2)
+
+                globalip = vim.vm.customization.GlobalIPSettings()
+
+                # Hostname settings
+                ident = vim.vm.customization.LinuxPrep()
+                ident.domain = zone
+                ident.hostName = vim.vm.customization.FixedName(name=h)
+                ident.hostName.name = h.split('.')[0]
+
+                customspec = vim.vm.customization.Specification()
+                customspec.globalIPSettings = globalip
+                customspec.identity = ident
 
                 devices = []
                 vmPathName = "[{}] {}/{}.vmx".format(root_datastore, h, h)
@@ -122,6 +135,9 @@ class vmProvider(object):
                     try:
                         task = content.fileManager.CopyDatastoreFile_Task(sourceName=templateDiskRaw, destinationName=destDiskRaw, force=True)
                         self._wait_for_task(task, reportTime=True)
+                        vmFound = self._get_obj(content, [vim.VirtualMachine], h)
+                        task = vmFound.Customize(customspec)
+                        self._wait_for_task(task)
                     except Exception as e:
                         print(e)
             else:
