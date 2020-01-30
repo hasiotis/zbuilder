@@ -60,7 +60,13 @@ class vmProvider(object):
 
                 root_datastore, root_size = v['root_disk'].split(':', 2)
 
+                adaptermap = []
+                devices = []
+
                 globalip = vim.vm.customization.GlobalIPSettings()
+                globalip.dnsSuffixList = zone
+                if 'dns' in v['network'][0]:
+                    globalip.dnsServerList = v['network'][0]['dns']
 
                 # Hostname settings
                 ident = vim.vm.customization.LinuxPrep()
@@ -70,25 +76,39 @@ class vmProvider(object):
 
                 customspec = vim.vm.customization.Specification()
                 customspec.globalIPSettings = globalip
+                customspec.nicSettingMap = adaptermap
                 customspec.identity = ident
 
-                devices = []
                 vmPathName = "[{}] {}/{}.vmx".format(root_datastore, h, h)
                 vmx_file = vim.vm.FileInfo(logDirectory=None, snapshotDirectory=None, suspendDirectory=None, vmPathName=vmPathName)
 
-                net = self._get_obj(content, [vim.Network], v['network'])
+                net = self._get_obj(content, [vim.Network], v['network'][0]['net'])
 
                 nicspec = vim.vm.device.VirtualDeviceSpec()
                 nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
-                nic_type = vim.vm.device.VirtualVmxnet3()
-                nicspec.device = nic_type
+                nicspec.device = vim.vm.device.VirtualVmxnet3()
+
                 nicspec.device.deviceInfo = vim.Description()
+                nicspec.device.deviceInfo.label = "Network Adapter #1"
+                nicspec.device.deviceInfo.summary = net.name
+
                 nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
                 nicspec.device.backing.network = net
                 nicspec.device.backing.deviceName = net.name
+
+                nicspec.device.backing.useAutoDetect = False
                 nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
                 nicspec.device.connectable.startConnected = True
                 nicspec.device.connectable.allowGuestControl = True
+
+                am = vim.vm.customization.AdapterMapping()
+                am.adapter = vim.vm.customization.IPSettings()
+                am.adapter.ip = vim.vm.customization.FixedIp()
+                am.adapter.ip.ipAddress = v['network'][0]['ip']
+                am.adapter.subnetMask = v['network'][0]['sn']
+                am.adapter.gateway = v['network'][0]['gw']
+                adaptermap.append(am)
+
                 devices.append(nicspec)
 
                 scsi_ctr = vim.vm.device.VirtualDeviceSpec()
@@ -134,10 +154,11 @@ class vmProvider(object):
                     destDiskRaw = "[{}] {}/{}_disk0-flat.vmdk".format(root_datastore, h, h)
                     try:
                         task = content.fileManager.CopyDatastoreFile_Task(sourceName=templateDiskRaw, destinationName=destDiskRaw, force=True)
-                        self._wait_for_task(task, reportTime=True)
-                        vmFound = self._get_obj(content, [vim.VirtualMachine], h)
-                        task = vmFound.Customize(customspec)
                         self._wait_for_task(task)
+                        vmFound = self._get_obj(content, [vim.VirtualMachine], h)
+                        vmFound.PowerOnVM_Task()
+                        #task = vmFound.Customize(customspec)
+                        #self._wait_for_task(task, reportTime=True)
                     except Exception as e:
                         print(e)
             else:
