@@ -157,8 +157,8 @@ class vmProvider(object):
                         self._wait_for_task(task)
                         vmFound = self._get_obj(content, [vim.VirtualMachine], h)
                         vmFound.PowerOnVM_Task()
-                        #task = vmFound.Customize(customspec)
-                        #self._wait_for_task(task, reportTime=True)
+                        # task = vmFound.Customize(customspec)
+                        # self._wait_for_task(task, reportTime=True)
                     except Exception as e:
                         print(e)
             else:
