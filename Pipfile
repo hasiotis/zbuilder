@@ -31,6 +31,7 @@ massedit = "*"
 tabulate = "*"
 pyvmomi = "*"
 arrow = "*"
+boto3 = "*"
 
 [dev-packages]
 "flake8" = "*"

@@ -11,7 +11,7 @@ cffi==1.14.0
 chardet==3.0.4
 coverage==5.0.3
 cryptography==2.8
-docutils==0.16
+docutils==0.15.2
 entrypoints==0.3
 flake8==3.7.9
 idna==2.9
@@ -54,7 +54,7 @@ sphinxcontrib-serializinghtml==1.1.4
 tqdm==4.43.0
 twine==3.1.1
 typed-ast==1.4.1 ; implementation_name == 'cpython' and python_version < '3.8'
-urllib3==1.25.8
+urllib3==1.25.8 ; python_version != '3.4'
 wcwidth==0.1.8
 webencodings==0.5.1
 wheel==0.34.2

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f0363d5487374f7460e316300fb05cb67e1fffb66d38136df4395a5e67a35bdd"
+            "sha256": "323972f44bc8b27609a4989c2bb6b3813433823312a8f194a3f9cdbfb3a0f4e8"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -103,6 +103,21 @@
                 "sha256:ff032765bb8716d9387fd5376d987a937254b0619eff0972779515b5c98820bc"
             ],
             "version": "==3.1.7"
+        },
+        "boto3": {
+            "hashes": [
+                "sha256:41cb779ff393a9a0a3e9dccce7689ec10c383c18deb5c69059181db8c0ccecc3",
+                "sha256:b21d781a7fb0bfa50771362c3495e30dc3cddd7e91d65c21bcb9fe37acf36b1e"
+            ],
+            "index": "pypi",
+            "version": "==1.12.11"
+        },
+        "botocore": {
+            "hashes": [
+                "sha256:35d553b8975a3810010fabb885e42d1bbc97bdae52c873f7640a2dd87772c455",
+                "sha256:87a53301ee9e32e776d2d805c121753091fbddc3457dfdb8d6bdf7dbd945295a"
+            ],
+            "version": "==1.15.11"
         },
         "cachetools": {
             "hashes": [
@@ -216,6 +231,14 @@
             "index": "pypi",
             "version": "==1.16.0"
         },
+        "docutils": {
+            "hashes": [
+                "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0",
+                "sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827",
+                "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"
+            ],
+            "version": "==0.15.2"
+        },
         "dpath": {
             "hashes": [
                 "sha256:bea06b5f4ff620a28dfc9848cf4d6b2bfeed34238edeb8ebe815c433b54eb1fa"
@@ -317,6 +340,13 @@
             ],
             "index": "pypi",
             "version": "==2.11.1"
+        },
+        "jmespath": {
+            "hashes": [
+                "sha256:695cb76fa78a10663425d5b73ddc5714eb711157e52704d69be03b1a02ba4fec",
+                "sha256:cca55c8d153173e21baa59983015ad0daf603f9cb799904ff057bfb8ff8dc2d9"
+            ],
+            "version": "==0.9.5"
         },
         "jsonpickle": {
             "hashes": [
@@ -594,6 +624,13 @@
             "markers": "platform_python_implementation == 'CPython' and python_version < '3.9'",
             "version": "==0.2.0"
         },
+        "s3transfer": {
+            "hashes": [
+                "sha256:2482b4259524933a022d59da830f51bd746db62f047d6eb213f2f8855dcb8a13",
+                "sha256:921a37e2aefc64145e7b73d50c71bb4f26f46e4c9f414dc648c6245ff92cf7db"
+            ],
+            "version": "==0.3.3"
+        },
         "six": {
             "hashes": [
                 "sha256:236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a",
@@ -620,6 +657,7 @@
                 "sha256:2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc",
                 "sha256:87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"
             ],
+            "markers": "python_version != '3.4'",
             "version": "==1.25.8"
         }
     },
@@ -778,10 +816,11 @@
         },
         "docutils": {
             "hashes": [
-                "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af",
-                "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"
+                "sha256:6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0",
+                "sha256:9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827",
+                "sha256:a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"
             ],
-            "version": "==0.16"
+            "version": "==0.15.2"
         },
         "entrypoints": {
             "hashes": [
@@ -1162,6 +1201,7 @@
                 "sha256:2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc",
                 "sha256:87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"
             ],
+            "markers": "python_version != '3.4'",
             "version": "==1.25.8"
         },
         "wcwidth": {
