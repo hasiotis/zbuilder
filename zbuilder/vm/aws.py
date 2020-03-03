@@ -70,7 +70,11 @@ class vmProvider(object):
         pass
 
     def dnsremove(self, hosts):
-        pass
+        ips = {}
+        for h in hosts:
+            if hosts[h]['enabled']:
+                ips[h] = None
+        dnsRemove(hosts)
 
     def snapCreate(self, hosts):
         pass
