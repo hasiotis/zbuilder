@@ -14,4 +14,5 @@ way it achieves high integration with ansible.
    do
    azure
    ganeti
+   aws
 
