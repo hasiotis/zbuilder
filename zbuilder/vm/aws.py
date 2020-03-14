@@ -37,14 +37,18 @@ class vmProvider(object):
                 click.echo("  - Creating host: {} ".format(h))
                 self.ec2.create_instances(
                     TagSpecifications=[{'ResourceType': 'instance', 'Tags': [{'Key': 'Name', 'Value': h}]}],
-                    ImageId=v['values']['ami'], MinCount=1, MaxCount=1
+                    ImageId=v['values']['ami'], MinCount=1, MaxCount=1,
+                    InstanceType=v['values']['vmtype'],
+                    KeyName=v['values']['key'],
+                    SecurityGroupIds=v['values']['sg'],
+                    SubnetId=v['values']['subnet']
                 )
             else:
                 click.echo("  - Status of host: {} is {}".format(h, v['status']))
 
         for h, v in self._getVMs(hosts).items():
             v['vm'].wait_until_running()
-            ips[h] = v['vm'].private_ip_address
+            ips[h] = v['vm'].public_ip_address
 
         dnsUpdate(ips)
 
@@ -86,4 +90,4 @@ class vmProvider(object):
         pass
 
     def params(self, params):
-        return {k: params[k] for k in ['ami']}
+        return {k: params[k] for k in ['ami', 'region', 'vmtype', 'subnet', 'sg']}
