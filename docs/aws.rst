@@ -1,4 +1,4 @@
-Google Cloud Provider
+AWS Cloud Provider
 =====================
 
 Initial zbuilder setup
