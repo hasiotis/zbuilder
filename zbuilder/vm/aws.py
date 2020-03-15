@@ -35,6 +35,16 @@ class vmProvider(object):
             if v['status'] is None:
                 click.echo("  - Creating host: {} ".format(h))
                 self.ec2.create_instances(
+                    BlockDeviceMappings=[
+                        {
+                            'DeviceName': '/dev/sda1',
+                            'Ebs': {
+                                'DeleteOnTermination': True,
+                                'VolumeSize': v['values'].get('disksize', 20),
+                                'VolumeType': 'standard',
+                            },
+                        },
+                    ],
                     TagSpecifications=[{'ResourceType': 'instance', 'Tags': [{'Key': 'Name', 'Value': h}]}],
                     ImageId=v['values']['ami'], MinCount=1, MaxCount=1,
                     InstanceType=v['values']['vmtype'],
