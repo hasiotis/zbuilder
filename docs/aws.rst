@@ -61,6 +61,7 @@ Now create and environment from a vagrant template::
   mkdir ZBUILDER_AWS_DEMO
   cd ZBUILDER_AWS_DEMO
   zbuilder init --template aws
+  (update security groups and subnet)
   zbuilder build
 
 Cleanup the environment
