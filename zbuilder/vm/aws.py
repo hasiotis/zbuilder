@@ -23,7 +23,7 @@ class vmProvider(object):
                 instances = list(self.ec2.instances.filter(Filters=[{'Name': 'tag:Name', 'Values': [h]}]))
                 retValue[h] = {'status': None}
                 for vm in instances:
-                    if vm.state['Name'] != 'terminated':
+                    if vm.state['Name'] not in ['terminated', 'shutting-down']:
                         retValue[h] = {'status': vm.state['Name'], 'vm': vm}
                 retValue[h]['values'] = v
 
@@ -32,7 +32,7 @@ class vmProvider(object):
     def build(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
-            if v['status'] is None or v['status'] == 'terminated':
+            if v['status'] is None:
                 click.echo("  - Creating host: {} ".format(h))
                 self.ec2.create_instances(
                     TagSpecifications=[{'ResourceType': 'instance', 'Tags': [{'Key': 'Name', 'Value': h}]}],
