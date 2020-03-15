@@ -36,6 +36,10 @@ class dnsProvider(object):
                          }]
                     }
                 )
+                if 'ChangeInfo' in response:
+                    ChangeInfoID = response['ChangeInfo']['Id']
+                    waiter = self.route53.get_waiter('resource_record_sets_changed')
+                    waiter.wait(Id=ChangeInfoID)
             except Exception as e:
                 click.echo("    Error: [{}]".format(e))
 
