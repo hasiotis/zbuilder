@@ -50,7 +50,11 @@ class vmProvider(object):
                     InstanceType=v['values']['vmtype'],
                     KeyName=v['values']['key'],
                     SecurityGroupIds=v['values']['sg'],
-                    SubnetId=v['values']['subnet']
+                    SubnetId=v['values']['subnet'],
+                    UserData="""#cloud-config
+                    fqdn: {}
+                    manage_etc_hosts: true
+                    """.format(h)
                 )
             else:
                 click.echo("  - Status of host: {} is {}".format(h, v['status']))
@@ -58,6 +62,7 @@ class vmProvider(object):
         for h, v in self._getVMs(hosts).items():
             if v['status'] is not None:
                 v['vm'].wait_until_running()
+                v['vm'].reload()
                 ips[h] = v['vm'].public_ip_address
 
         dnsUpdate(ips)

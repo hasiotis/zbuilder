@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import time
 import click
 import tabulate
 import dpath.util
@@ -8,7 +9,7 @@ import distutils.dir_util
 import zbuilder.vm
 import zbuilder.cfg
 
-from zbuilder.helpers import getHosts, runPlaybook, fixKeys, runCmd
+from zbuilder.helpers import getHosts, runPlaybook, fixKeys, runCmd, humanize_time
 from zbuilder.options import pass_state, common_options
 
 from click._bashcomplete import get_completion_script
@@ -45,6 +46,7 @@ def init(state, template):
 @pass_state
 def build(state):
     """Build the VMs"""
+    start_time = time.time()
     click.echo("Building VMs")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
@@ -53,6 +55,8 @@ def build(state):
     fixKeys(state)
     click.echo("Running bootstrap.yml")
     runPlaybook(state, "bootstrap.yml")
+    end_time = time.time()
+    click.echo("Time elapsed: {}".format(humanize_time(end_time - start_time)))
 
 
 @cli.command()

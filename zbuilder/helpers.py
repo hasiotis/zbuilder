@@ -125,6 +125,12 @@ def load_yaml(fname):
     return value
 
 
+def humanize_time(secs):
+    mins, secs = divmod(secs, 60)
+    hours, mins = divmod(mins, 60)
+    return '%02d:%02d' % (mins, secs)
+
+
 def dump_yaml(cfg, where=None):
     yaml = ruamel.yaml.YAML()
     if where:
