@@ -8,16 +8,22 @@ import zbuilder.vm
 import zbuilder.cfg
 
 from retrying import retry
-from ansible.cli import CLI
+from ansible.cli.inventory import InventoryCLI
 from ansible.errors import AnsibleError
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
 
 
+class ZBbuilderInventoryCLI(InventoryCLI):
+    def dumpVars(self):
+        super(ZBbuilderInventoryCLI, self).parse()
+        return self._play_prereqs()
+
+
 def getVars():
-    parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
-    options, args = parser.parse_args(["-i", "hosts"])
-    loader, inventory, vm = CLI._play_prereqs(options)
+    inv = ZBbuilderInventoryCLI(["zbuilder", "--list"])
+    loader, inventory, vm = inv.dumpVars()
+
     hosts = inventory.get_hosts(pattern='localhost')
     tVars = vm.get_vars(host=hosts[0])
     retValue = {}
@@ -30,9 +36,8 @@ def getVars():
 
 
 def getHostsWithVars(subset):
-    parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
-    options, args = parser.parse_args(["-i", "hosts", "-l", subset.limit])
-    loader, inventory, vm = CLI._play_prereqs(options)
+    inv = ZBbuilderInventoryCLI(["zbuilder", "--list"])
+    loader, inventory, vm = inv.dumpVars()
 
     hostVars = {}
     for host in inventory.get_hosts():
@@ -50,7 +55,7 @@ def getHostsWithVars(subset):
             if 'ZBUILDER_SYSUSER' in hvars:
                 hostVars[host.name]['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
 
-    inventory.subset(options.subset)
+    inventory.subset(subset.limit)
     for host in inventory.get_hosts():
         if host.name in hostVars:
             hostVars[host.name]['VM_OPTIONS']['enabled'] = True
