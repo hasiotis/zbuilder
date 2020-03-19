@@ -1,9 +1,7 @@
 import os
 import click
 import importlib
-import distutils.dir_util
 
-from zbuilder import getAssetsDir
 from zbuilder.wrappers import trywrap
 
 
@@ -15,13 +13,10 @@ class vmProvider(object):
         self.provider = vmProviderClass(cfg)
 
     def init(self):
-        ASSETS_DIR = getAssetsDir()
-
         if os.path.exists('group_vars') or os.path.exists('hosts'):
             raise click.ClickException("This directory already contains relevant files")
 
         click.echo("Initializing {} based zbuilder environment".format(self.factory))
-        distutils.dir_util.copy_tree(ASSETS_DIR, os.getcwd())
 
     @trywrap
     def build(self, hosts):

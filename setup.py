@@ -17,9 +17,6 @@ with open(os.path.join(base_dir, "requirements.txt")) as f:
 with open(os.path.join(base_dir, "README.md")) as f:
     long_description = f.read()
 
-assets_path = os.path.join('zbuilder', 'assets')
-assets_files = [(d, [os.path.join(d, f) for f in files]) for d, folders, files in os.walk(assets_path)]
-
 setup(
     name='zbuilder',
     version=__version__,
@@ -35,7 +32,6 @@ setup(
     entry_points={
         'console_scripts': ['zbuilder=zbuilder.cli:cli'],
     },
-    data_files=assets_files,
     python_requires='>=3.6',
     classifiers=[
         'Development Status :: 1 - Planning',

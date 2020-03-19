@@ -1,9 +1,79 @@
-import os
 import click
 import jinja2
 
-from zbuilder import getAssetsDir
 from zbuilder.helpers import runCmd
+
+VAGRANT_FILE = '''
+VAGRANTFILE_API_VERSION = "2"
+VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
+
+publickey = File.read(File.expand_path('{{ pubkey }}'))
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = true
+  config.hostmanager.include_offline = true
+  config.ssh.insert_key = false
+  config.ssh.private_key_path = ["{{ privkey }}", "~/.vagrant.d/insecure_private_key"]
+
+  zservers = {
+{% for h, p in hosts.items() %}
+    :'{{ h }}' {{ ' ' * (20 - h|string|count) }}  => { memory: {{ p['memory'] }}, vcpus: {{ p['vcpus'] }}, box: '{{ p['box'] }}', aliases: '{{ p['aliases'] }}', disks: '{{ p['disks'] }}', nics: {{ p['nics']|default(1) }} },
+{% endfor %}
+  }
+
+  zservers.each do |zname, zparam|
+    config.vm.define zname do |srvcfg|
+      srvcfg.vm.box = zparam[:box]
+      for i in 1..zparam[:nics]
+        srvcfg.vm.network :private_network, type: "dhcp"
+      end
+      srvcfg.vm.host_name = zname.to_s
+      srvcfg.vm.provision "file", source: "{{ pubkey }}", destination: ".ssh/authorized_keys"
+      domain = zname.to_s.sub(/^.*?\./, "")
+      srvcfg.hostmanager.aliases = zparam[:aliases].split(" ").map{|x| [x + '.' + domain] }
+      srvcfg.vm.provider "virtualbox" do |v|
+        v.name = zname.to_s
+        v.memory = zparam[:memory]
+        v.cpus = zparam[:vcpus]
+        v.customize ["modifyvm", :id, "--vram", "16"]
+        v.customize ["modifyvm", :id, "--vrde", "off"]
+        v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        v.customize ["modifyvm", :id, "--nictype1", "virtio"]
+        v.customize ["modifyvm", :id, "--nictype2", "virtio"]
+        v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+        zparam[:disks].split(",").map { |s| s.to_i }.each_with_index do |size, i|
+            disk_fname = File.join(VBOX_ROOT, zname.to_s, "disk#{i+2}_#{zname}.vmdk")
+            unless File.exist?(disk_fname)
+                v.customize ['createhd', '--filename', disk_fname, '--size', size * 1024, '--format', 'VMDK']
+            end
+            v.customize [
+                'storageattach', :id,
+                '--storagectl', 'SATA Controller',
+                '--port', i+1,
+                '--device', 0,
+                '--type', 'hdd',
+                '--medium', disk_fname
+            ]
+        end
+      end
+
+      srvcfg.hostmanager.ip_resolver = proc do |vm, resolving_vm|
+        if vm.id
+            ret = 'NOT FOUND'
+            loop do
+                ret = `VBoxManage guestproperty get #{vm.id} "/VirtualBox/GuestInfo/Net/1/V4/IP"`.split()[1]
+                break if ret != 'value'
+            end
+            ret
+        end
+      end
+
+    end
+  end
+end
+'''
 
 
 class vmProvider(object):
@@ -53,15 +123,11 @@ class vmProvider(object):
             return {k: params[k] for k in ['box', 'vcpus', 'memory']}
 
     def setVagrantfile(self, pubkey, hosts):
-        ASSETS_DIR = os.path.join(getAssetsDir(), 'vagrant')
-
-        templateLoader = jinja2.FileSystemLoader(searchpath=ASSETS_DIR)
-        templateEnv = jinja2.Environment(loader=templateLoader, trim_blocks=True)
-        template = templateEnv.get_template('Vagrant.j2')
+        templateLoader = jinja2.BaseLoader()
+        template = jinja2.Environment(loader=templateLoader, trim_blocks=True).from_string(VAGRANT_FILE)
         privkey = pubkey
         if privkey.endswith('.pub'):
             privkey = privkey[:-4]
-
         outputText = template.render(privkey=privkey, pubkey=pubkey, hosts=hosts)
 
         f = open('Vagrantfile', 'w')
