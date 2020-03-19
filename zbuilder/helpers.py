@@ -8,20 +8,19 @@ import zbuilder.vm
 import zbuilder.cfg
 
 from retrying import retry
-from ansible.cli.inventory import InventoryCLI
 from ansible.errors import AnsibleError
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
 
 
-class ZBbuilderInventoryCLI(InventoryCLI):
+class ZBbuilderInventoryCLI(PlaybookCLI):
     def dumpVars(self):
         super(ZBbuilderInventoryCLI, self).parse()
         return self._play_prereqs()
 
 
-def getHostsWithVars(subset):
-    inv = ZBbuilderInventoryCLI(["zbuilder", "--list"])
+def getHostsWithVars(limit, pbook='bootstrap.yml'):
+    inv = ZBbuilderInventoryCLI(["ansible-playbook", "-l", limit,  pbook])
     loader, inventory, vm = inv.dumpVars()
 
     hostVars = {}
@@ -40,7 +39,7 @@ def getHostsWithVars(subset):
             if 'ZBUILDER_SYSUSER' in hvars:
                 hostVars[host.name]['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
 
-    inventory.subset(subset.limit)
+    inventory.subset(limit)
     for host in inventory.get_hosts():
         if host.name in hostVars:
             hostVars[host.name]['VM_OPTIONS']['enabled'] = True
@@ -50,7 +49,7 @@ def getHostsWithVars(subset):
 
 def getHosts(state):
     cfg = zbuilder.cfg.load()
-    hosts = getHostsWithVars(state)
+    hosts = getHostsWithVars(state.limit)
 
     vmProviders = {}
     if cfg is None:
