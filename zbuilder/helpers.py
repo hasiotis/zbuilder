@@ -20,21 +20,6 @@ class ZBbuilderInventoryCLI(InventoryCLI):
         return self._play_prereqs()
 
 
-def getVars():
-    inv = ZBbuilderInventoryCLI(["zbuilder", "--list"])
-    loader, inventory, vm = inv.dumpVars()
-
-    hosts = inventory.get_hosts(pattern='localhost')
-    tVars = vm.get_vars(host=hosts[0])
-    retValue = {}
-    for v in tVars:
-        if v == 'VM_OPTIONS':
-            next
-        if v.startswith('ZBUILDER_'):
-            retValue[v] = tVars[v]
-    return retValue
-
-
 def getHostsWithVars(subset):
     inv = ZBbuilderInventoryCLI(["zbuilder", "--list"])
     loader, inventory, vm = inv.dumpVars()
@@ -64,7 +49,6 @@ def getHostsWithVars(subset):
 
 
 def getHosts(state):
-    state.vars = getVars()
     cfg = zbuilder.cfg.load()
     hosts = getHostsWithVars(state)
 
@@ -93,6 +77,7 @@ def getHosts(state):
             hvars['VM_OPTIONS']['ansible_host'] = hvars['ansible_host']
         if 'ZBUILDER_PUBKEY' in hvars:
             hvars['VM_OPTIONS']['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
+            state.vars = {'ZBUILDER_PUBKEY': hvars['ZBUILDER_PUBKEY']}
         if 'ZBUILDER_SYSUSER' in hvars:
             hvars['VM_OPTIONS']['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
 
