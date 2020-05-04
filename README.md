@@ -19,6 +19,6 @@ pip3 install --user --upgrade zbuilder
 
 ## Links
 
-* [Documentation](https://zbuilder.readthedocs.io/en/develop/?badge=develop)
+* [Documentation](https://zbuilder.readthedocs.io/en/stable/?badge=stable)
 * [Releases](https://pypi.org/project/zbuilder/)
 * [Code](https://github.com/hasiotis/zbuilder)
