@@ -32,6 +32,7 @@ tabulate = "*"
 pyvmomi = "*"
 arrow = "*"
 boto3 = "*"
+proxmoxer = "*"
 
 [dev-packages]
 "flake8" = "*"
