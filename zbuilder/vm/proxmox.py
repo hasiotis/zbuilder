@@ -1,0 +1,153 @@
+import os
+import re
+import time
+import click
+import urllib.parse
+
+from proxmoxer import ProxmoxAPI
+from zbuilder.dns import dnsUpdate, dnsRemove
+
+
+class vmProvider(object):
+    def __init__(self, cfg):
+        if cfg:
+            self.cfg = cfg
+            self.username = self.cfg['username']
+            password = self.cfg['password']
+            url = self.cfg['url']
+            verify = self.cfg.get('verify', True)
+
+            self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
+
+    def _waitTask(self, node, tid):
+        results = None
+        while True:
+            results = node.tasks(tid).status.get()
+            if results['status'] == 'stopped':
+                break
+            time.sleep(1)
+
+        return results['exitstatus']
+
+    def _getVMs(self, hosts):
+        retValue = {}
+        vms = {v['name']: v for v in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in hosts.items():
+            if hosts[h]['enabled']:
+                m = re.match(r"ip=(?P<ip>.*)/\d+,gw=(?P<gw>.*)", v.get('ipconfig', ''))
+                v['ip'] = m.groupdict()['ip']
+                if h in vms.keys():
+                    retValue[h] = v
+                    retValue[h].update(vms[h])
+                else:
+                    retValue[h] = v
+                    retValue[h].update({'status': None})
+
+        return retValue
+
+    def build(self, hosts):
+        ips = {}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                click.echo("  - Status of host: {} is {}".format(h, v['status']))
+                ips[h] = v['ip']
+            else:
+                click.echo("  - Creating host: {} ".format(h))
+                node = self.proxmox.nodes(v['node'])
+                nextid = self.proxmox.cluster.nextid.get()
+                if v['template'] in vms:
+                    template = vms[v['template']]
+                    if template['template'] != 1:
+                        click.echo("This is not a template: [{}]".format(v['template']))
+                        continue
+                else:
+                    click.echo("No such template: [{}]".format(v['template']))
+                    continue
+
+                # Clone the VM
+                taskid = node(template['id']).clone.post(newid=nextid, name=h)
+                result = self._waitTask(node, taskid)
+                if result != 'OK':
+                    click.echo("Clone failed".format())
+                    continue
+
+                # Customize the VM
+                fname = os.path.expanduser(v['ZBUILDER_PUBKEY'])
+                sshkey = ''
+                if os.path.isfile(fname):
+                    with open(fname, "r") as f:
+                        sshkey = f.read().rstrip('\n')
+
+                taskid = node.qemu(nextid).config.set(
+                    cores=v['vcpu'],
+                    memory=v['memory'],
+                    ipconfig0=v['ipconfig'],
+                    nameserver=v['nameserver'],
+                    searchdomain=v['searchdomain'],
+                    sshkeys=urllib.parse.quote(sshkey, safe=''),
+                    ciuser=v['ZBUILDER_SYSUSER']
+                )
+
+                ips[h] = v['ip']
+
+                # Start the VM
+                taskid = node.qemu(nextid).status.start().post()
+                result = self._waitTask(node, taskid)
+                if result != 'OK':
+                    click.echo("Can't start the VM".format())
+                    continue
+
+        dnsUpdate(ips)
+
+    def up(self, hosts):
+        pass
+
+    def halt(self, hosts):
+        pass
+
+    def destroy(self, hosts):
+        updateHosts = {}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                click.echo("  - Destroying host: {} ".format(h))
+                updateHosts[h] = {}
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+
+                if v['status'] == 'running':
+                    taskid = node(vm['id']).status.stop().post()
+                    result = self._waitTask(node, taskid)
+                    if result != 'OK':
+                        click.echo('Failed: {}'.format(result))
+                        continue
+
+                taskid = node.delete(vm['id'])
+                result = self._waitTask(node, taskid)
+                if result != 'OK':
+                    click.echo('Failed: {}'.format(result))
+                    continue
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
+
+        dnsRemove(updateHosts)
+
+    def dnsupdate(self, hosts):
+        ips = {}
+        for h, v in self._getVMs(hosts).items():
+            if 'ip-address' in v:
+                ips[h] = v['ip']
+        dnsUpdate(ips)
+
+    def dnsremove(self, hosts):
+        ips = {}
+        for h in hosts:
+            if hosts[h]['enabled']:
+                ips[h] = None
+        dnsRemove(hosts)
+
+    def params(self, params):
+        return {k: params[k] for k in ['node', 'template', 'vcpu', 'memory', 'ipconfig']}
