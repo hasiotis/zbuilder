@@ -1,4 +1,4 @@
-PHPipam Provider
+PowerDNS Provider
 ===============
 
 Provider configuration
