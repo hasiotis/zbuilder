@@ -162,10 +162,10 @@ class vmProvider(object):
 
     def dnsremove(self, hosts):
         ips = {}
-        for h, v in hosts.items():
+        for h, v in self._getVMs(hosts).items():
             if hosts[h]['enabled']:
                 ips[h] = None
-        dnsRemove(hosts)
+        dnsRemove(ips)
 
     def params(self, params):
         return {k: params[k] for k in ['node', 'template', 'vcpu', 'memory', 'ipconfig']}
