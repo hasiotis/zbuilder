@@ -105,7 +105,7 @@ class vmProvider(object):
                     ciuser=v['ZBUILDER_SYSUSER']
                 )
 
-                ips[h] = v['ip']
+                ips[h] = ip
 
                 # Start the VM
                 taskid = node.qemu(nextid).status.start().post()
