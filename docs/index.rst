@@ -16,4 +16,5 @@ way it achieves high integration with ansible.
    ganeti
    aws
    proxmox
+   phpipam
 
