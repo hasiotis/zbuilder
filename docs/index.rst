@@ -17,4 +17,5 @@ way it achieves high integration with ansible.
    aws
    proxmox
    phpipam
+   powerdns
 
