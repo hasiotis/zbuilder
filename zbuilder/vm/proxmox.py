@@ -156,13 +156,13 @@ class vmProvider(object):
     def dnsupdate(self, hosts):
         ips = {}
         for h, v in self._getVMs(hosts).items():
-            if 'ip-address' in v:
+            if 'ip' in v and hosts[h]['enabled']:
                 ips[h] = v['ip']
         dnsUpdate(ips)
 
     def dnsremove(self, hosts):
         ips = {}
-        for h in hosts:
+        for h, v in hosts.items():
             if hosts[h]['enabled']:
                 ips[h] = None
         dnsRemove(hosts)
