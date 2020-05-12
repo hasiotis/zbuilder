@@ -15,4 +15,5 @@ way it achieves high integration with ansible.
    azure
    ganeti
    aws
+   proxmox
 

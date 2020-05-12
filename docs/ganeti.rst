@@ -33,7 +33,7 @@ Since ganeti is not a DNS provider we will use ansible for the DNS (poor man's D
 Create your environment
 -----------------------
 
-Now create and environment from a vagrant template::
+Now create and environment from a ganeti template::
 
   mkdir ZBUILDER_GANETI_DEMO
   cd ZBUILDER_GANETI_DEMO
