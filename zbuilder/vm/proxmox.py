@@ -6,6 +6,7 @@ import urllib.parse
 
 from proxmoxer import ProxmoxAPI
 from zbuilder.dns import dnsUpdate, dnsRemove
+from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
 
 
 class vmProvider(object):
@@ -34,8 +35,20 @@ class vmProvider(object):
         vms = {v['name']: v for v in self.proxmox.cluster.resources.get(type='vm')}
         for h, v in hosts.items():
             if hosts[h]['enabled']:
-                m = re.match(r"ip=(?P<ip>.*)/\d+,gw=(?P<gw>.*)", v.get('ipconfig', ''))
-                v['ip'] = m.groupdict()['ip']
+                ipconfig = v.get('ipconfig', '')
+                if ipconfig.startswith('ipam='):
+                    m = re.match(r"ipam=(?P<subnet>.*)", ipconfig)
+                    subnet = m.groupdict()['subnet']
+                    v['subnet'] = subnet
+                    v['mask'] = subnet.split('/')[1]
+                    ip, gw = ipamLocate(h, subnet)
+                else:
+                    m = re.match(r"ip=(?P<ip>.*)/(?P<mask>\d+),gw=(?P<gw>.*)", ipconfig)
+                    ip = m.groupdict()['ip']
+                    gw = m.groupdict()['gw']
+
+                v['ip'] = ip
+                v['gw'] = gw
                 if h in vms.keys():
                     retValue[h] = v
                     retValue[h].update(vms[h])
@@ -80,10 +93,12 @@ class vmProvider(object):
                     with open(fname, "r") as f:
                         sshkey = f.read().rstrip('\n')
 
+                ip, gw = ipamReserve(h, v['subnet'])
+                ipconfig = "ip={}/{},gw={}".format(ip, v['mask'], gw)
                 taskid = node.qemu(nextid).config.set(
                     cores=v['vcpu'],
                     memory=v['memory'],
-                    ipconfig0=v['ipconfig'],
+                    ipconfig0=ipconfig,
                     nameserver=v['nameserver'],
                     searchdomain=v['searchdomain'],
                     sshkeys=urllib.parse.quote(sshkey, safe=''),
@@ -130,6 +145,9 @@ class vmProvider(object):
                 if result != 'OK':
                     click.echo('Failed: {}'.format(result))
                     continue
+
+                if v['ipconfig'].startswith('ipam='):
+                    ipamRelease(h, v['ip'], v['subnet'])
             else:
                 click.echo("  - Host does not exists [{}]".format(h))
 
