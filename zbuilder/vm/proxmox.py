@@ -39,14 +39,16 @@ class vmProvider(object):
                 if ipconfig.startswith('ipam='):
                     m = re.match(r"ipam=(?P<subnet>.*)", ipconfig)
                     subnet = m.groupdict()['subnet']
-                    v['subnet'] = subnet
-                    v['mask'] = subnet.split('/')[1]
+                    mask = subnet.split('/')[1]
                     ip, gw = ipamLocate(h, subnet)
+                    v['subnet'] = subnet
                 else:
                     m = re.match(r"ip=(?P<ip>.*)/(?P<mask>\d+),gw=(?P<gw>.*)", ipconfig)
+                    mask = m.groupdict()['mask']
                     ip = m.groupdict()['ip']
                     gw = m.groupdict()['gw']
 
+                v['mask'] = mask
                 v['ip'] = ip
                 v['gw'] = gw
                 if h in vms.keys():
@@ -93,19 +95,26 @@ class vmProvider(object):
                     with open(fname, "r") as f:
                         sshkey = f.read().rstrip('\n')
 
-                ip, gw = ipamReserve(h, v['subnet'])
-                ipconfig = "ip={}/{},gw={}".format(ip, v['mask'], gw)
+                ipconfig = v['ipconfig']
+                if v['ipconfig'].startswith('ipam='):
+                    ip, gw = ipamReserve(h, v['subnet'])
+                    ipconfig = "ip={}/{},gw={}".format(ip, v['mask'], gw)
+                    ips[h] = ip
+                else:
+                    ips[h] = v['ip']
+
                 taskid = node.qemu(nextid).config.set(
                     cores=v['vcpu'],
                     memory=v['memory'],
+                    scsihw=v.get('scsihw', 'virtio-scsi-pci'),
+                    net0=v.get('net0', 'virtio,bridge=vmbr0'),
+                    virtio1='local-lvm:1,size=4G',
                     ipconfig0=ipconfig,
                     nameserver=v['nameserver'],
                     searchdomain=v['searchdomain'],
                     sshkeys=urllib.parse.quote(sshkey, safe=''),
                     ciuser=v['ZBUILDER_SYSUSER']
                 )
-
-                ips[h] = ip
 
                 # Start the VM
                 taskid = node.qemu(nextid).status.start().post()
