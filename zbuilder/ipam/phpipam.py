@@ -76,9 +76,9 @@ class ipamProvider(object):
             j = r.json()
             ip = j['data']
             click.echo("      Reserving ip [{}] for host [{}]".format(ip, host))
-            url = "{}/api/zbuilder/addresses".format(self.server, verify=self.verify)
+            url = "{}/api/zbuilder/addresses".format(self.server)
             data = {'subnetId': sid, 'ip': ip, 'hostname': host}
-            r = requests.post(url, data=data, headers={'token': self.token})
+            r = requests.post(url, data=data, headers={'token': self.token}, verify=self.verify)
             j = r.json()
             if not j['success']:
                 ip = None
