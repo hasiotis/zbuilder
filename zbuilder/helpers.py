@@ -45,6 +45,8 @@ def getHostsWithVars(limit, pbook='bootstrap.yml'):
                 hostVars[host.name]['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
             if 'ZBUILDER_SYSUSER' in hvars:
                 hostVars[host.name]['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
+            if 'ZBUILDER_ENV' in hvars:
+                hostVars[host.name]['ZBUILDER_ENV'] = hvars['ZBUILDER_ENV']
 
     inventory.subset(limit)
     for host in inventory.get_hosts():
@@ -86,6 +88,8 @@ def getHosts(state):
             state.vars = {'ZBUILDER_PUBKEY': hvars['ZBUILDER_PUBKEY']}
         if 'ZBUILDER_SYSUSER' in hvars:
             hvars['VM_OPTIONS']['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
+        if 'ZBUILDER_ENV' in hvars:
+            hvars['VM_OPTIONS']['ZBUILDER_ENV'] = hvars['ZBUILDER_ENV']
 
         vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
 

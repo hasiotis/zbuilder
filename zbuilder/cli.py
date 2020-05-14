@@ -89,7 +89,20 @@ def destroy(state):
     click.echo("Destroying VMs")
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
-        vmProvider['cloud'].destroy(vmProvider['hosts'])
+        zbuilder_env = None
+        for h in vmProvider['hosts']:
+            if 'ZBUILDER_ENV' in vmProvider['hosts'][h]:
+                if 'prod' in vmProvider['hosts'][h]['ZBUILDER_ENV'].lower():
+                    zbuilder_env = vmProvider['hosts'][h]['ZBUILDER_ENV']
+                    break
+                if 'prd' in vmProvider['hosts'][h]['ZBUILDER_ENV'].lower():
+                    zbuilder_env = vmProvider['hosts'][h]['ZBUILDER_ENV']
+                    break
+        if zbuilder_env:
+            if click.confirm("  The ZBUILDER_ENV is set to [{}] Do you want to continue?".format(zbuilder_env)):
+                vmProvider['cloud'].destroy(vmProvider['hosts'])
+            else:
+                click.echo("    Aborting!")
 
 
 @cli.command()
