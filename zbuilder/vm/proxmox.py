@@ -62,7 +62,7 @@ class vmProvider(object):
 
     def build(self, hosts):
         ips = {}
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        templates = [i for i in self.proxmox.cluster.resources.get(type='vm') if i['template'] == 1]
 
         for h, v in self._getVMs(hosts).items():
             if v['status']:
@@ -72,13 +72,13 @@ class vmProvider(object):
                 click.echo("  - Creating host: {} ".format(h))
                 node = self.proxmox.nodes(v['node'])
                 nextid = self.proxmox.cluster.nextid.get()
-                if v['template'] in vms:
-                    template = vms[v['template']]
-                    if template['template'] != 1:
-                        click.echo("This is not a template: [{}]".format(v['template']))
-                        continue
-                else:
-                    click.echo("No such template: [{}]".format(v['template']))
+                template = None
+                for t in templates:
+                    if v['template'] == t['name'] and v['node'] == t['node']:
+                        template = t
+
+                if not template:
+                    click.echo("No such template: [{}] on node [{}]".format(v['template'], v['node']))
                     continue
 
                 # Clone the VM
