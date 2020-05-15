@@ -179,4 +179,4 @@ class vmProvider(object):
         dnsRemove(ips)
 
     def params(self, params):
-        return {k: params[k] for k in ['node', 'template', 'vcpu', 'memory', 'ipconfig']}
+        return {k: params.get(k, None) for k in ['node', 'template', 'vcpu', 'memory', 'ipconfig', 'disks']}
