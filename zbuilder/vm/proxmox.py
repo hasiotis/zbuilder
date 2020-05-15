@@ -108,13 +108,15 @@ class vmProvider(object):
                     memory=v['memory'],
                     scsihw=v.get('scsihw', 'virtio-scsi-pci'),
                     net0=v.get('net0', 'virtio,bridge=vmbr0'),
-                    virtio1='local-lvm:1,size=4G',
                     ipconfig0=ipconfig,
                     nameserver=v['nameserver'],
                     searchdomain=v['searchdomain'],
                     sshkeys=urllib.parse.quote(sshkey, safe=''),
                     ciuser=v['ZBUILDER_SYSUSER']
                 )
+                for i, disk in enumerate(v['disks']):
+                    args = {f"virtio{i+1}": disk}
+                    taskid = node.qemu(nextid).config.set(**args)
 
                 # Start the VM
                 taskid = node.qemu(nextid).status.start().post()
