@@ -114,7 +114,7 @@ class vmProvider(object):
                     sshkeys=urllib.parse.quote(sshkey, safe=''),
                     ciuser=v['ZBUILDER_SYSUSER']
                 )
-                for i, disk in enumerate(v['disks']):
+                for i, disk in enumerate(v.get('disks', [])):
                     args = {f"virtio{i+1}": disk}
                     taskid = node.qemu(nextid).config.set(**args)
 
