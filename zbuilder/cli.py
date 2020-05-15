@@ -103,6 +103,8 @@ def destroy(state):
                 vmProvider['cloud'].destroy(vmProvider['hosts'])
             else:
                 click.echo("    Aborting!")
+        else:
+            vmProvider['cloud'].destroy(vmProvider['hosts'])
 
 
 @cli.command()
