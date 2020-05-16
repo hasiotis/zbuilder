@@ -131,10 +131,36 @@ class vmProvider(object):
         dnsUpdate(ips)
 
     def up(self, hosts):
-        pass
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                click.echo("  - Starting host: {} ".format(h))
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+                if v['status'] == 'stopped':
+                    taskid = node(vm['id']).status.start().post()
+                    result = self._waitTask(node, taskid)
+                    if result != 'OK':
+                        click.echo('Failed: {}'.format(result))
+                        continue
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
 
     def halt(self, hosts):
-        pass
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                click.echo("  - Halting host: {} ".format(h))
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+                if v['status'] == 'running':
+                    taskid = node(vm['id']).status.shutdown().post()
+                    result = self._waitTask(node, taskid)
+                    if result != 'OK':
+                        click.echo('Failed: {}'.format(result))
+                        continue
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
 
     def destroy(self, hosts):
         updateHosts = {}
