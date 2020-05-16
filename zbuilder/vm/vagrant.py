@@ -4,13 +4,14 @@ import jinja2
 from zbuilder.helpers import runCmd
 
 VAGRANT_FILE = '''
+VAGRANTFILE_API_VERSION = "2"
+VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
+
 class VagrantPlugins::ProviderVirtualBox::Action::Network
   def dhcp_server_matches_config?(dhcp_server, config)
     true
   end
 end
-VAGRANTFILE_API_VERSION = "2"
-VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
 
 publickey = File.read(File.expand_path('{{ pubkey }}'))
 
