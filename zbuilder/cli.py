@@ -211,8 +211,8 @@ def providers(state):
     click.echo('Checking providers state...')
     cfg = zbuilder.cfg.load(touch=True)
     data = getProviders(cfg, state)
-    headers = ['Name', 'Type', 'Config', 'Check']
-    click.echo(tabulate.tabulate(data, headers=headers, tablefmt="psql"))
+    headers = ['Name', 'Type', 'Check']
+    click.echo(tabulate.tabulate(data, headers=headers))
 
 
 @cli.group()

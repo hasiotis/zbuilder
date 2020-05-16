@@ -108,9 +108,9 @@ def getProviders(cfg, state):
                 curProvider = zbuilder.dns.dnsProvider(cp['type'], cp)
             if cp['type'] in ['phpipam']:
                 curProvider = zbuilder.ipam.ipamProvider(cp['type'], cp)
-            providers.append([p, cp['type'], curProvider.config(), curProvider.status()])
+            providers.append([p, cp['type'], curProvider.status()])
         except Exception as e:
-            providers.append([p, cp['type'], '', e])
+            providers.append([p, cp['type'], e])
 
     return providers
 

@@ -2,6 +2,7 @@ import os
 import re
 import time
 import click
+import requests
 import urllib.parse
 
 from proxmoxer import ProxmoxAPI
@@ -17,7 +18,10 @@ class vmProvider(object):
             password = self.cfg['password']
             url = self.cfg['url']
             verify = self.cfg.get('verify', True)
-            self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
+            try:
+                self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
+            except requests.exceptions.Timeout as e:
+                raise Exception(e.args[0].reason.args[1])
 
     def _waitTask(self, node, tid):
         results = None

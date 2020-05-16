@@ -251,7 +251,7 @@ class vmProvider(object):
         dnsRemove(ips)
 
     def config(self):
-        return "subscr: {v[subscription_id]}, tenant: {v[tenant_id]}".format(v=self.cfg)
+        return "subscription: {v[subscription_id]}".format(v=self.cfg)
 
     def status(self):
         return "PASS"
