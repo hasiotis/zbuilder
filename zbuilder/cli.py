@@ -9,7 +9,7 @@ import distutils.dir_util
 import zbuilder.vm
 import zbuilder.cfg
 
-from zbuilder.helpers import getHosts, runPlaybook, fixKeys, runCmd, humanize_time
+from zbuilder.helpers import getHosts, getProviders, runPlaybook, fixKeys, runCmd, humanize_time
 from zbuilder.options import pass_state, common_options
 
 from click._bashcomplete import get_completion_script
@@ -202,6 +202,17 @@ def summary(state):
         for h, v in vmProvider['hosts'].items():
             data.append([vmProvider['cloud'].factory, h, vmProvider['cloud'].params(v)])
     click.echo(tabulate.tabulate(data, headers=["Provider", "Host", 'Parameters'], tablefmt="psql"))
+
+
+@cli.command()
+@pass_state
+def providers(state):
+    """Display providers info"""
+    click.echo('Checking providers state...')
+    cfg = zbuilder.cfg.load(touch=True)
+    data = getProviders(cfg, state)
+    headers = ['Name', 'Type', 'Config', 'Check']
+    click.echo(tabulate.tabulate(data, headers=headers, tablefmt="psql"))
 
 
 @cli.group()

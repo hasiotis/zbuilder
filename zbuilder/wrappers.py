@@ -1,4 +1,3 @@
-import click
 import traceback
 
 
@@ -7,7 +6,7 @@ def trywrap(func):
         try:
             return func(*args, **kwargs)
         except AttributeError:
-            click.echo("Provider does not implement this action")
+            raise Exception("Provider does not implement this action")
         except Exception:
             traceback.print_exc()
 

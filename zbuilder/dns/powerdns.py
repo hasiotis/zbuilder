@@ -54,3 +54,9 @@ class dnsProvider(object):
             r = requests.patch(uri, json=payload, headers={'X-API-Key': self.apikey})
         else:
             click.echo("  - No such record {}".format(fqdn))
+
+    def config(self):
+        return "url: {v[url]}".format(v=self.cfg)
+
+    def status(self):
+        return 'PASS'

@@ -7,6 +7,7 @@ from zbuilder.dns import dnsUpdate, dnsRemove
 class vmProvider(object):
     def __init__(self, cfg):
         if cfg:
+            self.cfg = cfg
             if 'aws_access_key_id' and 'aws_access_key_id' in cfg:
                 self.ec2 = boto3.resource(
                     'ec2',
@@ -107,6 +108,12 @@ class vmProvider(object):
 
     def snapDelete(self, hosts):
         pass
+
+    def config(self):
+        return "aws_access_key_id: {}".format(self.cfg['aws_access_key_id'])
+
+    def status(self):
+        return "PASS"
 
     def params(self, params):
         return {k: params[k] for k in ['ami', 'region', 'vmtype', 'subnet', 'sg']}

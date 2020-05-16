@@ -8,9 +8,10 @@ from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+CONFIG_PATH = "~/.config/zbuilder/"
+
 
 def auth(cfg):
-    CONFIG_PATH = "~/.config/zbuilder/"
     SCOPES = ['https://www.googleapis.com/auth/compute', 'https://www.googleapis.com/auth/ndev.clouddns.readwrite']
 
     creds = None
@@ -231,6 +232,15 @@ class vmProvider(object):
 
     def snapDelete(self, hosts):
         pass
+
+    def config(self):
+        if 'service-key' in self.cfg:
+            return "service-key: {}{}".format(CONFIG_PATH, self.cfg['service-key'])
+        else:
+            return "client-secret: {}{}".format(CONFIG_PATH, self.cfg['client-secret'])
+
+    def status(self):
+        return "PASS"
 
     def params(self, params):
         return {k: params[k] for k in ['size', 'image']}

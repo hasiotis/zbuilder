@@ -1,4 +1,5 @@
 import click
+import shutil
 import jinja2
 
 from zbuilder.helpers import runCmd
@@ -127,6 +128,15 @@ class vmProvider(object):
             return {k: params[k] for k in ['box', 'vcpus', 'memory', 'disks']}
         else:
             return {k: params[k] for k in ['box', 'vcpus', 'memory']}
+
+    def config(self):
+        return shutil.which("vagrant")
+
+    def status(self):
+        if shutil.which("vagrant"):
+            return 'PASS'
+        else:
+            return 'Vagrant binary not found'
 
     def setVagrantfile(self, pubkey, hosts):
         templateLoader = jinja2.BaseLoader()

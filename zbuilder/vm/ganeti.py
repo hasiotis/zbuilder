@@ -159,5 +159,11 @@ class vmProvider(object):
                 ips[h] = None
         dnsRemove(hosts)
 
+    def config(self):
+        return "url: {}, user: {}".format(self.cfg['url'], self.cfg['user'])
+
+    def status(self):
+        return "PASS"
+
     def params(self, params):
         return {k: params[k] for k in ['beparams', 'disks', 'os_type', 'nics']}

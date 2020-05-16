@@ -57,3 +57,11 @@ class vmProvider(object):
     @trywrap
     def params(self, v):
         return self.provider.params(v)
+
+    @trywrap
+    def config(self):
+        return self.provider.config()
+
+    @trywrap
+    def status(self):
+        return self.provider.status()

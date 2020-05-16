@@ -57,3 +57,11 @@ class ipamProvider(object):
     @trywrap
     def reserve(self, host, subnet):
         return self.provider.reserve(host, subnet)
+
+    @trywrap
+    def config(self):
+        return self.provider.config()
+
+    @trywrap
+    def status(self):
+        return self.provider.status()

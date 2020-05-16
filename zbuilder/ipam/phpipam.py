@@ -91,3 +91,9 @@ class ipamProvider(object):
         gw = self._get_subnet_gw(sid)
         ip = self._locate(sid, host)
         return ip, gw
+
+    def config(self):
+        return "server: {v[server]}, username: {v[username]}".format(v=self.cfg)
+
+    def status(self):
+        return 'PASS'

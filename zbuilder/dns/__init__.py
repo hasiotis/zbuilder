@@ -80,3 +80,11 @@ class dnsProvider(object):
     @trywrap
     def remove(self, host, zone):
         self.provider.remove(host, zone)
+
+    @trywrap
+    def config(self):
+        return self.provider.config()
+
+    @trywrap
+    def status(self):
+        return self.provider.status()

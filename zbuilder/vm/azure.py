@@ -14,6 +14,7 @@ from msrestazure.tools import parse_resource_id
 class vmProvider(object):
     def __init__(self, cfg):
         if cfg:
+            self.cfg = cfg
             self.credentials = ServicePrincipalCredentials(
                 client_id=cfg['client_id'],
                 secret=cfg['client_secret'],
@@ -248,3 +249,9 @@ class vmProvider(object):
                 ips[h] = None
 
         dnsRemove(ips)
+
+    def config(self):
+        return "subscr: {v[subscription_id]}, tenant: {v[tenant_id]}".format(v=self.cfg)
+
+    def status(self):
+        return "PASS"

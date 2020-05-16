@@ -17,7 +17,6 @@ class vmProvider(object):
             password = self.cfg['password']
             url = self.cfg['url']
             verify = self.cfg.get('verify', True)
-
             self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
 
     def _waitTask(self, node, tid):
@@ -177,6 +176,12 @@ class vmProvider(object):
             if hosts[h]['enabled']:
                 ips[h] = None
         dnsRemove(ips)
+
+    def config(self):
+        return "url: {v[url]}, username: {v[username]}".format(v=self.cfg)
+
+    def status(self):
+        return 'PASS'
 
     def params(self, params):
         return {k: params.get(k, None) for k in ['node', 'template', 'vcpu', 'memory', 'ipconfig', 'disks']}

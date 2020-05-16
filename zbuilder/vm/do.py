@@ -169,3 +169,9 @@ class vmProvider(object):
                     snaps[snapshot_name].destroy()
                 else:
                     click.echo("  - No such snapshot: {}".format(snapshot_name))
+
+    def config(self):
+        return "apikey: {}...".format(self.cfg['apikey'][0:10])
+
+    def status(self):
+        return "PASS"

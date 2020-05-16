@@ -96,6 +96,25 @@ def getHosts(state):
     return vmProviders
 
 
+def getProviders(cfg, state):
+    providers = []
+    for p in cfg['providers']:
+        try:
+            cp = cfg['providers'][p]
+            cp['state'] = state
+            if cp['type'] in ['aws', 'azure', 'do', 'ganeti', 'gcp', 'proxmox', 'vagrant']:
+                curProvider = zbuilder.vm.vmProvider(cp['type'], cp)
+            if cp['type'] in ['powerdns']:
+                curProvider = zbuilder.dns.dnsProvider(cp['type'], cp)
+            if cp['type'] in ['phpipam']:
+                curProvider = zbuilder.ipam.ipamProvider(cp['type'], cp)
+            providers.append([p, cp['type'], curProvider.config(), curProvider.status()])
+        except Exception as e:
+            providers.append([p, cp['type'], '', e])
+
+    return providers
+
+
 def runPlaybook(state, pbook):
     try:
         playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
