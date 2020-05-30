@@ -207,6 +207,67 @@ class vmProvider(object):
                 ips[h] = None
         dnsRemove(ips)
 
+    def snapCreate(self, hosts):
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+                snapshots = node(vm['id']).snapshot.get()
+                for curSnapshot in snapshots:
+                    if curSnapshot['name'] == 'zbuilder':
+                        click.echo("  - Deleting snapshot for vm: {} ".format(h))
+                        taskid = node(vm['id']).snapshot("zbuilder").delete()
+                        result = self._waitTask(node, taskid)
+                        if result != 'OK':
+                            click.echo('    Failed: {}'.format(result))
+                click.echo("  - Creating snapshot for vm: {} ".format(h))
+                taskid = node(vm['id']).snapshot.post(snapname="zbuilder", description="Managed by zbuilder")
+                result = self._waitTask(node, taskid)
+                if result != 'OK':
+                    click.echo('Failed: {}'.format(result))
+                    continue
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
+
+    def snapRestore(self, hosts):
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+                snapshots = node(vm['id']).snapshot.get()
+                for curSnapshot in snapshots:
+                    if curSnapshot['name'] == 'zbuilder':
+                        click.echo("  - Restoring snapshot for vm: {} ".format(h))
+                        taskid = node(vm['id']).snapshot("zbuilder").rollback.post()
+                        result = self._waitTask(node, taskid)
+                        if result != 'OK':
+                            click.echo('    Failed: {}'.format(result))
+                        taskid = node(vm['id']).status.start().post()
+                        result = self._waitTask(node, taskid)
+                        if result != 'OK':
+                            click.echo('Failed: {}'.format(result))
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
+
+    def snapDelete(self, hosts):
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        for h, v in self._getVMs(hosts).items():
+            if v['status']:
+                node = self.proxmox.nodes(v['node'])
+                vm = vms[h]
+                snapshots = node(vm['id']).snapshot.get()
+                for curSnapshot in snapshots:
+                    if curSnapshot['name'] == 'zbuilder':
+                        click.echo("  - Deleting snapshot for vm: {} ".format(h))
+                        taskid = node(vm['id']).snapshot("zbuilder").delete()
+                        result = self._waitTask(node, taskid)
+                        if result != 'OK':
+                            click.echo('    Failed: {}'.format(result))
+            else:
+                click.echo("  - Host does not exists [{}]".format(h))
+
     def config(self):
         return "url: {v[url]}, username: {v[username]}".format(v=self.cfg)
 
