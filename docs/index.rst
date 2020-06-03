@@ -18,4 +18,4 @@ way it achieves high integration with ansible.
    proxmox
    phpipam
    powerdns
-
+   bind
