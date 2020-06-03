@@ -9,6 +9,12 @@ from proxmoxer import ProxmoxAPI
 from zbuilder.dns import dnsUpdate, dnsRemove
 from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
 
+NOTES_FORMAT = """Created with zbuilder
+
+time: {}
+user: {}
+"""
+
 
 class vmProvider(object):
     def __init__(self, cfg):
@@ -115,7 +121,8 @@ class vmProvider(object):
                     nameserver=v['nameserver'],
                     searchdomain=v['searchdomain'],
                     sshkeys=urllib.parse.quote(sshkey, safe=''),
-                    ciuser=v['ZBUILDER_SYSUSER']
+                    ciuser=v['ZBUILDER_SYSUSER'],
+                    description=NOTES_FORMAT.format(time.strftime("%c", time.localtime()), self.username)
                 )
                 for i, disk in enumerate(v.get('disks', [])):
                     args = {f"virtio{i+1}": disk}
