@@ -261,7 +261,7 @@ def provider(state, args):
     cfg = zbuilder.cfg.load(touch=True)
 
     base_path = args[0].replace('.', '/')
-    sub_path, value = args[1].split('=')
+    sub_path, value = args[1].split('=', 1)
     if ',' in value:
         value = value.split(',')
     if value in ['True', 'true']:
