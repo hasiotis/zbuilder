@@ -1,5 +1,5 @@
 PHPipam Provider
-===============
+================
 
 Provider configuration
 ----------------------

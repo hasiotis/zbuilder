@@ -1,5 +1,5 @@
 PowerDNS Provider
-===============
+=================
 
 Provider configuration
 ----------------------

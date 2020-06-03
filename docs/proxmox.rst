@@ -1,5 +1,5 @@
 Proxmox Provider
-===============
+================
 
 Main configuration
 ------------------
