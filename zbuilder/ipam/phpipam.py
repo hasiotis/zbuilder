@@ -16,6 +16,7 @@ class ipamProvider(object):
             self.verify = cfg.get('verify', True)
             self.server = "http{}://{}".format('s' if self.ssl else '', cfg['server'])
             self.token = None
+            self._refresh_token()
 
     def _refresh_token(self):
         url = "{}/api/zbuilder/user/".format(self.server)
@@ -23,11 +24,13 @@ class ipamProvider(object):
             r = requests.post(url, auth=(self.username, self.password), verify=self.verify)
         except Exception as e:
             click.echo("Error {}".format(e))
-            exit()
         if r.status_code == 200:
             j = r.json()
             if 'data' in j:
                 self.token = j['data']['token']
+        else:
+            j = r.json()
+            raise Exception(j['message'])
 
     def _get_subnet(self, subnet):
         url = "{}/api/zbuilder/subnets/cidr/{}".format(self.server, subnet)
