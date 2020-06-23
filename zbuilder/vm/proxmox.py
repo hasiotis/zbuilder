@@ -41,7 +41,7 @@ class vmProvider(object):
 
     def _getVMs(self, hosts):
         retValue = {}
-        vms = {v['name']: v for v in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {v['name']: v for v in self.proxmox.cluster.resources.get(type='vm') if 'name' in v}
         for h, v in hosts.items():
             if hosts[h]['enabled']:
                 ipconfig = v.get('ipconfig', '')
@@ -71,7 +71,7 @@ class vmProvider(object):
 
     def build(self, hosts):
         ips = {}
-        templates = [i for i in self.proxmox.cluster.resources.get(type='vm') if i['template'] == 1]
+        templates = [i for i in self.proxmox.cluster.resources.get(type='vm') if i.get('template', 0) == 1]
 
         for h, v in self._getVMs(hosts).items():
             if v['status']:
@@ -138,7 +138,7 @@ class vmProvider(object):
         dnsUpdate(ips)
 
     def up(self, hosts):
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
         for h, v in self._getVMs(hosts).items():
             if v['status']:
                 click.echo("  - Starting host: {} ".format(h))
@@ -154,7 +154,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def halt(self, hosts):
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
         for h, v in self._getVMs(hosts).items():
             if v['status']:
                 click.echo("  - Halting host: {} ".format(h))
@@ -171,7 +171,7 @@ class vmProvider(object):
 
     def destroy(self, hosts):
         updateHosts = {}
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
 
         for h, v in self._getVMs(hosts).items():
             if v['status']:
@@ -215,7 +215,7 @@ class vmProvider(object):
         dnsRemove(ips)
 
     def snapCreate(self, hosts):
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
         for h, v in self._getVMs(hosts).items():
             if v['status']:
                 node = self.proxmox.nodes(v['node'])
@@ -238,7 +238,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def snapRestore(self, hosts):
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
         for h, v in self._getVMs(hosts).items():
             if v['status']:
                 node = self.proxmox.nodes(v['node'])
@@ -259,7 +259,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def snapDelete(self, hosts):
-        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm')}
+        vms = {i['name']: i for i in self.proxmox.cluster.resources.get(type='vm') if 'name' in i}
         for h, v in self._getVMs(hosts).items():
             if v['status']:
                 node = self.proxmox.nodes(v['node'])
