@@ -53,8 +53,9 @@ def build(state):
         vmProvider['cloud'].build(vmProvider['hosts'])
     click.echo("Fixing ssh keys VMs")
     fixKeys(state)
-    click.echo("Running bootstrap.yml")
-    runPlaybook(state, "bootstrap.yml")
+    if os.path.exists('bootstrap.yml'):
+        click.echo("Running bootstrap.yml")
+        runPlaybook(state, "bootstrap.yml")
     end_time = time.time()
     click.echo("Time elapsed: {}".format(humanize_time(end_time - start_time)))
 
