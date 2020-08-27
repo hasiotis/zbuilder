@@ -92,7 +92,11 @@ class vmProvider(object):
 
                 # Clone the VM
                 full = int(v.get('full', 0) is True)
-                taskid = node(template['id']).clone.post(newid=nextid, name=h, full=full)
+                storage = v.get('storage', None)
+                if storage:
+                    taskid = node(template['id']).clone.post(newid=nextid, name=h, full=1, storage=storage)
+                else:
+                    taskid = node(template['id']).clone.post(newid=nextid, name=h, full=full)
                 result = self._waitTask(node, taskid)
                 if result != 'OK':
                     click.echo("Clone failed".format())
