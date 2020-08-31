@@ -31,7 +31,7 @@ def waitDNS(hostname, ip):
 
 def getProvider(zone, cfg):
     for p, v in cfg.items():
-        if 'dns' in v and 'zones' in v['dns'] and zone in v['dns']['zones']:
+        if 'dns' in v and 'zones' in v['dns'] and zone == v['dns']['zones']:
             return dnsProvider(cfg[p]['type'], cfg[p])
     return None
 
