@@ -28,6 +28,8 @@ class vmProvider(object):
                 self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
             except requests.exceptions.Timeout as e:
                 raise Exception(e.args[0].reason.args[1])
+            except requests.exceptions.ConnectionError as e:
+                raise Exception(str(e))
 
     def _waitTask(self, node, tid):
         results = None
