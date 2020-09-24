@@ -24,6 +24,8 @@ class ZBbuilderInventoryCLI(PlaybookCLI):
             return self._play_prereqs(options)
         if ansible_version.startswith('2.9'):
             return self._play_prereqs()
+        if ansible_version.startswith('2.10'):
+            return self._play_prereqs()
 
 
 def getHostsWithVars(limit, pbook='bootstrap.yml'):
