@@ -175,3 +175,6 @@ class vmProvider(object):
 
     def status(self):
         return "PASS"
+
+    def params(self, params):
+        return {k: params.get(k, None) for k in ['size_slug', 'region', 'image']}
