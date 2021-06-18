@@ -19,7 +19,7 @@ from zbuilder.helpers import (
 )
 from zbuilder.options import pass_state, common_options
 
-from click.shell_completion import shell_complete
+from click.shell_completion import get_completion_class
 
 
 @click.group()
@@ -318,4 +318,6 @@ def update(state, yes):
 @click.argument("shell", default="bash")
 def completion(shell):
     """Autocomplete for bash"""
-    click.echo(shell_complete("zbuilder", "_ZBUILDER_COMPLETE", shell))
+    comp_cls = get_completion_class(shell)
+    comp = comp_cls(cli, {}, 'zbuilder', "_ZBUILDER_COMPLETE")
+    click.echo(comp.source())
