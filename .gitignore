@@ -6,3 +6,4 @@ docs/_build
 results.xml
 .env
 .coverage
+workflow

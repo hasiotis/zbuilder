@@ -6,7 +6,7 @@ if [[ $MODIFY == 0 ]]; then
     exit 1
 fi
 
-make tests
+flake8 zbuilder && pytest
 if [[ $? != 0 ]]; then
     echo "Tests failed!"
     exit 1

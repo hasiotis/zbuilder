@@ -10,11 +10,12 @@
 
 import os
 import sys
+import pkg_resources
 
 sys.path.insert(0, os.path.abspath('..'))
 base_dir = os.path.dirname(__file__)
 
-from zbuilder import __version__
+ver = pkg_resources.get_distribution("zbuilder").version
 
 
 # -- Project information -----------------------------------------------------
@@ -24,8 +25,8 @@ copyright = '2019, Nikos Chasiotis'
 author = 'Nikos Chasiotis'
 
 # The full version, including alpha/beta/rc tags
-version = __version__
-release = __version__
+version = ver
+release = ver
 
 
 # -- General configuration ---------------------------------------------------
@@ -55,6 +56,6 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 master_doc = 'index'
