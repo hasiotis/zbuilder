@@ -11,15 +11,13 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup python
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
-
-    - name: Get full Python version
-      id: full-python-version
-      shell: bash
-      run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
 
     - name: Bootstrap poetry
       shell: bash
@@ -28,7 +26,6 @@ jobs:
           | python - -y ${{ matrix.bootstrap-args }}
 
     - name: Update PATH
-      if: ${{ matrix.os != 'Windows' }}
       shell: bash
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
@@ -51,3 +48,4 @@ jobs:
     - name: Check our style
       run: |
         poetry run flake8
+        poetry run pytest
