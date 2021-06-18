@@ -8,26 +8,46 @@ on:
       - closed
 
 jobs:
-  build:
+  Testing:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.6
-      uses: actions/setup-python@v1
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup python
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.6
+        python-version: 3.8
+
+    - name: Bootstrap poetry
+      shell: bash
+      run: |
+        curl -sL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py \
+          | python - -y ${{ matrix.bootstrap-args }}
+
+    - name: Update PATH
+      shell: bash
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Set up cache
+      uses: actions/cache@v2
+      id: cache
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Ensure cache is healthy
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: timeout 10s poetry run pip --version || rm -rf .venv
+
     - name: Install dependencies
+      shell: bash
+      run: poetry install
+
+    - name: Check our style
       run: |
-        make init
-    - name: Bump version
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        make release
-        git push https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git HEAD:master --tags
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-        READTHEDOCS_TOKEN: ${{ secrets.READTHEDOCS_TOKEN }}
+        poetry run flake8
+        poetry run pytest

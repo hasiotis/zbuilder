@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  build:
+  Testing:
 
     runs-on: ubuntu-20.04
 
