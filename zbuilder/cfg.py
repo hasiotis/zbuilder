@@ -14,7 +14,7 @@ providers: {}
 def initConfig(fname):
     Path(fname).parent.mkdir(parents=True, exist_ok=True)
     Path(fname).touch()
-    Path(fname).open('w').write(CONFIG_EMPTY)
+    Path(fname).open("w").write(CONFIG_EMPTY)
 
 
 def load(touch=False):
@@ -36,5 +36,5 @@ def view(cfg):
 
 def save(cfg):
     fname = os.path.expanduser(CONFIG_PATH)
-    with open(fname, 'w') as fp:
+    with open(fname, "w") as fp:
         dump_yaml(cfg, fp)

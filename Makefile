@@ -22,24 +22,15 @@ clean:
 
 .PHONY: release  ## Make release
 release:
-	echo $(shell "poetry version")
-	#poetry version patch
-	#VERSION := $(shell poetry -s version)
-	#echo $(VERSION)
-	#@git add pyproject.toml
-	#@git commit -m "Bump version: 0.0.29 → 0.0.30"
-	#@poetry build
-	#@poetry publish --dry-run
+	#MSG=`poetry version patch`
+	#git add pyproject.toml
+	#git commit -m "${MSG}"
+	#VER=`poetry version -s`
+	#git tag -a v${VER} -m "Tagged version ${VER}"
+	#poetry build
+	#poetry publish -u hasiotis -p ${PASS}
 	rm -rf dist/*
 	#curl -X POST -s -o /dev/null -w "%{http_code}"      \
 	#		-H "Authorization: Token ${READTHEDOCS_TOKEN}"  \
 	#	-H "Content-Type: application/json"             \
 	#		https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
-
-
-.PHONY: pre-release  ## Make pre release
-pre-release:
-	@poetry version prerelease
-	@poetry build
-	#@poetry publish -r https://test.pypi.org/legacy/
-	rm -rf dist/*

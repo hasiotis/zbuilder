@@ -17,19 +17,20 @@ from ansible.release import __version__ as ansible_version
 class ZBbuilderInventoryCLI(PlaybookCLI):
     def dumpVars(self):
         super(ZBbuilderInventoryCLI, self).parse()
-        if ansible_version.startswith('2.7'):
+        if ansible_version.startswith("2.7"):
             from ansible.cli import CLI
+
             parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
             options, args = parser.parse_args(["-i", "hosts"])
             return self._play_prereqs(options)
-        if ansible_version.startswith('2.9'):
+        if ansible_version.startswith("2.9"):
             return self._play_prereqs()
-        if ansible_version.startswith('2.10'):
+        if ansible_version.startswith("2.10"):
             return self._play_prereqs()
 
 
-def getHostsWithVars(limit, pbook='bootstrap.yml'):
-    inv = ZBbuilderInventoryCLI(["ansible-playbook", "-l", limit,  pbook])
+def getHostsWithVars(limit, pbook="bootstrap.yml"):
+    inv = ZBbuilderInventoryCLI(["ansible-playbook", "-l", limit, pbook])
     loader, inventory, vm = inv.dumpVars()
 
     hostVars = {}
@@ -38,22 +39,22 @@ def getHostsWithVars(limit, pbook='bootstrap.yml'):
         templar = Templar(loader=loader, variables=hvars)
         hvars = templar.template(hvars)
 
-        if 'ZBUILDER_PROVIDER' in hvars:
-            hvars['ZBUILDER_PROVIDER']['VM_OPTIONS']['enabled'] = False
-            hostVars[host.name] = hvars['ZBUILDER_PROVIDER']
-            if 'ansible_host' in hvars:
-                hostVars[host.name]['ansible_host'] = hvars['ansible_host']
-            if 'ZBUILDER_PUBKEY' in hvars:
-                hostVars[host.name]['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
-            if 'ZBUILDER_SYSUSER' in hvars:
-                hostVars[host.name]['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
-            if 'ZBUILDER_ENV' in hvars:
-                hostVars[host.name]['ZBUILDER_ENV'] = hvars['ZBUILDER_ENV']
+        if "ZBUILDER_PROVIDER" in hvars:
+            hvars["ZBUILDER_PROVIDER"]["VM_OPTIONS"]["enabled"] = False
+            hostVars[host.name] = hvars["ZBUILDER_PROVIDER"]
+            if "ansible_host" in hvars:
+                hostVars[host.name]["ansible_host"] = hvars["ansible_host"]
+            if "ZBUILDER_PUBKEY" in hvars:
+                hostVars[host.name]["ZBUILDER_PUBKEY"] = hvars["ZBUILDER_PUBKEY"]
+            if "ZBUILDER_SYSUSER" in hvars:
+                hostVars[host.name]["ZBUILDER_SYSUSER"] = hvars["ZBUILDER_SYSUSER"]
+            if "ZBUILDER_ENV" in hvars:
+                hostVars[host.name]["ZBUILDER_ENV"] = hvars["ZBUILDER_ENV"]
 
     inventory.subset(limit)
     for host in inventory.get_hosts():
         if host.name in hostVars:
-            hostVars[host.name]['VM_OPTIONS']['enabled'] = True
+            hostVars[host.name]["VM_OPTIONS"]["enabled"] = True
 
     return hostVars
 
@@ -65,61 +66,69 @@ def getHosts(state):
     vmProviders = {}
     if cfg is None:
         click.Abort("Config file seems to be empty")
-    if 'providers' not in cfg:
+    if "providers" not in cfg:
         click.Abort("There is no 'providers' sections on config file")
 
     for h, hvars in hosts.items():
-        if 'CLOUD' in hvars:
-            curVMProvider = hvars['CLOUD']
+        if "CLOUD" in hvars:
+            curVMProvider = hvars["CLOUD"]
         else:
             next
 
         if curVMProvider not in vmProviders:
-            provider_cfg = cfg['providers'][curVMProvider]
-            provider_cfg['state'] = state
+            provider_cfg = cfg["providers"][curVMProvider]
+            provider_cfg["state"] = state
             vmProviders[curVMProvider] = {
-                'cloud': zbuilder.vm.vmProvider(provider_cfg['type'], provider_cfg),
-                'hosts': {}
+                "cloud": zbuilder.vm.vmProvider(provider_cfg["type"], provider_cfg),
+                "hosts": {},
             }
 
-        hvars['VM_OPTIONS']['aliases'] = ''
-        if 'ansible_host' in hvars:
-            hvars['VM_OPTIONS']['ansible_host'] = hvars['ansible_host']
-        if 'ZBUILDER_PUBKEY' in hvars:
-            hvars['VM_OPTIONS']['ZBUILDER_PUBKEY'] = hvars['ZBUILDER_PUBKEY']
-            state.vars = {'ZBUILDER_PUBKEY': hvars['ZBUILDER_PUBKEY']}
-        if 'ZBUILDER_SYSUSER' in hvars:
-            hvars['VM_OPTIONS']['ZBUILDER_SYSUSER'] = hvars['ZBUILDER_SYSUSER']
-        if 'ZBUILDER_ENV' in hvars:
-            hvars['VM_OPTIONS']['ZBUILDER_ENV'] = hvars['ZBUILDER_ENV']
+        hvars["VM_OPTIONS"]["aliases"] = ""
+        if "ansible_host" in hvars:
+            hvars["VM_OPTIONS"]["ansible_host"] = hvars["ansible_host"]
+        if "ZBUILDER_PUBKEY" in hvars:
+            hvars["VM_OPTIONS"]["ZBUILDER_PUBKEY"] = hvars["ZBUILDER_PUBKEY"]
+            state.vars = {"ZBUILDER_PUBKEY": hvars["ZBUILDER_PUBKEY"]}
+        if "ZBUILDER_SYSUSER" in hvars:
+            hvars["VM_OPTIONS"]["ZBUILDER_SYSUSER"] = hvars["ZBUILDER_SYSUSER"]
+        if "ZBUILDER_ENV" in hvars:
+            hvars["VM_OPTIONS"]["ZBUILDER_ENV"] = hvars["ZBUILDER_ENV"]
 
-        vmProviders[curVMProvider]['hosts'][h] = hvars['VM_OPTIONS']
+        vmProviders[curVMProvider]["hosts"][h] = hvars["VM_OPTIONS"]
 
     return vmProviders
 
 
 def getProviders(cfg, state):
     providers = []
-    for p in cfg['providers']:
+    for p in cfg["providers"]:
         try:
-            cp = cfg['providers'][p]
-            cp['state'] = state
-            if cp['type'] in ['aws', 'azure', 'do', 'ganeti', 'gcp', 'proxmox', 'vagrant']:
-                curProvider = zbuilder.vm.vmProvider(cp['type'], cp)
-            if cp['type'] in ['powerdns']:
-                curProvider = zbuilder.dns.dnsProvider(cp['type'], cp)
-            if cp['type'] in ['phpipam']:
-                curProvider = zbuilder.ipam.ipamProvider(cp['type'], cp)
-            providers.append([p, cp['type'], curProvider.status()])
+            cp = cfg["providers"][p]
+            cp["state"] = state
+            if cp["type"] in [
+                "aws",
+                "azure",
+                "do",
+                "ganeti",
+                "gcp",
+                "proxmox",
+                "vagrant",
+            ]:
+                curProvider = zbuilder.vm.vmProvider(cp["type"], cp)
+            if cp["type"] in ["powerdns"]:
+                curProvider = zbuilder.dns.dnsProvider(cp["type"], cp)
+            if cp["type"] in ["phpipam"]:
+                curProvider = zbuilder.ipam.ipamProvider(cp["type"], cp)
+            providers.append([p, cp["type"], curProvider.status()])
         except Exception as e:
-            providers.append([p, cp['type'], e])
+            providers.append([p, cp["type"], e])
 
     return providers
 
 
 def runPlaybook(state, pbook):
     try:
-        playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit,  pbook])
+        playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit, pbook])
         playbookCLI.parse()
         playbookCLI.run()
     except AnsibleError as e:
@@ -131,14 +140,14 @@ def load_yaml(fname):
     value = None
     try:
         yaml = ruamel.yaml.YAML()
-        with open(fname, 'r') as f:
+        with open(fname, "r") as f:
             value = yaml.load(f)
     except ruamel.yaml.YAMLError as e:
-        if hasattr(e, 'problem_mark'):
+        if hasattr(e, "problem_mark"):
             mark = e.problem_mark
             raise click.ClickException(
-                "Yaml error (%s) at position: [line:%s column:%s]" %
-                (fname, mark.line + 1, mark.column + 1)
+                "Yaml error (%s) at position: [line:%s column:%s]"
+                % (fname, mark.line + 1, mark.column + 1)
             )
     except Exception as e:
         raise click.ClickException(e)
@@ -149,7 +158,7 @@ def load_yaml(fname):
 def humanize_time(secs):
     mins, secs = divmod(secs, 60)
     hours, mins = divmod(mins, 60)
-    return '%02d:%02d' % (mins, secs)
+    return "%02d:%02d" % (mins, secs)
 
 
 def dump_yaml(cfg, where=None):
@@ -182,16 +191,20 @@ def waitSSH(ip):
 def fixKeys(state):
     vmProviders = getHosts(state)
     for _, vmProvider in vmProviders.items():
-        for h, v in vmProvider['hosts'].items():
-            if v['enabled']:
+        for h, v in vmProvider["hosts"].items():
+            if v["enabled"]:
                 ip = None
-                if 'ansible_host' in v:
-                    ip = v['ansible_host']
+                if "ansible_host" in v:
+                    ip = v["ansible_host"]
                 else:
                     try:
                         ip = getIP(h)
                     except Exception:
-                        click.echo(click.style("  - Host: {} can't be resolved".format(h), fg='red'))
+                        click.echo(
+                            click.style(
+                                "  - Host: {} can't be resolved".format(h), fg="red"
+                            )
+                        )
                         continue
 
                 click.echo("  - Host: {}".format(h))
@@ -200,12 +213,18 @@ def fixKeys(state):
                     runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
                     waitSSH(ip)
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
-                        verbose=state.verbose, ignoreError=True
+                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(
+                            h
+                        ),
+                        verbose=state.verbose,
+                        ignoreError=True,
                     )
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(ip),
-                        verbose=state.verbose, ignoreError=True
+                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(
+                            ip
+                        ),
+                        verbose=state.verbose,
+                        ignoreError=True,
                     )
 
 
@@ -215,8 +234,8 @@ def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
     if not dry:
         status = delegator.run(cmd)
         if verbose:
-            click.echo(click.style(status.out, fg='green'))
+            click.echo(click.style(status.out, fg="green"))
         if status.return_code != 0 and not ignoreError:
-            click.echo(click.style(status.err, fg='red'))
+            click.echo(click.style(status.err, fg="red"))
 
     return status.return_code

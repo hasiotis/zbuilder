@@ -17,7 +17,15 @@ def verbose_option(f):
         state = ctx.ensure_object(State)
         state.verbose = value
         return value
-    return click.option('-v', '--verbose', count=True, expose_value=False, help='Enables verbose', callback=callback)(f)
+
+    return click.option(
+        "-v",
+        "--verbose",
+        count=True,
+        expose_value=False,
+        help="Enables verbose",
+        callback=callback,
+    )(f)
 
 
 def limit_option(f):
@@ -25,7 +33,15 @@ def limit_option(f):
         state = ctx.ensure_object(State)
         state.limit = value
         return value
-    return click.option('-l', '--limit', default=None, expose_value=False, help='Limit selected hosts to a pattern', callback=callback)(f)
+
+    return click.option(
+        "-l",
+        "--limit",
+        default=None,
+        expose_value=False,
+        help="Limit selected hosts to a pattern",
+        callback=callback,
+    )(f)
 
 
 def common_options(f):

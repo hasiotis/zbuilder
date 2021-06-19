@@ -319,5 +319,5 @@ def update(state, yes):
 def completion(shell):
     """Autocomplete for bash"""
     comp_cls = get_completion_class(shell)
-    comp = comp_cls(cli, {}, 'zbuilder', "_ZBUILDER_COMPLETE")
+    comp = comp_cls(cli, {}, "zbuilder", "_ZBUILDER_COMPLETE")
     click.echo(comp.source())

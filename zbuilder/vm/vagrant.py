@@ -4,7 +4,7 @@ import jinja2
 
 from zbuilder.helpers import runCmd
 
-VAGRANT_FILE = '''
+VAGRANT_FILE = """
 VAGRANTFILE_API_VERSION = "2"
 VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
 
@@ -80,7 +80,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 end
-'''
+"""
 
 
 class vmProvider(object):
@@ -88,64 +88,68 @@ class vmProvider(object):
         self.cfg = cfg
 
     def _cmd(self, hosts, cmd):
-        self.setVagrantfile(pubkey=self.cfg['state'].vars["ZBUILDER_PUBKEY"], hosts=hosts)
+        self.setVagrantfile(
+            pubkey=self.cfg["state"].vars["ZBUILDER_PUBKEY"], hosts=hosts
+        )
         for h in hosts:
-            if hosts[h]['enabled']:
+            if hosts[h]["enabled"]:
                 click.echo("  - Host: {}".format(h))
-                runCmd(cmd.format(host=h), verbose=self.cfg['state'].verbose)
+                runCmd(cmd.format(host=h), verbose=self.cfg["state"].verbose)
 
     def build(self, hosts):
-        self._cmd(hosts, 'vagrant up {host}')
+        self._cmd(hosts, "vagrant up {host}")
 
     def up(self, hosts):
-        self._cmd(hosts, 'vagrant up {host}')
+        self._cmd(hosts, "vagrant up {host}")
 
     def halt(self, hosts):
-        self._cmd(hosts, 'vagrant halt {host}')
+        self._cmd(hosts, "vagrant halt {host}")
 
     def destroy(self, hosts):
-        self._cmd(hosts, 'vagrant destroy --force {host}')
+        self._cmd(hosts, "vagrant destroy --force {host}")
 
     def dnsupdate(self, hosts):
-        self._cmd(hosts, 'vagrant hostmanager {host}')
+        self._cmd(hosts, "vagrant hostmanager {host}")
 
     def snapCreate(self, hosts):
-        self._cmd(hosts, 'vagrant snapshot save {host} zbuilder --force')
+        self._cmd(hosts, "vagrant snapshot save {host} zbuilder --force")
 
     def snapRestore(self, hosts):
         click.echo("  Halting")
-        self._cmd(hosts, 'vagrant halt {host}')
+        self._cmd(hosts, "vagrant halt {host}")
         click.echo("  Restoring")
-        self._cmd(hosts, 'vboxmanage snapshot {host} restore zbuilder')
+        self._cmd(hosts, "vboxmanage snapshot {host} restore zbuilder")
         click.echo("  Booting up")
-        self._cmd(hosts, 'vboxmanage startvm {host} --type headless')
+        self._cmd(hosts, "vboxmanage startvm {host} --type headless")
 
     def snapDelete(self, hosts):
-        self._cmd(hosts, 'vagrant snapshot delete {host} zbuilder')
+        self._cmd(hosts, "vagrant snapshot delete {host} zbuilder")
 
     def params(self, params):
-        if 'disks' in params.keys():
-            return {k: params[k] for k in ['box', 'vcpus', 'memory', 'disks']}
+        if "disks" in params.keys():
+            return {k: params[k] for k in ["box", "vcpus", "memory", "disks"]}
         else:
-            return {k: params[k] for k in ['box', 'vcpus', 'memory']}
+            return {k: params[k] for k in ["box", "vcpus", "memory"]}
 
     def config(self):
         return shutil.which("vagrant")
 
     def status(self):
         if shutil.which("vagrant"):
-            return 'PASS'
+            return "PASS"
         else:
-            return 'Vagrant binary not found'
+            return "Vagrant binary not found"
 
     def setVagrantfile(self, pubkey, hosts):
         templateLoader = jinja2.BaseLoader()
-        template = jinja2.Environment(loader=templateLoader, trim_blocks=True).from_string(VAGRANT_FILE)
+        template = jinja2.Environment(
+            loader=templateLoader, trim_blocks=True
+        ).from_string(VAGRANT_FILE)
         privkey = pubkey
-        if privkey.endswith('.pub'):
+        if privkey.endswith(".pub"):
             privkey = privkey[:-4]
         outputText = template.render(privkey=privkey, pubkey=pubkey, hosts=hosts)
 
-        f = open('Vagrantfile', 'w')
+        f = open("Vagrantfile", "w")
         f.write(outputText)
         f.close()

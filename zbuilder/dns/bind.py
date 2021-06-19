@@ -8,19 +8,25 @@ class dnsProvider(object):
     def __init__(self, cfg):
         if cfg:
             self.cfg = cfg
-            self.keyname = cfg['keyname']
-            self.keysecret = cfg['keysecret']
-            self.server = cfg['server']
-            if not isinstance(cfg['server'], list):
-                self.server = [cfg['server']]
-            self.keyring = dns.tsigkeyring.from_text({self.keyname: ('HMAC-MD5.SIG-ALG.REG.INT', self.keysecret)})
+            self.keyname = cfg["keyname"]
+            self.keysecret = cfg["keysecret"]
+            self.server = cfg["server"]
+            if not isinstance(cfg["server"], list):
+                self.server = [cfg["server"]]
+            self.keyring = dns.tsigkeyring.from_text(
+                {self.keyname: ("HMAC-MD5.SIG-ALG.REG.INT", self.keysecret)}
+            )
 
     def _dns_query(self, update):
         for srv in self.server:
             response = dns.query.tcp(update, srv)
             if response.rcode():
                 err = dns.rcode.to_text(response.rcode())
-                click.echo("      Failed to update DNS record [{}] on server [{}]".format(err, srv))
+                click.echo(
+                    "      Failed to update DNS record [{}] on server [{}]".format(
+                        err, srv
+                    )
+                )
 
     def update(self, host, zone, ip):
         if ip is None:
@@ -29,7 +35,7 @@ class dnsProvider(object):
         fqdn = "{}.{}".format(host, zone)
         click.echo("  - Creating/Updating record [{}] with ip [{}]".format(fqdn, ip))
         update = dns.update.Update(zone, keyring=self.keyring)
-        update.replace(host, 300, 'a', str(ip))
+        update.replace(host, 300, "a", str(ip))
         self._dns_query(update)
 
     def remove(self, host, zone):
@@ -43,4 +49,4 @@ class dnsProvider(object):
         return "server: {}, keyname: {}".format(self.server, self.keyname)
 
     def status(self):
-        return 'PASS'
+        return "PASS"
