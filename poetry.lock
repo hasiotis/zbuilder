@@ -16,8 +16,8 @@ requests = ">=2.0.0,<3"
 name = "alabaster"
 version = "0.7.12"
 description = "A configurable sidebar-enabled Sphinx theme"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = "*"
 
 [[package]]
@@ -180,8 +180,8 @@ msrest = ">=0.6.21"
 name = "babel"
 version = "2.9.1"
 description = "Internationalization utilities"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.dependencies]
@@ -405,8 +405,8 @@ trio = ["trio (>=0.14.0)", "sniffio (>=1.1)"]
 name = "docutils"
 version = "0.17.1"
 description = "Docutils -- Python Documentation Utilities"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
@@ -610,8 +610,8 @@ python-versions = ">=3.5"
 name = "imagesize"
 version = "1.2.0"
 description = "Getting image size from png/jpeg/jpeg2000/gif file"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
@@ -965,8 +965,8 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 name = "pygments"
 version = "2.10.0"
 description = "Pygments is a syntax highlighting package written in Python."
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [[package]]
@@ -1212,16 +1212,16 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "snowballstemmer"
 version = "2.1.0"
 description = "This package provides 29 stemmers for 28 languages generated from Snowball algorithms."
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = "*"
 
 [[package]]
 name = "sphinx"
 version = "4.2.0"
 description = "Python documentation generator"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.6"
 
 [package.dependencies]
@@ -1251,8 +1251,8 @@ test = ["pytest", "pytest-cov", "html5lib", "cython", "typed-ast"]
 name = "sphinxcontrib-applehelp"
 version = "1.0.2"
 description = "sphinxcontrib-applehelp is a sphinx extension which outputs Apple help books"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [package.extras]
@@ -1263,8 +1263,8 @@ test = ["pytest"]
 name = "sphinxcontrib-devhelp"
 version = "1.0.2"
 description = "sphinxcontrib-devhelp is a sphinx extension which outputs Devhelp document."
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [package.extras]
@@ -1275,8 +1275,8 @@ test = ["pytest"]
 name = "sphinxcontrib-htmlhelp"
 version = "2.0.0"
 description = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.6"
 
 [package.extras]
@@ -1287,8 +1287,8 @@ test = ["pytest", "html5lib"]
 name = "sphinxcontrib-jsmath"
 version = "1.0.1"
 description = "A sphinx extension which renders display math in HTML via JavaScript"
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [package.extras]
@@ -1298,8 +1298,8 @@ test = ["pytest", "flake8", "mypy"]
 name = "sphinxcontrib-qthelp"
 version = "1.0.3"
 description = "sphinxcontrib-qthelp is a sphinx extension which outputs QtHelp document."
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [package.extras]
@@ -1310,8 +1310,8 @@ test = ["pytest"]
 name = "sphinxcontrib-serializinghtml"
 version = "1.1.5"
 description = "sphinxcontrib-serializinghtml is a sphinx extension which outputs \"serialized\" HTML files (json and pickle)."
-category = "dev"
-optional = false
+category = "main"
+optional = true
 python-versions = ">=3.5"
 
 [package.extras]
@@ -1423,10 +1423,13 @@ python-versions = ">=3.6"
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
+[extras]
+docs = ["Sphinx"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<4"
-content-hash = "49df0d6807c9b0d527299f0b984ebf6913ce985e6561b209492a8f7d1bc1e597"
+content-hash = "d00c551140d2c6aa8f0d32514348547c8d24f9dc4524d3736b13da25578fb069"
 
 [metadata.files]
 adal = [
