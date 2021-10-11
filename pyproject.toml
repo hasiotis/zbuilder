@@ -57,6 +57,9 @@ flake8 = "^3"
 pre-commit = "^2.13.0"
 black = "^21.6b0"
 
+[tool.poetry.extras]
+docs = ["sphinx"]
+
 [tool.poetry.scripts]
 zbuilder = 'zbuilder.cli:cli'
 
