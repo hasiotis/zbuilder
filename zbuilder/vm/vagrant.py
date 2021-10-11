@@ -2,8 +2,10 @@ import click
 import shutil
 import jinja2
 
+from pathlib import Path
 from zbuilder.helpers import runCmd
 
+VAGRANT_FILE_TMPL = "Vagrantfile.tmpl"
 VAGRANT_FILE = """
 VAGRANTFILE_API_VERSION = "2"
 VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
@@ -44,6 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.name = zname.to_s
         v.memory = zparam[:memory]
         v.cpus = zparam[:vcpus]
+        v.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
         v.customize ["modifyvm", :id, "--vram", "16"]
         v.customize ["modifyvm", :id, "--vrde", "off"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -141,6 +144,8 @@ class vmProvider(object):
             return "Vagrant binary not found"
 
     def setVagrantfile(self, pubkey, hosts):
+        if Path(VAGRANT_FILE_TMPL).exists():
+            VAGRANT_FILE = Path(VAGRANT_FILE_TMPL).read_text()
         templateLoader = jinja2.BaseLoader()
         template = jinja2.Environment(
             loader=templateLoader, trim_blocks=True
