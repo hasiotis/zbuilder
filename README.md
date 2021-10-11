@@ -1,6 +1,6 @@
 # Zbuilder: Building VMs and applying ansible playbooks
 
-[![PyPi version](https://pypip.in/v/zbuilder/badge.png)](https://pypi.org/project/zbuilder/)
+[![PyPi version](https://badge.fury.io/py/zbuilder.png)](https://pypi.org/project/zbuilder/)
 [![PyPi downloads](https://pypip.in/d/zbuilder/badge.png)](https://pypistats.org/packages/zbuilder)
 [![Build status](https://github.com/hasiotis/zbuilder/workflows/Build%20status/badge.svg)](https://github.com/hasiotis/zbuilder/actions?query=workflow%3A%22Build+status%22)
 [![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=stable)](https://zbuilder.readthedocs.io/en/develop/?badge=develop)

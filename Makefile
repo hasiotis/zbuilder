@@ -28,7 +28,7 @@ release:
 	git commit -m "Setting version to $$VERSION";             \
 	git tag -a v$$VERSION -m "Tagged version $$VERSION";      \
 	poetry build;                                             \
-	poetry publish -u hasiotis -p ${POETRY_PYPI_TOKEN_PYPI};  \
+	poetry publish -u __token__ -p ${POETRY_PYPI_TOKEN_PYPI};  \
 	rm -rf dist/*;                                            \
 	curl -X POST -s -o /dev/null -w "%{http_code}"            \
 	  -H "Authorization: Token ${READTHEDOCS_TOKEN}"          \
