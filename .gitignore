@@ -5,5 +5,6 @@ dist/
 docs/_build
 results.xml
 .env
+.envrc
 .coverage
 workflow

@@ -21,16 +21,17 @@ clean:
 
 
 .PHONY: release  ## Make release
+VERSION=$(shell poetry version -s)
 release:
-	#MSG=`poetry version patch`
-	#git add pyproject.toml
-	#git commit -m "${MSG}"
-	#VER=`poetry version -s`
-	#git tag -a v${VER} -m "Tagged version ${VER}"
-	#poetry build
-	#poetry publish -u hasiotis -p ${PASS}
-	rm -rf dist/*
+	poetry version patch
+	echo $(VERSION)
+	#@git add pyproject.toml;
+	#@git commit -m "Setting version to $(VERSION)"
+	#@git tag -a v$(VERSION) -m "Tagged version $(VERSION)"
+	#@poetry build
+	#poetry publish -u hasiotis -p ${POETRY_PYPI_TOKEN_PYPI}
+	@rm -rf dist/*
 	#curl -X POST -s -o /dev/null -w "%{http_code}"      \
-	#		-H "Authorization: Token ${READTHEDOCS_TOKEN}"  \
-	#	-H "Content-Type: application/json"             \
-	#		https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
+	#	-H "Authorization: Token ${READTHEDOCS_TOKEN}"   \
+	#	-H "Content-Type: application/json"              \
+	#	https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ -d ""
