@@ -144,6 +144,7 @@ class vmProvider(object):
             return "Vagrant binary not found"
 
     def setVagrantfile(self, pubkey, hosts):
+        global VAGRANT_FILE
         if Path(VAGRANT_FILE_TMPL).exists():
             VAGRANT_FILE = Path(VAGRANT_FILE_TMPL).read_text()
         templateLoader = jinja2.BaseLoader()
