@@ -49,6 +49,7 @@ proxmoxer = "^1.1"
 msrestazure = "^0.6.4"
 Sphinx = {version = "^4.2.0", optional = true}
 PyJWT = "^2.5.0"
+oauthlib = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6"
