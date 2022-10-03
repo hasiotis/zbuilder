@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zbuilder"
-version = "0.0.37a1"
+version = "0.0.37a2"
 description = "Create VMs"
 authors = ["Chasiotis Nikos <hasiotis@gmail.com>"]
 license = "GPL-3.0-or-later"
@@ -20,8 +20,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
-ansible = "~2.10"
+python = ">=3.8,<4"
 click = "^8"
 "ruamel.yaml" = "^0.17"
 Jinja2 = "^3.0"
@@ -50,6 +49,7 @@ msrestazure = "^0.6.4"
 Sphinx = {version = "^4.2.0", optional = true}
 PyJWT = "^2.5.0"
 oauthlib = "^3.2.1"
+ansible = "^6.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6"

@@ -39,6 +39,7 @@ class dnsProvider(object):
             click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, ip))
         else:
             click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, ip))
+
         r = requests.patch(uri, json=payload, headers={"X-API-Key": self.apikey})
 
     def remove(self, host, zone):

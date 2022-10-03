@@ -11,22 +11,12 @@ from retrying import retry
 from ansible.errors import AnsibleError
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
-from ansible.release import __version__ as ansible_version
 
 
 class ZBbuilderInventoryCLI(PlaybookCLI):
     def dumpVars(self):
         super(ZBbuilderInventoryCLI, self).parse()
-        if ansible_version.startswith("2.7"):
-            from ansible.cli import CLI
-
-            parser = CLI.base_parser(vault_opts=True, inventory_opts=True)
-            options, args = parser.parse_args(["-i", "hosts"])
-            return self._play_prereqs(options)
-        if ansible_version.startswith("2.9"):
-            return self._play_prereqs()
-        if ansible_version.startswith("2.10"):
-            return self._play_prereqs()
+        return self._play_prereqs()
 
 
 def getHostsWithVars(limit, pbook="bootstrap.yml"):
