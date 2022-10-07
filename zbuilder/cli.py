@@ -315,6 +315,20 @@ def update(state, yes):
 
 
 @cli.command()
+@pass_state
+def plugins(state):
+    """Autocomplete for bash"""
+    click.echo("List of available vm plugins")
+    for plugin in ["vagrant", "gcp", "aws", "do", "azure", "proxmox", "ganeti"]:
+        try:
+            p = zbuilder.vm.vmProvider(plugin)
+            p.enabled()
+            click.echo(f"  - {plugin:8}: enabled")
+        except Exception:
+            pass
+
+
+@cli.command()
 @click.argument("shell", default="bash")
 def completion(shell):
     """Autocomplete for bash"""

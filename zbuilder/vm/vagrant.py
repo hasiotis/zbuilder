@@ -159,3 +159,6 @@ class vmProvider(object):
         f = open("Vagrantfile", "w")
         f.write(outputText)
         f.close()
+
+    def enabled(self):
+        return True

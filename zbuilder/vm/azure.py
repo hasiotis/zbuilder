@@ -298,3 +298,6 @@ class vmProvider(object):
 
     def status(self):
         return "PASS"
+
+    def enabled(self):
+        return True

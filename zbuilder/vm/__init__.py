@@ -67,3 +67,7 @@ class vmProvider(object):
     @trywrap
     def status(self):
         return self.provider.status()
+
+    @trywrap
+    def enabled(self):
+        return self.provider.enabled()

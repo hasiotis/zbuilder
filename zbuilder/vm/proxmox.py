@@ -339,3 +339,6 @@ class vmProvider(object):
             k: params.get(k, None)
             for k in ["node", "template", "vcpu", "memory", "ipconfig", "disks"]
         }
+
+    def enabled(self):
+        return True

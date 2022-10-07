@@ -130,3 +130,6 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["ami", "region", "vmtype", "subnet", "sg"]}
+
+    def enabled(self):
+        return True

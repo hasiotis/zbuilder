@@ -302,3 +302,6 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["size", "image"]}
+
+    def enabled(self):
+        return True

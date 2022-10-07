@@ -174,3 +174,6 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["beparams", "disks", "os_type", "nics"]}
+
+    def enabled(self):
+        return True
