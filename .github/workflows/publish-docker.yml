@@ -47,7 +47,7 @@ jobs:
 
       - name: Sign image with a key
         run: |
-          cosign sign --key env://COSIGN_PRIVATE_KEY \
+          cosign sign \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
