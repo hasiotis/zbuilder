@@ -47,9 +47,11 @@ jobs:
 
       - name: Sign image with a key
         run: |
-          cosign sign \
-            -a "repo=${{ github.repository }}" \
-            -a "ref=${{ github.sha }}" \
+          cosign sign                           \
+            --key env://COSIGN_PRIVATE_KEY      \
+            -a "repo=${{ github.repository }}"  \
+            -a "ref=${{ github.sha }}"          \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
         env:
-          COSIGN_EXPERIMENTAL: true
+          COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
