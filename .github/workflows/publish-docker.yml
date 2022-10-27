@@ -38,6 +38,7 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
+        id: build-and-push
         with:
           context: .
           push: true
@@ -49,7 +50,7 @@ jobs:
           cosign sign --key env://COSIGN_PRIVATE_KEY \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            ${{ steps.meta.outputs.result }}@${{ steps.meta.outputs.digest }}
+            ${{ steps.meta.outputs.result }}@${{ steps.build-and-push.outputs.digest }}
         env:
           COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
           COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
