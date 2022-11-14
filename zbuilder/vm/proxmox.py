@@ -139,6 +139,7 @@ class vmProvider(object):
 
                 taskid = node.qemu(nextid).config.set(
                     cores=v["vcpu"],
+                    cpu=v.get("cpu", "host"),
                     memory=v["memory"],
                     scsihw=v.get("scsihw", "virtio-scsi-pci"),
                     net0=v.get("net0", "virtio,bridge=vmbr0"),
