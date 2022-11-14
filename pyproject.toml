@@ -35,36 +35,31 @@ PyJWT = "^2.5.0"
 dpath = "^2.0"
 dnspython = "^2"
 massedit = "^0.69"
+boto3 = "^1.17"
+google-api-python-client = "^2.9"
+google-cloud-dns = "^0.32"
+google-auth-oauthlib = "^0.4"
+oauthlib = "^3.2.1"
+azure-mgmt-resource = "^18.0"
+azure-mgmt-network = "^19.0"
+azure-mgmt-compute = "^21.0"
+azure-mgmt-dns = "^8.0"
+msrestazure = "^0.6.4"
+python-digitalocean = "^1.16"
+proxmoxer = "^1.1"
 
-boto3 = { version = "^1.17", optional = true }
-google-api-python-client = { version = "^2.9", optional = true }
-google-cloud-dns = { version = "^0.32", optional = true }
-google-auth-oauthlib = { version = "^0.4", optional = true }
-oauthlib = { version = "^3.2.1", optional = true }
-azure-mgmt-resource = { version = "^18.0", optional = true }
-azure-mgmt-network = { version = "^19.0", optional = true }
-azure-mgmt-compute = { version = "^21.0", optional = true }
-azure-mgmt-dns = { version = "^8.0", optional = true }
-msrestazure = { version = "^0.6.4", optional = true }
-python-digitalocean = { version = "^1.16", optional = true }
-proxmoxer = { version = "^1.1", optional = true }
 Sphinx = { version = "^4.2.0", optional = true }
 
 [tool.poetry.dev-dependencies]
-pytest = "^6"
-pytest-cov = "^2"
+pytest = "^7"
 pylint = "^2"
+pytest-cov = "^4.0.0"
 flake8 = "^3"
 pre-commit = "^2.13.0"
 black = "^21.6b0"
 
 [tool.poetry.extras]
 docs = ["sphinx"]
-azure = ["azure-mgmt-resource", "azure-mgmt-network", "azure-mgmt-compute", "azure-mgmt-dns", "msrestazure"]
-gcp = ["google-api-python-client", "google-cloud-dns", "google-auth-oauthlib", "oauthlib"]
-proxmox = ["proxmoxer"]
-aws = ["boto3"]
-do = ["python-digitalocean"]
 
 [tool.poetry.scripts]
 zbuilder = 'zbuilder.cli:cli'
