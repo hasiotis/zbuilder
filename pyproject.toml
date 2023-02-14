@@ -48,8 +48,6 @@ msrestazure = "^0.6.4"
 python-digitalocean = "^1.16"
 proxmoxer = "^1.1"
 
-Sphinx = { version = "^4.2.0", optional = true }
-
 [tool.poetry.dev-dependencies]
 pytest = "^7"
 pylint = "^2"
@@ -57,9 +55,7 @@ pytest-cov = "^4.0.0"
 flake8 = "^3"
 pre-commit = "^2.13.0"
 black = "^21.6b0"
-
-[tool.poetry.extras]
-docs = ["sphinx"]
+Sphinx = "^4.2.0"
 
 [tool.poetry.scripts]
 zbuilder = 'zbuilder.cli:cli'
