@@ -141,7 +141,7 @@ class vmProvider(object):
                     cores=v["vcpu"],
                     cpu=v.get("cpu", "host"),
                     memory=v["memory"],
-                    scsihw=v.get("scsihw", "virtio-scsi-pci"),
+                    scsihw=v.get("scsihw", "virtio-scsi-single"),
                     net0=v.get("net0", "virtio,bridge=vmbr0"),
                     ipconfig0=ipconfig,
                     nameserver=v["nameserver"],
@@ -160,7 +160,12 @@ class vmProvider(object):
                 taskid = node.qemu(nextid).status.start().post()
                 result = self._waitTask(node, taskid)
                 if result != "OK":
-                    click.echo("Can't start the VM".format())
+                    if result.startswith("WARNINGS"):
+                        log = node.tasks(taskid).log.get()
+                        for line in log:
+                            click.secho(f"        {line['t']}", fg="yellow")
+                    else:
+                        click.secho("        Can't start the VM", fg="red")
                     continue
 
         dnsUpdate(ips)
