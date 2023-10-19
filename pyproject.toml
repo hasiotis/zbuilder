@@ -21,7 +21,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4"
-ansible = "^7.0"
+ansible = "^8.0"
 click = "^8"
 "ruamel.yaml" = "^0.17"
 Jinja2 = "^3.0"
