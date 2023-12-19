@@ -20,8 +20,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<4"
-ansible = "^8.0"
+python = ">=3.10,<4"
 click = "^8"
 "ruamel.yaml" = "^0.17"
 Jinja2 = "^3.0"
@@ -47,6 +46,7 @@ azure-mgmt-dns = "^8.0"
 msrestazure = "^0.6.4"
 python-digitalocean = "^1.16"
 proxmoxer = "^1.1"
+ansible = "^9.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7"
