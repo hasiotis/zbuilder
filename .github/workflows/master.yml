@@ -1,4 +1,5 @@
-name: Master merge pipeline
+name: Merge to master
+run-name: Merge to master
 
 on:
   pull_request:
@@ -6,47 +7,28 @@ on:
       - master
     types:
       - closed
+  push:
+    branches:
+      - master
 
 jobs:
-  Testing:
-
+  testing:
     runs-on: ubuntu-22.04
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Bootstrap poetry
-      shell: bash
-      run: |
-        curl -sSL https://install.python-poetry.org | python - -y ${{ matrix.bootstrap-args }}
+      - name: Install poetry
+        run: pipx install poetry
 
-    - name: Update PATH
-      shell: bash
-      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Set up cache
-      uses: actions/cache@v3
-      id: cache
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Ensure cache is healthy
-      if: steps.cache.outputs.cache-hit == 'true'
-      shell: bash
-      run: timeout 10s poetry run pip --version || rm -rf .venv
-
-    - name: Install dependencies
-      shell: bash
-      run: poetry install
-
-    - name: Check our style
-      run: |
-        poetry run flake8
-        poetry run pytest
+      - name: Check our style
+        run: |
+          poetry env use python3.11
+          poetry install
+          poetry run flake8
+          poetry run pytest
