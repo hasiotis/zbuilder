@@ -59,7 +59,7 @@ black = "^21.6b0"
 [tool.poetry.scripts]
 zbuilder = 'zbuilder.cli:cli'
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.docs.dependencies]
 sphinx = "^7.2.6"
 
 [build-system]
