@@ -35,7 +35,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@3.3.0
+        uses: sigstore/cosign-installer@v3.3.0
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
