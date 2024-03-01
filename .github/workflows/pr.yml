@@ -7,23 +7,21 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
-    - name: Install dependencies
+        python-version: '3.11'
+
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Run tests
       run: |
-        make init
-    - name: Check our style
-      run: |
-        make tests
-    - name: Publish documentation
-      run: |
-        make doc-devel
-      env:
-        READTHEDOCS_TOKEN: ${{ secrets.READTHEDOCS_TOKEN }}
+        poetry env use python3.11
+        poetry install
+        poetry run pytest
