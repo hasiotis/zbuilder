@@ -20,6 +20,11 @@ clean:
 	@find . -type d -name __pycache__ -exec rm -r {} \+
 
 
+.PHONY: docker ## Create docker file
+docker:
+	@earthly --ci +docker
+
+
 .PHONY: release  ## Make release
 release:
 	poetry version patch;                                                      \

@@ -20,9 +20,14 @@ build:
     SAVE ARTIFACT /usr/local/bin/zbuilder
 
 docker:
+    ARG reg=localhost
+    ARG tag=latest
+
     ENV PYTHONPATH=/usr/lib/python3/site-packages
+
     COPY +build/site-packages /usr/lib/python3/site-packages
     COPY +build/zbuilder /usr/bin/zbuilder
+
     CMD ["/usr/bin/zbuilder"]
 
-    SAVE IMAGE zbuilder:latest
+    SAVE IMAGE --push $reg/zbuilder:$tag

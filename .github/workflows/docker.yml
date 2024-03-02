@@ -18,6 +18,10 @@ jobs:
       packages: write
 
     steps:
+      - uses: earthly/actions-setup@v1
+        with:
+          version: v0.8.0
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -28,29 +32,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.3.0
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        id: build-and-push
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push docker image
+        run: earthly --push --ci +docker --reg=env.REGISTRY --tag=github.ref_name
 
       - name: Sign image with a key
         run: |
           cosign sign                           \
             --key env://COSIGN_PRIVATE_KEY      \
             -a "repo=${{ github.repository }}"  \
+            -a "ref=${{ github.ref_name }}"     \
             -a "ref=${{ github.sha }}"          \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
         env:
