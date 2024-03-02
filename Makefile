@@ -35,5 +35,5 @@ release:
 	git tag -a v$$VERSION -m "Tagged version $$VERSION";                       \
 	poetry publish -n --build -u __token__ -p ${POETRY_PYPI_TOKEN_PYPI};       \
 	rm -rf dist/*;                                                             \
-	http POST https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ \
-	  "Authorization:Token ${READTHEDOCS_TOKEN}"
+	http -b POST https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ \
+	  "Authorization:Token ${READTHEDOCS_TOKEN}" | jq .builds.urls.build
