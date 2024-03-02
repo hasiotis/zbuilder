@@ -1,5 +1,5 @@
-name: Publish in GitHub Package Registry
-run-name: Release
+name: Release
+rub-name: Publish in GitHub Package Registry
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
         uses: sigstore/cosign-installer@v3.3.0
 
       - name: Build and push docker image
-        run: earthly --push --ci +docker --reg=env.REGISTRY --tag=github.ref_name
+        run: earthly --push --ci +docker --reg=${{ env.REGISTRY }} --tag=${{ github.ref_name }}
 
       - name: Sign image with a key
         run: |
