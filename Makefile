@@ -31,9 +31,9 @@ release:
 	VERSION=`poetry version -s`;                                               \
 	git add pyproject.toml;                                                    \
 	git commit -m "Setting version to $$VERSION";                              \
-	git push                                                                   \
+	git push;                                                                  \
 	git tag -a v$$VERSION -m "Tagged version $$VERSION";                       \
 	poetry publish -n --build -u __token__ -p ${POETRY_PYPI_TOKEN_PYPI};       \
 	rm -rf dist/*;                                                             \
-	http POST https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds \
+	http POST https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/ \
 	  "Authorization:Token ${READTHEDOCS_TOKEN}"
