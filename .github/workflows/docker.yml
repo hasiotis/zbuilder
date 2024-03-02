@@ -1,5 +1,5 @@
 name: Release
-rub-name: Publish in GitHub Package Registry
+run-name: Publish in GitHub Package Registry
 
 on:
   push:
