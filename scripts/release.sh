@@ -15,4 +15,4 @@ git push --tags
 poetry publish -n --build -u __token__ -p ${POETRY_PYPI_TOKEN_PYPI}
 rm -rf dist/*
 
-http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq .builds.urls.build
+http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq -r .build.urls.build
