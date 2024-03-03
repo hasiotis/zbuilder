@@ -9,7 +9,7 @@ NEW_VERSION=`poetry version -s`
 git add pyproject.toml
 git commit -m "Bump version from v${OLD_VERSION} to v${NEW_VERSION}"
 git push
-git tag -a "release-v${NEW_VERSION}" -m "Version v${NEW_VERSION}"
+git tag -a "v${NEW_VERSION}" -m "Version v${NEW_VERSION}"
 git push --tags
 
 poetry publish -n --build -u __token__ -p ${POETRY_PYPI_TOKEN_PYPI}
