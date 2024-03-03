@@ -45,7 +45,7 @@ jobs:
             -a "repo=${{ github.repository }}"  \
             -a "ref=${{ github.ref_name }}"     \
             -a "ref=${{ github.sha }}"          \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ github.sha }}
         env:
           COSIGN_PRIVATE_KEY: ${{secrets.COSIGN_PRIVATE_KEY}}
           COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
