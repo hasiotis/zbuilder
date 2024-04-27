@@ -49,19 +49,19 @@ proxmoxer = "^1.1"
 ansible = "^9.1.0"
 setuptools = "^69.5.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "^7"
 pylint = "^2"
 pytest-cov = "^4.0.0"
 flake8 = "^3"
 pre-commit = "^2.13.0"
-black = "^21.6b0"
-
-[tool.poetry.scripts]
-zbuilder = 'zbuilder.cli:cli'
+black = "^24.4.2"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^7.2.6"
+
+[tool.poetry.scripts]
+zbuilder = 'zbuilder.cli:cli'
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools"]
