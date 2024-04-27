@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zbuilder"
-version = "0.0.61"
+version = "0.0.62"
 description = "Create VMs"
 authors = ["Chasiotis Nikos <hasiotis@gmail.com>"]
 license = "GPL-3.0-or-later"
