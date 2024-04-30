@@ -47,7 +47,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.memory = zparam[:memory]
         v.cpus = zparam[:vcpus]
         v.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
-        v.customize ["modifyvm", :id, "--vram", "16"]
+        v.customize ["modifyvm", :id, "--vram", "64"]
         v.customize ["modifyvm", :id, "--vrde", "off"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
         v.customize ["modifyvm", :id, "--nictype1", "virtio"]
