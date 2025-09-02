@@ -1,3 +1,4 @@
+# flake8: noqa
 import click
 import shutil
 import jinja2
