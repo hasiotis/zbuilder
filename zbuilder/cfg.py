@@ -1,7 +1,8 @@
 import os
 
+import zbuilder.helpers
+
 from pathlib import Path
-from zbuilder.helpers import load_yaml, dump_yaml
 
 CONFIG_PATH = "~/.config/zbuilder/zbuilder.yaml"
 CONFIG_EMPTY = """# ZBuilder configuration
@@ -22,19 +23,19 @@ def load(touch=False):
     if not os.path.exists(fname) and touch:
         initConfig(fname)
 
-    retValue = load_yaml(fname)
+    retValue = zbuilder.helpers.load_yaml(fname)
     if retValue is None:
         initConfig(fname)
-        retValue = load_yaml(fname)
+        retValue = zbuilder.helpers.load_yaml(fname)
 
     return retValue
 
 
 def view(cfg):
-    dump_yaml(cfg)
+    zbuilder.helpers.dump_yaml(cfg)
 
 
 def save(cfg):
     fname = os.path.expanduser(CONFIG_PATH)
     with open(fname, "w") as fp:
-        dump_yaml(cfg, fp)
+        zbuilder.helpers.dump_yaml(cfg, fp)

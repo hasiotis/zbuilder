@@ -11,6 +11,72 @@ from retrying import retry
 from ansible.errors import AnsibleError
 from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
+from ansible.parsing.vault import VaultSecretsContext
+from ansible.utils.context_objects import GlobalCLIArgs
+
+
+def resetVaultContext():
+    """Drop the process wide vault context
+
+    Since ansible-core 2.19 the vault secrets live in a process wide context
+    that refuses to be initialized twice. zbuilder runs more than one CLI per
+    process (inventory parsing followed by a playbook run), so the context has
+    to be cleared before every one of them.
+    """
+    VaultSecretsContext._current = None
+
+
+def resetCliContext():
+    """Drop the process wide cli arguments
+
+    The parsed cli arguments live in a singleton, so only the first CLI of a
+    process ever wins: every later parse() silently keeps the arguments of the
+    first one. zbuilder builds one CLI to read the inventory and another one to
+    run the playbook, so the singleton has to be dropped before every parse.
+    """
+    GlobalCLIArgs._Singleton__instance = None
+
+
+def playbookArgs(pbook, limit):
+    """Build the ansible-playbook argv, with -l only when there is a limit
+
+    Passing "-l None" makes ansible look for hosts named None and end up with
+    nothing to target.
+    """
+    args = ["ansible-playbook"]
+    if limit is not None:
+        args += ["-l", limit]
+    args.append(pbook)
+
+    return args
+
+
+def nativeTypes(value):
+    """Turn ansible tagged values into plain python ones
+
+    Since ansible-core 2.19 templating returns tagged subclasses of str, int,
+    dict, ... which carry the origin of every value. Code dispatching on the
+    exact type, like the yaml dumper or the cloud sdks, does not know about
+    them, so unwrap everything back to the builtin types.
+    """
+    if isinstance(value, dict):
+        return {nativeTypes(k): nativeTypes(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [nativeTypes(v) for v in value]
+    if isinstance(value, tuple):
+        return tuple(nativeTypes(v) for v in value)
+    if isinstance(value, set):
+        return {nativeTypes(v) for v in value}
+    if value is None or isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return str(value)
+    if isinstance(value, int):
+        return int(value)
+    if isinstance(value, float):
+        return float(value)
+
+    return value
 
 
 class ZBbuilderInventoryCLI(PlaybookCLI):
@@ -20,14 +86,16 @@ class ZBbuilderInventoryCLI(PlaybookCLI):
 
 
 def getHostsWithVars(limit, pbook="bootstrap.yml"):
-    inv = ZBbuilderInventoryCLI(["ansible-playbook", "-l", limit, pbook])
+    resetVaultContext()
+    resetCliContext()
+    inv = ZBbuilderInventoryCLI(playbookArgs(pbook, limit))
     loader, inventory, vm = inv.dumpVars()
 
     hostVars = {}
     for host in inventory.get_hosts():
         hvars = vm.get_vars(host=host, include_hostvars=True)
         templar = Templar(loader=loader, variables=hvars)
-        hvars = templar.template(hvars)
+        hvars = nativeTypes(templar.template(hvars))
 
         if "ZBUILDER_PROVIDER" in hvars:
             hvars["ZBUILDER_PROVIDER"]["VM_OPTIONS"]["enabled"] = False
@@ -118,7 +186,9 @@ def getProviders(cfg, state):
 
 def runPlaybook(state, pbook):
     try:
-        playbookCLI = PlaybookCLI(["ansible-playbook", "-l", state.limit, pbook])
+        resetVaultContext()
+        resetCliContext()
+        playbookCLI = PlaybookCLI(playbookArgs(pbook, state.limit))
         playbookCLI.parse()
         playbookCLI.run()
     except AnsibleError as e:

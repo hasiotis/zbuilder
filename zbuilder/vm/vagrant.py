@@ -9,7 +9,7 @@ from zbuilder.helpers import runCmd
 VAGRANT_FILE_TMPL = "Vagrantfile.tmpl"
 VAGRANT_FILE = """
 VAGRANTFILE_API_VERSION = "2"
-VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\s+})[1].chomp
+VBOX_ROOT = `VBoxManage list systemproperties | grep "Default machine folder:"`.split(%r{:\\s+})[1].chomp
 
 class VagrantPlugins::ProviderVirtualBox::Action::Network
   def dhcp_server_matches_config?(dhcp_server, config)
@@ -41,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       srvcfg.vm.host_name = zname.to_s
       srvcfg.vm.provision "file", source: "{{ pubkey }}", destination: ".ssh/authorized_keys"
-      domain = zname.to_s.sub(/^.*?\./, "")
+      domain = zname.to_s.sub(/^.*?\\./, "")
       srvcfg.hostmanager.aliases = zparam[:aliases].split(" ").map{|x| [x + '.' + domain] }
       srvcfg.vm.provider "virtualbox" do |v|
         v.name = zname.to_s
