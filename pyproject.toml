@@ -20,7 +20,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4"
+python = ">=3.12,<4"
 click = "^8"
 "ruamel.yaml" = "^0.17"
 Jinja2 = "^3.0"
@@ -47,7 +47,7 @@ python-digitalocean = "^1.16"
 proxmoxer = "^1.1"
 setuptools = "^80.9.0"
 massedit = "^0.70.0"
-ansible = "^11.9.0"
+ansible = "^14.3.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7"

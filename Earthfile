@@ -1,5 +1,5 @@
 VERSION 0.8
-FROM python:3.11
+FROM python:3.12
 
 build:
     # Install poetry
@@ -16,7 +16,7 @@ build:
     RUN pip3 install dist/zbuilder-*.whl
 
     # Save for usage on docker
-    SAVE ARTIFACT /usr/local/lib/python3.11/site-packages
+    SAVE ARTIFACT /usr/local/lib/python3.12/site-packages
     SAVE ARTIFACT /usr/local/bin/zbuilder
 
 docker:

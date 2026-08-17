@@ -1,0 +1,7 @@
+---
+- hosts: all:!localhost
+  become: true
+  tasks:
+    - name: bootstrap | Say hello
+      debug:
+        msg: "Bootstrapping {{ inventory_hostname }}"

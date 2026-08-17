@@ -1,0 +1,9 @@
+---
+- hosts: all:!localhost
+  become: false
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: noop | Say hello
+      debug:
+        msg: "Playing {{ inventory_hostname }}"
