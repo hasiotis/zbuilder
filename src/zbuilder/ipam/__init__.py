@@ -1,8 +1,7 @@
 import click
-import importlib
 
 import zbuilder.cfg
-from zbuilder.wrappers import trywrap
+import zbuilder.plugins
 
 
 def getProvider(subnet, cfg):
@@ -39,29 +38,8 @@ def ipamRelease(hostname, ip, subnet):
         click.echo("No IPAM provider found for subnet [{}]".format(subnet))
 
 
-class ipamProvider(object):
-    def __init__(self, factory, cfg=None):
-        self.factory = factory
-        self.cfg = cfg
-        ipamProviderClass = getattr(importlib.import_module("zbuilder.ipam.%s" % factory), "ipamProvider")
-        self.provider = ipamProviderClass(cfg)
-
-    @trywrap
-    def release(self, host, ip, subnet):
-        self.provider.release(host, ip, subnet)
-
-    @trywrap
-    def locate(self, host, subnet):
-        return self.provider.locate(host, subnet)
-
-    @trywrap
-    def reserve(self, host, subnet):
-        return self.provider.reserve(host, subnet)
-
-    @trywrap
-    def config(self):
-        return self.provider.config()
-
-    @trywrap
-    def status(self):
-        return self.provider.status()
+def ipamProvider(factory, cfg=None):
+    """Instantiate the IPAM provider registered as `factory`"""
+    provider = zbuilder.plugins.load(zbuilder.plugins.IPAM, factory)(cfg)
+    provider.factory = factory
+    return provider

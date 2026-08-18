@@ -52,12 +52,33 @@ Repository = "https://github.com/hasiotis/zbuilder"
 [project.scripts]
 zbuilder = "zbuilder.cli:cli"
 
+# Provider plugins. Discovered at runtime by zbuilder.plugins, so an external
+# distribution can register providers under the same groups.
+[project.entry-points."zbuilder.vm"]
+aws = "zbuilder.vm.aws:vmProvider"
+azure = "zbuilder.vm.azure:vmProvider"
+do = "zbuilder.vm.do:vmProvider"
+ganeti = "zbuilder.vm.ganeti:vmProvider"
+gcp = "zbuilder.vm.gcp:vmProvider"
+proxmox = "zbuilder.vm.proxmox:vmProvider"
+vagrant = "zbuilder.vm.vagrant:vmProvider"
+
+[project.entry-points."zbuilder.dns"]
+ansible = "zbuilder.dns.ansible:dnsProvider"
+aws = "zbuilder.dns.aws:dnsProvider"
+azure = "zbuilder.dns.azure:dnsProvider"
+bind = "zbuilder.dns.bind:dnsProvider"
+do = "zbuilder.dns.do:dnsProvider"
+gcp = "zbuilder.dns.gcp:dnsProvider"
+powerdns = "zbuilder.dns.powerdns:dnsProvider"
+vagrant = "zbuilder.dns.vagrant:dnsProvider"
+
+[project.entry-points."zbuilder.ipam"]
+phpipam = "zbuilder.ipam.phpipam:ipamProvider"
+
 [dependency-groups]
 dev = [
-    "pylint>=2,<3",
-    "pre-commit>=2.13.0,<3",
     "pytest>=9.1.1,<10",
-    "pytest-cov>=7.1.0,<8",
     "pytest-md-report>=0.8.0",
 ]
 docs = [

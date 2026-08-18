@@ -1,11 +1,10 @@
 import click
 import massedit
 
+from zbuilder.base import DNSProvider
 
-class dnsProvider(object):
-    def __init__(self, state):
-        self.state = state
 
+class dnsProvider(DNSProvider):
     def update(self, host, zone, ip):
         click.echo("  - Updating record [{}.{}] with ip [{}]".format(host, zone, ip))
         filenames = ["hosts"]

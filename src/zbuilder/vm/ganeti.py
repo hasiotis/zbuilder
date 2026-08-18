@@ -4,16 +4,17 @@ import urllib3
 import requests
 import ipaddress
 
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 
 SLEEP_TIME = 5
 urllib3.disable_warnings()
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.user = self.cfg["user"]
             self.apikey = self.cfg["apikey"]
             self.url = self.cfg["url"]
@@ -172,6 +173,3 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["beparams", "disks", "os_type", "nics"]}
-
-    def enabled(self):
-        return True

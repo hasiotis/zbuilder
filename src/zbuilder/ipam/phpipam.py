@@ -2,14 +2,16 @@ import click
 import requests
 import urllib3
 
+from zbuilder.base import IPAMProvider
+
 
 urllib3.disable_warnings()
 
 
-class ipamProvider(object):
+class ipamProvider(IPAMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.username = cfg["username"]
             self.password = cfg["password"]
             self.ssl = cfg.get("ssl", True)

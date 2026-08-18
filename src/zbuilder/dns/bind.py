@@ -3,11 +3,13 @@ import dns.query
 import dns.tsigkeyring
 import dns.update
 
+from zbuilder.base import DNSProvider
 
-class dnsProvider(object):
+
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.keyname = cfg["keyname"]
             self.keysecret = cfg["keysecret"]
             self.server = cfg["server"]

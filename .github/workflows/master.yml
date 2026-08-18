@@ -1,5 +1,5 @@
-name: Merge to master
-run-name: Merge to master
+name: master
+run-name: master
 
 on:
   pull_request:

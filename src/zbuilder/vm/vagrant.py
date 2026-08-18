@@ -4,6 +4,7 @@ import shutil
 import jinja2
 
 from pathlib import Path
+from zbuilder.base import VMProvider
 from zbuilder.helpers import runCmd
 
 VAGRANT_FILE_TMPL = "Vagrantfile.tmpl"
@@ -46,7 +47,7 @@ ZBUILDER_IP_DELAY = 2
 def zbuilder_guest_ip(vm_id)
   ZBUILDER_IP_TRIES.times do |attempt|
     out = `VBoxManage guestproperty get #{Shellwords.escape(vm_id)} "/VirtualBox/GuestInfo/Net/1/V4/IP" 2>/dev/null`
-    ip = out[/^Value:\s*(\S+)/, 1]
+    ip = out[/^Value:\\s*(\\S+)/, 1]
     return ip if ip
     sleep ZBUILDER_IP_DELAY unless attempt == ZBUILDER_IP_TRIES - 1
   end
@@ -84,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # the private key listed first in ssh.private_key_path.
       srvcfg.vm.provision "file", source: "{{ pubkey }}", destination: ".ssh/authorized_keys"
 
-      domain = zname.to_s.sub(/^.*?\./, "")
+      domain = zname.to_s.sub(/^.*?\\./, "")
       srvcfg.hostmanager.aliases = zparam[:aliases].split(" ").map { |a| "#{a}.#{domain}" }
 
       # Vagrant creates, attaches and cleans these up per machine, picking a free
@@ -112,8 +113,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         next nil unless vm.id
         ip = zbuilder_guest_ip(vm.id)
         if ip.nil?
-          warn "hostmanager: no guest IP for #{vm.name} " \
-               "(not running, or guest additions unavailable) - skipping /etc/hosts entry"
+          warn "hostmanager: no guest IP for #{vm.name} (not running, or guest additions unavailable) - skipping /etc/hosts entry"
         end
         ip
       end
@@ -123,10 +123,7 @@ end
 """
 
 
-class vmProvider(object):
-    def __init__(self, cfg):
-        self.cfg = cfg
-
+class vmProvider(VMProvider):
     def _cmd(self, hosts, cmd):
         self.setVagrantfile(pubkey=self.cfg["state"].vars["ZBUILDER_PUBKEY"], hosts=hosts)
         for h in hosts:
@@ -192,6 +189,3 @@ class vmProvider(object):
         f = open("Vagrantfile", "w")
         f.write(outputText)
         f.close()
-
-    def enabled(self):
-        return True

@@ -1,10 +1,9 @@
 import time
 import click
-import importlib
 import dns.resolver
 
 import zbuilder.cfg
-from zbuilder.wrappers import trywrap
+import zbuilder.plugins
 
 
 def waitDNS(hostname, ip):
@@ -71,24 +70,8 @@ def dnsRemove(hosts):
             click.echo("No DNS provider found for zone [{}]".format(zone))
 
 
-class dnsProvider(object):
-    def __init__(self, factory, cfg=None):
-        self.factory = factory
-        dnsProviderClass = getattr(importlib.import_module("zbuilder.dns.%s" % factory), "dnsProvider")
-        self.provider = dnsProviderClass(cfg)
-
-    @trywrap
-    def update(self, host, zone, ip):
-        self.provider.update(host, zone, ip)
-
-    @trywrap
-    def remove(self, host, zone):
-        self.provider.remove(host, zone)
-
-    @trywrap
-    def config(self):
-        return self.provider.config()
-
-    @trywrap
-    def status(self):
-        return self.provider.status()
+def dnsProvider(factory, cfg=None):
+    """Instantiate the DNS provider registered as `factory`"""
+    provider = zbuilder.plugins.load(zbuilder.plugins.DNS, factory)(cfg)
+    provider.factory = factory
+    return provider

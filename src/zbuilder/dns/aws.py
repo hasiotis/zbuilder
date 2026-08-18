@@ -1,9 +1,12 @@
 import click
 import boto3
 
+from zbuilder.base import DNSProvider
 
-class dnsProvider(object):
+
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
             if "aws_access_key_id" and "aws_access_key_id" in cfg:
                 self.route53 = boto3.client(

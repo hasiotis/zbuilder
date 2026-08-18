@@ -1,6 +1,7 @@
 import os
 import click
 
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 
 from azure.common.credentials import ServicePrincipalCredentials
@@ -11,10 +12,10 @@ from msrestazure.azure_exceptions import CloudError
 from msrestazure.tools import parse_resource_id
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.credentials = ServicePrincipalCredentials(
                 client_id=cfg["client_id"],
                 secret=cfg["client_secret"],
@@ -258,6 +259,3 @@ class vmProvider(object):
 
     def status(self):
         return "PASS"
-
-    def enabled(self):
-        return True

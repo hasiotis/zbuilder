@@ -1,13 +1,14 @@
 import boto3
 import click
 
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             if "aws_access_key_id" and "aws_access_key_id" in cfg:
                 self.ec2 = boto3.resource(
                     "ec2",
@@ -107,15 +108,6 @@ class vmProvider(object):
                 ips[h] = None
         dnsRemove(hosts)
 
-    def snapCreate(self, hosts):
-        pass
-
-    def snapRestore(self, hosts):
-        pass
-
-    def snapDelete(self, hosts):
-        pass
-
     def config(self):
         return "aws_access_key_id: {}".format(self.cfg["aws_access_key_id"])
 
@@ -124,6 +116,3 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["ami", "region", "vmtype", "subnet", "sg"]}
-
-    def enabled(self):
-        return True

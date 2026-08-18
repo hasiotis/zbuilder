@@ -1,12 +1,15 @@
 import click
 
+from zbuilder.base import DNSProvider
+
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.mgmt.dns import DnsManagementClient
 from msrestazure.tools import parse_resource_id
 
 
-class dnsProvider(object):
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
             self.credentials = ServicePrincipalCredentials(
                 client_id=cfg["client_id"],

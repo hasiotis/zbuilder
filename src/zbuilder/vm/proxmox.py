@@ -6,6 +6,7 @@ import requests
 import urllib.parse
 
 from proxmoxer import ProxmoxAPI
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
 
@@ -16,10 +17,10 @@ user: {}
 """
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.username = self.cfg["username"]
             password = self.cfg["password"]
             url = self.cfg["url"]
@@ -296,6 +297,3 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params.get(k, None) for k in ["node", "template", "vcpu", "memory", "ipconfig", "disks"]}
-
-    def enabled(self):
-        return True
