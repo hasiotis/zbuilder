@@ -13,7 +13,7 @@ git tag -a "v${NEW_VERSION}" -m "Version v${NEW_VERSION}"
 git push --tags
 
 uv build
-uv publish -u __token__ -p ${UV_PUBLISH_TOKEN}
+uv publish
 rm -rf dist/*
 
 http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq -r .build.urls.build
