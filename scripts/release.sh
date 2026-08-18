@@ -16,4 +16,4 @@ uv build
 uv publish
 rm -rf dist/*
 
-#http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq -r .build.urls.build
+http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq -r .build.urls.build
