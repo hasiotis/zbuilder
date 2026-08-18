@@ -2,7 +2,7 @@
 
 [![PyPi version](https://badge.fury.io/py/zbuilder.svg)](https://pypi.org/project/zbuilder/)
 [![PyPi downloads](https://img.shields.io/pypi/dm/zbuilder.svg)](https://pypistats.org/packages/zbuilder)
-[![Build status](https://github.com/hasiotis/zbuilder/workflows/Merge%20to%20master/badge.svg)](https://github.com/hasiotis/zbuilder/actions?query=workflow%3A%22Merge+to+master%22)
+[![Build status](https://github.com/hasiotis/zbuilder/workflows/master/badge.svg)](https://github.com/hasiotis/zbuilder/actions?query=workflow%3A%22Merge+to+master%22)
 [![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=stable)](https://zbuilder.readthedocs.io/en/develop/?badge=develop)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/hasiotis/zbuilder/blob/master/LICENSE)
 
