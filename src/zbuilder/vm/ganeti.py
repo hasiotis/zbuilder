@@ -137,9 +137,7 @@ class vmProvider(object):
                 click.echo("  - Destroying host: {} ".format(h))
                 updateHosts[h] = {}
                 url = "{}/2/instances/{}".format(self.url, h)
-                r = requests.delete(
-                    url, auth=(self.user, self.apikey), verify=self.verify
-                )
+                r = requests.delete(url, auth=(self.user, self.apikey), verify=self.verify)
 
                 jobid = r.text.rstrip("\n")
                 j = self._getJob(jobid)

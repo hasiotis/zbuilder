@@ -12,9 +12,25 @@ way it achieves high integration with ansible.
 
 ## Installation
 
-Install and update using:
+
+## Installation
+
+Install with:
+```
+pipx install --force zbuilder
+```
+
+or
+
 ```
 pip3 install --user --upgrade zbuilder
+```
+
+## Development
+During development you can:
+```
+uv sync
+. .venv/bin/activate
 ```
 
 ## Links

@@ -1,19 +1,21 @@
 VERSION 0.8
 FROM python:3.12
 
+uv:
+    FROM ghcr.io/astral-sh/uv:latest
+    SAVE ARTIFACT /uv
+
 build:
-    # Install poetry
-    RUN apt-get update && apt-get install -y curl
-    RUN curl -sSL https://install.python-poetry.org | python3 -
-    RUN ln -s /root/.local/bin/poetry /usr/local/bin/poetry
+    # Install uv
+    COPY +uv/uv /usr/local/bin/uv
 
     # Add files
     COPY --dir zbuilder .
-    COPY poetry.lock pyproject.toml README.md .
+    COPY uv.lock pyproject.toml README.md LICENSE .
 
     # Install zbuilder
-    RUN poetry build
-    RUN pip3 install dist/zbuilder-*.whl
+    RUN uv build
+    RUN uv pip install --system dist/zbuilder-*.whl
 
     # Save for usage on docker
     SAVE ARTIFACT /usr/local/lib/python3.12/site-packages

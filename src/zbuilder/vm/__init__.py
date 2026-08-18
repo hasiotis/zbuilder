@@ -9,9 +9,7 @@ class vmProvider(object):
     def __init__(self, factory, cfg=None):
         self.factory = factory
         self.cfg = cfg
-        vmProviderClass = getattr(
-            importlib.import_module("zbuilder.vm.%s" % factory), "vmProvider"
-        )
+        vmProviderClass = getattr(importlib.import_module("zbuilder.vm.%s" % factory), "vmProvider")
         self.provider = vmProviderClass(cfg)
 
     def init(self):

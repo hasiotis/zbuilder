@@ -21,11 +21,7 @@ class vmProvider(object):
         retValue = {}
         for h, v in hosts.items():
             if hosts[h]["enabled"]:
-                instances = list(
-                    self.ec2.instances.filter(
-                        Filters=[{"Name": "tag:Name", "Values": [h]}]
-                    )
-                )
+                instances = list(self.ec2.instances.filter(Filters=[{"Name": "tag:Name", "Values": [h]}]))
                 retValue[h] = {"status": None}
                 for vm in instances:
                     if vm.state["Name"] not in ["terminated", "shutting-down"]:
@@ -66,9 +62,7 @@ class vmProvider(object):
                     UserData="""#cloud-config
                     fqdn: {}
                     manage_etc_hosts: true
-                    """.format(
-                        h
-                    ),
+                    """.format(h),
                 )
             else:
                 click.echo("  - Status of host: {} is {}".format(h, v["status"]))

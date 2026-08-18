@@ -107,11 +107,7 @@ def destroy(state):
                     zbuilder_env = vmProvider["hosts"][h]["ZBUILDER_ENV"]
                     break
         if zbuilder_env:
-            if click.confirm(
-                "  The ZBUILDER_ENV is set to [{}] Do you want to continue?".format(
-                    zbuilder_env
-                )
-            ):
+            if click.confirm("  The ZBUILDER_ENV is set to [{}] Do you want to continue?".format(zbuilder_env)):
                 vmProvider["cloud"].destroy(vmProvider["hosts"])
             else:
                 click.echo("    Aborting!")
@@ -213,11 +209,7 @@ def summary(state):
     for _, vmProvider in vmProviders.items():
         for h, v in vmProvider["hosts"].items():
             data.append([vmProvider["cloud"].factory, h, vmProvider["cloud"].params(v)])
-    click.echo(
-        tabulate.tabulate(
-            data, headers=["Provider", "Host", "Parameters"], tablefmt="psql"
-        )
-    )
+    click.echo(tabulate.tabulate(data, headers=["Provider", "Host", "Parameters"], tablefmt="psql"))
 
 
 @cli.command()
@@ -305,11 +297,7 @@ def update(state, yes):
         tmpl_path = dpath.util.get(cfg, "/main/templates/path")
         if tmpl_repo and tmpl_path:
             click.echo(" * Updating templates")
-            runCmd(
-                "git -C {path} pull || git clone {repo} {path}".format(
-                    repo=tmpl_repo, path=tmpl_path
-                )
-            )
+            runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
     except KeyError:
         pass
 

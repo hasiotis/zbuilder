@@ -17,9 +17,7 @@ class dnsProvider(object):
 
             try:
                 if "project" in cfg["dns"]:
-                    self.dns = dns.Client(
-                        project=self.cfg["dns"]["project"], credentials=creds
-                    )
+                    self.dns = dns.Client(project=self.cfg["dns"]["project"], credentials=creds)
                 else:
                     self.dns = dns.Client(credentials=creds)
             except Exception as e:
@@ -40,27 +38,17 @@ class dnsProvider(object):
         mzone = self._getZoneInfo(host, zone)
         try:
             changes = mzone.changes()
-            changes.delete_record_set(
-                mzone.resource_record_set(
-                    "{}.{}.".format(host, zone), "A", DNS_TTL, [ip]
-                )
-            )
+            changes.delete_record_set(mzone.resource_record_set("{}.{}.".format(host, zone), "A", DNS_TTL, [ip]))
             changes.create()
             while changes.status != "done":
                 time.sleep(5)
                 changes.reload()
-            click.echo(
-                "  - Updating record [{}.{}] with ip [{}]".format(host, zone, ip)
-            )
+            click.echo("  - Updating record [{}.{}] with ip [{}]".format(host, zone, ip))
         except Exception:
-            click.echo(
-                "  - Creating record [{}.{}] with ip [{}]".format(host, zone, ip)
-            )
+            click.echo("  - Creating record [{}.{}] with ip [{}]".format(host, zone, ip))
 
         changes = mzone.changes()
-        changes.add_record_set(
-            mzone.resource_record_set("{}.{}.".format(host, zone), "A", DNS_TTL, [ip])
-        )
+        changes.add_record_set(mzone.resource_record_set("{}.{}.".format(host, zone), "A", DNS_TTL, [ip]))
         changes.create()
         while changes.status != "done":
             time.sleep(5)
@@ -79,9 +67,7 @@ class dnsProvider(object):
                 found = True
                 click.echo("  - Removing record [{}.{}]".format(host, zone))
                 changes = mzone.changes()
-                changes.delete_record_set(
-                    mzone.resource_record_set(r.name, r.record_type, r.ttl, r.rrdatas)
-                )
+                changes.delete_record_set(mzone.resource_record_set(r.name, r.record_type, r.ttl, r.rrdatas))
                 changes.create()
                 while changes.status != "done":
                     time.sleep(5)

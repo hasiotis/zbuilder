@@ -13,20 +13,14 @@ class dnsProvider(object):
             self.server = cfg["server"]
             if not isinstance(cfg["server"], list):
                 self.server = [cfg["server"]]
-            self.keyring = dns.tsigkeyring.from_text(
-                {self.keyname: ("HMAC-MD5.SIG-ALG.REG.INT", self.keysecret)}
-            )
+            self.keyring = dns.tsigkeyring.from_text({self.keyname: ("HMAC-MD5.SIG-ALG.REG.INT", self.keysecret)})
 
     def _dns_query(self, update):
         for srv in self.server:
             response = dns.query.tcp(update, srv)
             if response.rcode():
                 err = dns.rcode.to_text(response.rcode())
-                click.echo(
-                    "      Failed to update DNS record [{}] on server [{}]".format(
-                        err, srv
-                    )
-                )
+                click.echo("      Failed to update DNS record [{}] on server [{}]".format(err, srv))
 
     def update(self, host, zone, ip):
         if ip is None:

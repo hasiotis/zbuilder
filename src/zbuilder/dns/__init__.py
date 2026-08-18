@@ -74,9 +74,7 @@ def dnsRemove(hosts):
 class dnsProvider(object):
     def __init__(self, factory, cfg=None):
         self.factory = factory
-        dnsProviderClass = getattr(
-            importlib.import_module("zbuilder.dns.%s" % factory), "dnsProvider"
-        )
+        dnsProviderClass = getattr(importlib.import_module("zbuilder.dns.%s" % factory), "dnsProvider")
         self.provider = dnsProviderClass(cfg)
 
     @trywrap

@@ -43,9 +43,7 @@ class ipamProvider(object):
     def __init__(self, factory, cfg=None):
         self.factory = factory
         self.cfg = cfg
-        ipamProviderClass = getattr(
-            importlib.import_module("zbuilder.ipam.%s" % factory), "ipamProvider"
-        )
+        ipamProviderClass = getattr(importlib.import_module("zbuilder.ipam.%s" % factory), "ipamProvider")
         self.provider = ipamProviderClass(cfg)
 
     @trywrap

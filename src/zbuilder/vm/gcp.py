@@ -20,12 +20,8 @@ def auth(cfg):
     creds = None
     # First we check for client-secret and creds-file
     if "client-secret" in cfg and "creds-file" in cfg:
-        secretFilename = os.path.expanduser(
-            "{}/{}".format(CONFIG_PATH, cfg["client-secret"])
-        )
-        tokenFilename = os.path.expanduser(
-            "{}/{}".format(CONFIG_PATH, cfg.get("creds-file", ""))
-        )
+        secretFilename = os.path.expanduser("{}/{}".format(CONFIG_PATH, cfg["client-secret"]))
+        tokenFilename = os.path.expanduser("{}/{}".format(CONFIG_PATH, cfg.get("creds-file", "")))
         if os.path.exists(secretFilename) and os.path.exists(tokenFilename):
             with open(tokenFilename, "rb") as token:
                 creds = pickle.load(token)
@@ -40,13 +36,9 @@ def auth(cfg):
 
     # In case of missing client-secret or creds-file fallback to service-key
     if creds is None and "service-key" in cfg:
-        secretFilename = os.path.expanduser(
-            "{}/{}".format(CONFIG_PATH, cfg["service-key"])
-        )
+        secretFilename = os.path.expanduser("{}/{}".format(CONFIG_PATH, cfg["service-key"]))
         if os.path.exists(secretFilename) and os.path.exists(secretFilename):
-            creds = service_account.Credentials.from_service_account_file(
-                secretFilename, scopes=SCOPES
-            )
+            creds = service_account.Credentials.from_service_account_file(secretFilename, scopes=SCOPES)
 
     # Fail if no auth keys are available
     if creds is None:
@@ -63,9 +55,7 @@ class vmProvider(object):
             creds = auth(self.cfg)
 
             try:
-                self.compute = googleapiclient.discovery.build(
-                    "compute", "v1", credentials=creds
-                )
+                self.compute = googleapiclient.discovery.build("compute", "v1", credentials=creds)
             except Exception as e:
                 click.echo("Login failed: [{}]".format(e))
                 raise click.Abort()
@@ -110,9 +100,7 @@ class vmProvider(object):
 
                     image_response = (
                         self.compute.images()
-                        .getFromFamily(
-                            project=v["image"]["project"], family=v["image"]["family"]
-                        )
+                        .getFromFamily(project=v["image"]["project"], family=v["image"]["family"])
                         .execute()
                     )
                     source_disk_image = image_response["selfLink"]
@@ -127,26 +115,20 @@ class vmProvider(object):
                     if "/" in v["network"]:
                         network = v["network"]
 
-                    subnetwork = "regions/{v[region]}/subnetworks/{v[subnet]}".format(
-                        v=v
-                    )
+                    subnetwork = "regions/{v[region]}/subnetworks/{v[subnet]}".format(v=v)
                     if "/" in v["subnet"]:
                         subnetwork = v["subnet"]
 
                     accessConfigs = []
                     if v.get("net_external", False):
-                        accessConfigs = [
-                            {"type": "ONE_TO_ONE_NAT", "name": "External NAT"}
-                        ]
+                        accessConfigs = [{"type": "ONE_TO_ONE_NAT", "name": "External NAT"}]
 
                     retValue[h]["insert"] = self.compute.instances().insert(
                         project=v["project"],
                         zone=v["zone"],
                         body={
                             "name": shortname,
-                            "machineType": "zones/{v[zone]}/machineTypes/{v[size]}".format(
-                                v=v
-                            ),
+                            "machineType": "zones/{v[zone]}/machineTypes/{v[size]}".format(v=v),
                             "disks": [
                                 {
                                     "boot": True,
@@ -163,11 +145,7 @@ class vmProvider(object):
                                     "accessConfigs": accessConfigs,
                                 }
                             ],
-                            "metadata": {
-                                "items": [
-                                    {"key": "ssh-keys", "value": "gcpadmin:" + sshkey}
-                                ]
-                            },
+                            "metadata": {"items": [{"key": "ssh-keys", "value": "gcpadmin:" + sshkey}]},
                         },
                     )
 

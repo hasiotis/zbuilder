@@ -22,8 +22,10 @@ class ipamProvider(object):
         url = "{}/api/zbuilder/user/".format(self.server)
         try:
             r = requests.post(
-                url, auth=(self.username, self.password),
-                verify=self.verify, headers=self.headers
+                url,
+                auth=(self.username, self.password),
+                verify=self.verify,
+                headers=self.headers,
             )
         except Exception as e:
             click.echo("Error {}".format(e))
@@ -53,7 +55,7 @@ class ipamProvider(object):
         url = "{}/api/zbuilder/subnets/{}/addresses".format(self.server, sid)
         r = requests.get(url, headers=self.headers, verify=self.verify)
         j = r.json()
-        if j['success']:
+        if j["success"]:
             for r in j["data"]:
                 if r["hostname"] == host:
                     return r["ip"]
@@ -70,9 +72,7 @@ class ipamProvider(object):
             else:
                 click.echo("      Releasing ip [{}] for host [{}]".format(ip, host))
                 url = "{}/api/zbuilder/addresses/{}/".format(self.server, ipid)
-                r = requests.delete(
-                    url, headers=self.headers, verify=self.verify
-                )
+                r = requests.delete(url, headers=self.headers, verify=self.verify)
 
     def reserve(self, host, subnet):
         self._refresh_token()
@@ -87,9 +87,7 @@ class ipamProvider(object):
             click.echo("      Reserving ip [{}] for host [{}]".format(ip, host))
             url = "{}/api/zbuilder/addresses".format(self.server)
             data = {"subnetId": sid, "ip": ip, "hostname": host}
-            r = requests.post(
-                url, json=data, headers=self.headers, verify=self.verify
-            )
+            r = requests.post(url, json=data, headers=self.headers, verify=self.verify)
             j = r.json()
             if not j["success"]:
                 ip = None
