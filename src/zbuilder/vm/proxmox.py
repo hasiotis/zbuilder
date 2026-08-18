@@ -25,9 +25,7 @@ class vmProvider(object):
             url = self.cfg["url"]
             verify = self.cfg.get("verify", True)
             try:
-                self.proxmox = ProxmoxAPI(
-                    url, user=self.username, password=password, verify_ssl=verify
-                )
+                self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
             except requests.exceptions.Timeout as e:
                 raise Exception(e.args[0].reason.args[1])
             except requests.exceptions.ConnectionError as e:
@@ -45,11 +43,7 @@ class vmProvider(object):
 
     def _getVMs(self, hosts):
         retValue = {}
-        vms = {
-            v["name"]: v
-            for v in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in v
-        }
+        vms = {v["name"]: v for v in self.proxmox.cluster.resources.get(type="vm") if "name" in v}
         for h, v in hosts.items():
             if hosts[h]["enabled"]:
                 ipconfig = v.get("ipconfig", "")
@@ -79,11 +73,7 @@ class vmProvider(object):
 
     def build(self, hosts):
         ips = {}
-        templates = [
-            i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if i.get("template", 0) == 1
-        ]
+        templates = [i for i in self.proxmox.cluster.resources.get(type="vm") if i.get("template", 0) == 1]
 
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
@@ -99,24 +89,16 @@ class vmProvider(object):
                         template = t
 
                 if not template:
-                    click.echo(
-                        "No such template: [{}] on node [{}]".format(
-                            v["template"], v["node"]
-                        )
-                    )
+                    click.echo("No such template: [{}] on node [{}]".format(v["template"], v["node"]))
                     continue
 
                 # Clone the VM
                 full = int(v.get("full", 0) is True)
                 storage = v.get("storage", None)
                 if storage:
-                    taskid = node(template["id"]).clone.post(
-                        newid=nextid, name=h, full=1, storage=storage
-                    )
+                    taskid = node(template["id"]).clone.post(newid=nextid, name=h, full=1, storage=storage)
                 else:
-                    taskid = node(template["id"]).clone.post(
-                        newid=nextid, name=h, full=full
-                    )
+                    taskid = node(template["id"]).clone.post(newid=nextid, name=h, full=full)
                 result = self._waitTask(node, taskid)
                 if result != "OK":
                     click.echo("Clone failed".format())
@@ -148,12 +130,10 @@ class vmProvider(object):
                     searchdomain=v["searchdomain"],
                     sshkeys=urllib.parse.quote(sshkey, safe=""),
                     ciuser=v["ZBUILDER_SYSUSER"],
-                    description=NOTES_FORMAT.format(
-                        time.strftime("%c", time.localtime()), self.username
-                    ),
+                    description=NOTES_FORMAT.format(time.strftime("%c", time.localtime()), self.username),
                 )
                 for i, disk in enumerate(v.get("disks", [])):
-                    args = {f"virtio{i+1}": disk}
+                    args = {f"virtio{i + 1}": disk}
                     taskid = node.qemu(nextid).config.set(**args)
 
                 # Start the VM
@@ -171,11 +151,7 @@ class vmProvider(object):
         dnsUpdate(ips)
 
     def up(self, hosts):
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
                 click.echo("  - Starting host: {} ".format(h))
@@ -191,11 +167,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def halt(self, hosts):
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
                 click.echo("  - Halting host: {} ".format(h))
@@ -212,11 +184,7 @@ class vmProvider(object):
 
     def destroy(self, hosts):
         updateHosts = {}
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
 
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
@@ -260,11 +228,7 @@ class vmProvider(object):
         dnsRemove(ips)
 
     def snapCreate(self, hosts):
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
                 node = self.proxmox.nodes(v["node"])
@@ -278,9 +242,7 @@ class vmProvider(object):
                         if result != "OK":
                             click.echo("    Failed: {}".format(result))
                 click.echo("  - Creating snapshot for vm: {} ".format(h))
-                taskid = node(vm["id"]).snapshot.post(
-                    snapname="zbuilder", description="Managed by zbuilder"
-                )
+                taskid = node(vm["id"]).snapshot.post(snapname="zbuilder", description="Managed by zbuilder")
                 result = self._waitTask(node, taskid)
                 if result != "OK":
                     click.echo("Failed: {}".format(result))
@@ -289,11 +251,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def snapRestore(self, hosts):
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
                 node = self.proxmox.nodes(v["node"])
@@ -314,11 +272,7 @@ class vmProvider(object):
                 click.echo("  - Host does not exists [{}]".format(h))
 
     def snapDelete(self, hosts):
-        vms = {
-            i["name"]: i
-            for i in self.proxmox.cluster.resources.get(type="vm")
-            if "name" in i
-        }
+        vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
                 node = self.proxmox.nodes(v["node"])
@@ -341,10 +295,7 @@ class vmProvider(object):
         return "PASS"
 
     def params(self, params):
-        return {
-            k: params.get(k, None)
-            for k in ["node", "template", "vcpu", "memory", "ipconfig", "disks"]
-        }
+        return {k: params.get(k, None) for k in ["node", "template", "vcpu", "memory", "ipconfig", "disks"]}
 
     def enabled(self):
         return True

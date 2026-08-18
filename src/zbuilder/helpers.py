@@ -13,6 +13,7 @@ from ansible.template import Templar
 from ansible.cli.playbook import PlaybookCLI
 from ansible.parsing.vault import VaultSecretsContext
 from ansible.utils.context_objects import GlobalCLIArgs
+from ansible.utils.collection_loader._collection_finder import _AnsibleCollectionFinder
 
 
 def resetVaultContext():
@@ -35,6 +36,23 @@ def resetCliContext():
     run the playbook, so the singleton has to be dropped before every parse.
     """
     GlobalCLIArgs._Singleton__instance = None
+
+
+def resetCollectionLoader():
+    """Uninstall the process wide collection finder
+
+    Every CLI installs a collection finder on run, and warns instead of
+    installing a second one. zbuilder runs more than one CLI per process, so
+    the finder of the previous one has to be uninstalled before the next.
+    """
+    _AnsibleCollectionFinder._remove()
+
+
+def resetAnsibleContext():
+    """Clear everything ansible keeps process wide between two CLI runs"""
+    resetVaultContext()
+    resetCliContext()
+    resetCollectionLoader()
 
 
 def playbookArgs(pbook, limit):
@@ -86,8 +104,7 @@ class ZBbuilderInventoryCLI(PlaybookCLI):
 
 
 def getHostsWithVars(limit, pbook="bootstrap.yml"):
-    resetVaultContext()
-    resetCliContext()
+    resetAnsibleContext()
     inv = ZBbuilderInventoryCLI(playbookArgs(pbook, limit))
     loader, inventory, vm = inv.dumpVars()
 
@@ -186,8 +203,7 @@ def getProviders(cfg, state):
 
 def runPlaybook(state, pbook):
     try:
-        resetVaultContext()
-        resetCliContext()
+        resetAnsibleContext()
         playbookCLI = PlaybookCLI(playbookArgs(pbook, state.limit))
         playbookCLI.parse()
         playbookCLI.run()
@@ -206,8 +222,7 @@ def load_yaml(fname):
         if hasattr(e, "problem_mark"):
             mark = e.problem_mark
             raise click.ClickException(
-                "Yaml error (%s) at position: [line:%s column:%s]"
-                % (fname, mark.line + 1, mark.column + 1)
+                "Yaml error (%s) at position: [line:%s column:%s]" % (fname, mark.line + 1, mark.column + 1)
             )
     except Exception as e:
         raise click.ClickException(e)
@@ -260,11 +275,7 @@ def fixKeys(state):
                     try:
                         ip = getIP(h)
                     except Exception:
-                        click.echo(
-                            click.style(
-                                "  - Host: {} can't be resolved".format(h), fg="red"
-                            )
-                        )
+                        click.echo(click.style("  - Host: {} can't be resolved".format(h), fg="red"))
                         continue
 
                 click.echo("  - Host: {}".format(h))
@@ -273,16 +284,12 @@ def fixKeys(state):
                     runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
                     waitSSH(ip)
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(
-                            h
-                        ),
+                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
                         verbose=state.verbose,
                         ignoreError=True,
                     )
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(
-                            ip
-                        ),
+                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(ip),
                         verbose=state.verbose,
                         ignoreError=True,
                     )

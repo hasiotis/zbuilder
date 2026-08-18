@@ -4,6 +4,6 @@ from zbuilder.cli import cli
 
 def test_version():
     runner = CliRunner()
-    result = runner.invoke(cli, ['--version'])
+    result = runner.invoke(cli, ["--version"])
     assert result.exit_code == 0
-    assert 'cli, version ' in result.output
+    assert "cli, version " in result.output

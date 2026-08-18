@@ -1,74 +1,87 @@
-[tool.poetry]
+[project]
 name = "zbuilder"
 version = "0.0.68"
 description = "Create VMs"
-authors = ["Chasiotis Nikos <hasiotis@gmail.com>"]
+authors = [{ name = "Nikos Chasiotis", email = "hasiotis@gmail.com" }]
 license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
 readme = "README.md"
-repository = "https://github.com/hasiotis/zbuilder"
-include = ["LICENSE"]
+requires-python = ">=3.12,<4"
 classifiers = [
     "Development Status :: 1 - Planning",
     "Environment :: Console",
     "Intended Audience :: System Administrators",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
+dependencies = [
+    "click>=8,<9",
+    "Jinja2>=3.0,<4",
+    "delegator.py>=0.1.1,<0.2",
+    "colorama>=0.4,<0.5",
+    "retrying>=1.3,<2",
+    "requests>=2,<3",
+    "arrow>=1.1,<2",
+    "PyJWT>=2.5.0,<3",
+    "dpath>=2.0,<3",
+    "dnspython>=2,<3",
+    "google-auth-oauthlib>=0.4,<1.5",
+    "oauthlib>=3.2.1,<4",
+    "azure-mgmt-resource>=18.0,<27",
+    "azure-mgmt-network>=19.0,<33",
+    "azure-mgmt-compute>=21.0,<39",
+    "azure-mgmt-dns>=8.0,<10",
+    "msrestazure>=0.6.4,<0.7",
+    "python-digitalocean>=1.16,<2",
+    "proxmoxer>=1.1,<3",
+    "ansible>=14.3.1,<15",
+    "google-api-python-client>=2.198.0,<3",
+    "google-cloud-dns>=0.37.0,<0.38",
+    "setuptools>=84.0.0,<85",
+    "massedit>=0.71.0",
+    "ruamel-yaml>=0.19.1",
+    "boto3>=1.43.73",
+    "tabulate>=0.10.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<4"
-click = "^8"
-"ruamel.yaml" = "^0.17"
-Jinja2 = "^3.0"
-"delegator.py" = "^0.1.1"
-colorama = "^0.4"
-retrying = "^1.3"
-requests = "^2"
-tabulate = "^0.8"
-arrow = "^1.1"
-PyJWT = "^2.5.0"
-dpath = "^2.0"
-dnspython = "^2"
-boto3 = "^1.17"
-google-auth-oauthlib = "^0.4"
-oauthlib = "^3.2.1"
-azure-mgmt-resource = "^18.0"
-azure-mgmt-network = "^19.0"
-azure-mgmt-compute = "^21.0"
-azure-mgmt-dns = "^8.0"
-msrestazure = "^0.6.4"
-python-digitalocean = "^1.16"
-proxmoxer = "^1.1"
-massedit = "^0.70.0"
-ansible = "^14.3.1"
-google-api-python-client = "^2.198.0"
-google-cloud-dns = "^0.37.0"
-setuptools = "^84.0.0"
+[project.urls]
+Repository = "https://github.com/hasiotis/zbuilder"
 
-[tool.poetry.group.dev.dependencies]
-pylint = "^2"
-pre-commit = "^2.13.0"
-flake8 = "^7.3.0"
-black = "^26.5.1"
-pytest = "^9.1.1"
-pytest-cov = "^7.1.0"
+[project.scripts]
+zbuilder = "zbuilder.cli:cli"
 
-[tool.poetry.group.docs.dependencies]
-sphinx = "^7.2.6"
+[dependency-groups]
+dev = [
+    "pylint>=2,<3",
+    "pre-commit>=2.13.0,<3",
+    "pytest>=9.1.1,<10",
+    "pytest-cov>=7.1.0,<8",
+    "pytest-md-report>=0.8.0",
+]
+docs = [
+    "sphinx>=7.2.6,<8",
+]
 
-[tool.poetry.scripts]
-zbuilder = 'zbuilder.cli:cli'
+[tool.uv]
+default-groups = ["dev"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "setuptools"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 120
 
 [tool.pytest.ini_options]
-addopts = "-ra -q --junit-xml=results.xml --cov=zbuilder --cov-fail-under=5 --color=yes"
-junit_family = "xunit2"
-filterwarnings = "ignore::DeprecationWarning"
 testpaths = [ "tests" ]
+filterwarnings = [
+    # ansible starts its result thread before forking its workers, so every
+    # playbook run forks a multi threaded process. Nothing zbuilder can fix.
+    "ignore:This process .* is multi-threaded, use of fork.*:DeprecationWarning:multiprocessing.popen_fork",
+]
+md_report = true
+md_report_verbose = "1"
+md_report_color = "auto"
+md_report_show_duration = true

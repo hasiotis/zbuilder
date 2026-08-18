@@ -19,9 +19,7 @@ class dnsProvider(object):
                 continue
 
         if ip and not retValue:
-            retValue = digitalocean.Record(
-                token=self.apikey, domain_name=zone, name=host, type="A", data=ip
-            )
+            retValue = digitalocean.Record(token=self.apikey, domain_name=zone, name=host, type="A", data=ip)
 
         return retValue
 
@@ -29,14 +27,10 @@ class dnsProvider(object):
         fqdn = "{}.{}".format(host, zone)
         record = self.getRecord(host, zone, ip)
         if not record.id:
-            click.echo(
-                "  - Creating record [{}] with ip [{}]".format(fqdn, record.data)
-            )
+            click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, record.data))
             record.create()
         else:
-            click.echo(
-                "  - Updating record [{}] with ip [{}]".format(fqdn, record.data)
-            )
+            click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, record.data))
             record.save()
 
     def remove(self, host, zone):
