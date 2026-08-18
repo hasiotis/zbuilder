@@ -4,22 +4,22 @@ import click
 from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 
-from azure.common.credentials import ServicePrincipalCredentials
-from azure.mgmt.resource import ResourceManagementClient
+from azure.core.exceptions import HttpResponseError, ResourceNotFoundError
+from azure.identity import ClientSecretCredential
+from azure.mgmt.resource.resources import ResourceManagementClient
 from azure.mgmt.compute import ComputeManagementClient
 from azure.mgmt.network import NetworkManagementClient
-from msrestazure.azure_exceptions import CloudError
-from msrestazure.tools import parse_resource_id
+from azure.mgmt.core.tools import parse_resource_id
 
 
 class vmProvider(VMProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
-            self.credentials = ServicePrincipalCredentials(
+            self.credentials = ClientSecretCredential(
+                tenant_id=cfg["tenant_id"],
                 client_id=cfg["client_id"],
-                secret=cfg["client_secret"],
-                tenant=cfg["tenant_id"],
+                client_secret=cfg["client_secret"],
             )
             self.rgroupClient = ResourceManagementClient(self.credentials, cfg["subscription_id"])
             self.netClient = NetworkManagementClient(self.credentials, cfg["subscription_id"])
@@ -103,16 +103,14 @@ class vmProvider(VMProvider):
         ips = {}
         for h, v in hosts.items():
             if v["enabled"]:
-                vm = None
                 try:
                     vm = self.vmClient.virtual_machines.get(v["resource_group"], h)
                     click.echo("  - Already up host: {} ".format(vm.name))
-                except CloudError as e:
-                    if str(e).startswith("Azure Error: ResourceNotFound"):
-                        click.echo("  - Creating host: {} ".format(h))
-                        nic = self.create_nic(h, v)
-                        vm = self.create_vm(h, v, nic)
-                        ips[vm.name] = None
+                except ResourceNotFoundError:
+                    click.echo("  - Creating host: {} ".format(h))
+                    nic = self.create_nic(h, v)
+                    vm = self.create_vm(h, v, nic)
+                    ips[vm.name] = None
 
                 interface = vm.network_profile.network_interfaces[0]
                 nicInfo = parse_resource_id(interface.id)
@@ -132,7 +130,6 @@ class vmProvider(VMProvider):
     def up(self, hosts):
         for h, v in hosts.items():
             if v["enabled"]:
-                vm = None
                 try:
                     vm = self.vmClient.virtual_machines.get(v["resource_group"], h, expand="instanceView")
                     vmStatus = vm.instance_view.statuses[1].display_status
@@ -142,14 +139,12 @@ class vmProvider(VMProvider):
                         async_vm_start.wait()
                     else:
                         click.echo("  - Status of host: {} is [{}]".format(h, vmStatus))
-                except CloudError as e:
-                    if str(e).startswith("Azure Error: ResourceNotFound"):
-                        click.echo("  - No such host: {} ".format(h))
+                except ResourceNotFoundError:
+                    click.echo("  - No such host: {} ".format(h))
 
     def halt(self, hosts):
         for h, v in hosts.items():
             if v["enabled"]:
-                vm = None
                 try:
                     vm = self.vmClient.virtual_machines.get(v["resource_group"], h, expand="instanceView")
                     vmStatus = vm.instance_view.statuses[1].display_status
@@ -159,15 +154,13 @@ class vmProvider(VMProvider):
                         async_vm_stop.wait()
                     else:
                         click.echo("  - Status of host: {} is [{}]".format(h, vmStatus))
-                except CloudError as e:
-                    if str(e).startswith("Azure Error: ResourceNotFound"):
-                        click.echo("  - No such host: {} ".format(h))
+                except ResourceNotFoundError:
+                    click.echo("  - No such host: {} ".format(h))
 
     def destroy(self, hosts):
         ips = {}
         for h, v in hosts.items():
             if hosts[h]["enabled"]:
-                vm = None
                 try:
                     vm = self.vmClient.virtual_machines.get(v["resource_group"], h)
 
@@ -201,9 +194,8 @@ class vmProvider(VMProvider):
                     else:
                         ips[vm.name] = ip_configurations[0].private_ip_address
 
-                except CloudError as e:
-                    if str(e).startswith("Azure Error: ResourceNotFound"):
-                        click.echo("  - Host does not exists : {}".format(h))
+                except ResourceNotFoundError:
+                    click.echo("  - Host does not exists : {}".format(h))
 
                 try:
                     disks_list = self.vmClient.disks.list_by_resource_group(v["resource_group"])
@@ -216,7 +208,7 @@ class vmProvider(VMProvider):
                             async_disk_handle_list.append(async_disk_delete)
                     for async_disk_delete in disk_handle_list:
                         async_disk_delete.wait()
-                except CloudError as e:
+                except HttpResponseError as e:
                     click.echo("    Error while removing disk: {}".format(e))
 
         dnsRemove(ips)
@@ -240,9 +232,8 @@ class vmProvider(VMProvider):
                         ips[vm.name] = pip.ip_address
                     else:
                         ips[vm.name] = ip_configurations[0].private_ip_address
-                except CloudError as e:
-                    if str(e).startswith("Azure Error: ResourceNotFound"):
-                        pass
+                except ResourceNotFoundError:
+                    pass
 
         dnsUpdate(ips)
 

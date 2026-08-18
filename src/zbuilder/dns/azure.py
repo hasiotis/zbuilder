@@ -2,21 +2,21 @@ import click
 
 from zbuilder.base import DNSProvider
 
-from azure.common.credentials import ServicePrincipalCredentials
+from azure.identity import ClientSecretCredential
 from azure.mgmt.dns import DnsManagementClient
-from msrestazure.tools import parse_resource_id
+from azure.mgmt.core.tools import parse_resource_id
 
 
 class dnsProvider(DNSProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
-            self.credentials = ServicePrincipalCredentials(
+            self.credentials = ClientSecretCredential(
+                tenant_id=cfg["tenant_id"],
                 client_id=cfg["client_id"],
-                secret=cfg["client_secret"],
-                tenant=cfg["tenant_id"],
+                client_secret=cfg["client_secret"],
             )
-        self.dnsClient = DnsManagementClient(self.credentials, cfg["subscription_id"])
+            self.dnsClient = DnsManagementClient(self.credentials, cfg["subscription_id"])
 
     def _getZoneInfo(self, host, zone):
         rgroup = None
