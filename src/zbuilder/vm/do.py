@@ -2,16 +2,17 @@ import time
 import click
 import digitalocean
 
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 
 
 SLEEP_TIME = 5
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.apikey = self.cfg["apikey"]
             self.manager = digitalocean.Manager(token=self.apikey)
 
@@ -178,6 +179,3 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params.get(k, None) for k in ["size_slug", "region", "image"]}
-
-    def enabled(self):
-        return True

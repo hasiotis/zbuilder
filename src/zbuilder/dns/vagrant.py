@@ -1,7 +1,7 @@
-class dnsProvider(object):
-    def __init__(self, cfg):
-        self.cfg = cfg
+from zbuilder.base import DNSProvider
 
+
+class dnsProvider(DNSProvider):
     def update(self, host, zone, ip):
         pass
 

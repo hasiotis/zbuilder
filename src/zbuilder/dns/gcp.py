@@ -2,6 +2,7 @@ import time
 import click
 
 
+from zbuilder.base import DNSProvider
 from zbuilder.vm.gcp import auth
 from google.cloud import dns
 
@@ -9,10 +10,10 @@ from google.cloud import dns
 DNS_TTL = 60 * 10  # 10 mins
 
 
-class dnsProvider(object):
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             creds = auth(self.cfg)
 
             try:

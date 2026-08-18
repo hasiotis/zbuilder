@@ -1,11 +1,13 @@
 import click
 import digitalocean
 
+from zbuilder.base import DNSProvider
 
-class dnsProvider(object):
+
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.apikey = self.cfg["apikey"]
             self.manager = digitalocean.Manager(token=self.apikey)
 

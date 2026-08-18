@@ -8,6 +8,7 @@ import distutils.dir_util
 
 import zbuilder.vm
 import zbuilder.cfg
+import zbuilder.plugins
 
 from zbuilder.helpers import (
     getHosts,
@@ -307,7 +308,7 @@ def update(state, yes):
 def plugins(state):
     """Autocomplete for bash"""
     click.echo("List of available vm plugins")
-    for plugin in ["vagrant", "gcp", "aws", "do", "azure", "proxmox", "ganeti"]:
+    for plugin in zbuilder.plugins.names(zbuilder.plugins.VM):
         try:
             p = zbuilder.vm.vmProvider(plugin)
             p.enabled()

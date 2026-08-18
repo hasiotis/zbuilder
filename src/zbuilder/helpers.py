@@ -5,7 +5,10 @@ import socket
 import delegator
 import ruamel.yaml
 import zbuilder.vm
+import zbuilder.dns
+import zbuilder.ipam
 import zbuilder.cfg
+import zbuilder.plugins
 
 from retrying import retry
 from ansible.errors import AnsibleError
@@ -180,20 +183,16 @@ def getProviders(cfg, state):
         try:
             cp = cfg["providers"][p]
             cp["state"] = state
-            if cp["type"] in [
-                "aws",
-                "azure",
-                "do",
-                "ganeti",
-                "gcp",
-                "proxmox",
-                "vagrant",
-            ]:
+            # A name can be registered in more than one family (gcp is both a
+            # vm and a dns provider), vm wins as it is the richer one.
+            if cp["type"] in zbuilder.plugins.names(zbuilder.plugins.VM):
                 curProvider = zbuilder.vm.vmProvider(cp["type"], cp)
-            if cp["type"] in ["powerdns"]:
+            elif cp["type"] in zbuilder.plugins.names(zbuilder.plugins.DNS):
                 curProvider = zbuilder.dns.dnsProvider(cp["type"], cp)
-            if cp["type"] in ["phpipam"]:
+            elif cp["type"] in zbuilder.plugins.names(zbuilder.plugins.IPAM):
                 curProvider = zbuilder.ipam.ipamProvider(cp["type"], cp)
+            else:
+                raise click.ClickException("Unknown provider type [{}]".format(cp["type"]))
             providers.append([p, cp["type"], curProvider.status()])
         except Exception as e:
             providers.append([p, cp["type"], e])

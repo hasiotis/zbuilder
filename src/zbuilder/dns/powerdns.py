@@ -1,11 +1,13 @@
 import click
 import requests
 
+from zbuilder.base import DNSProvider
 
-class dnsProvider(object):
+
+class dnsProvider(DNSProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             self.apikey = self.cfg["apikey"]
             self.url = self.cfg["url"] + "api/v1"
 

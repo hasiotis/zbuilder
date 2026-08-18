@@ -3,6 +3,7 @@ import click
 import pickle
 import googleapiclient.discovery
 
+from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -48,10 +49,10 @@ def auth(cfg):
     return creds
 
 
-class vmProvider(object):
+class vmProvider(VMProvider):
     def __init__(self, cfg):
+        super().__init__(cfg)
         if cfg:
-            self.cfg = cfg
             creds = auth(self.cfg)
 
             try:
@@ -280,6 +281,3 @@ class vmProvider(object):
 
     def params(self, params):
         return {k: params[k] for k in ["size", "image"]}
-
-    def enabled(self):
-        return True
