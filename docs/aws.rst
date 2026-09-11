@@ -56,7 +56,7 @@ For this to work you need to have your dns zone managed by aws route53
 Create your environment
 -----------------------
 
-Now create and environment from a vagrant template::
+Now create and environment from a template::
 
   mkdir ZBUILDER_AWS_DEMO
   cd ZBUILDER_AWS_DEMO

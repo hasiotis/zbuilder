@@ -138,7 +138,7 @@ def test_domain_has_the_memory_and_cpus_of_the_host():
     assert dom.findtext("vcpu") == "4"
 
 
-def test_domain_accepts_the_vagrant_spelling_of_vcpus():
+def test_domain_accepts_the_plural_spelling_of_vcpus():
     assert domain(opts={"memory": 512, "vcpus": 2}).findtext("vcpu") == "2"
 
 

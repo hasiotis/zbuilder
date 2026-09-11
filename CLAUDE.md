@@ -67,8 +67,8 @@ Three parallel plugin families, each with an identical dynamic-import loader:
 
 | Package | Loader | Module must export | Base class | Implementations |
 |---|---|---|---|---|
-| `zbuilder/vm/` | `vmProvider(factory, cfg)` | `vmProvider` class | `base.VMProvider` | vagrant, gcp, aws, do, azure, proxmox, ganeti, kvm |
-| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, gcp, aws, azure, do, vagrant, ansible |
+| `zbuilder/vm/` | `vmProvider(factory, cfg)` | `vmProvider` class | `base.VMProvider` | gcp, aws, proxmox, kvm |
+| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, gcp, aws, ansible |
 | `zbuilder/ipam/` | `ipamProvider(factory, cfg)` | `ipamProvider` class | `base.IPAMProvider` | phpipam |
 
 The loader resolves `factory` through `plugins.load()`, instantiates the class with the provider config and stamps `factory` on it — nothing wraps or delegates, callers hold the provider itself.
@@ -77,13 +77,11 @@ The loader resolves `factory` through `plugins.load()`, instantiates the class w
 
 Providers with their own `__init__` must call `super().__init__(cfg)` — that is what sets `self.cfg`.
 
-`plugins.py` discovers providers via `importlib.metadata` entry points, one group per family (`zbuilder.vm`, `zbuilder.dns`, `zbuilder.ipam`), declared in `pyproject.toml`. Loading stays lazy — only the selected provider's module is imported, so a missing cloud SDK breaks that provider alone. `plugins.names(group)` is the single source of truth for "which providers exist"; `cli.plugins` and `helpers.getProviders` both read it, so **adding a provider means dropping a module in the package and adding one line to `[project.entry-points."zbuilder.<family>"]`** — then `uv sync` to refresh the installed metadata, or discovery won't see it. An out-of-tree distribution registering the same groups is picked up the same way. A name registered in two families (`gcp`, `aws`, `do`, `azure`, `vagrant` are both vm and dns) resolves to vm in `getProviders`. `tests/test_plugins.py` asserts the entry points and the modules on disk stay in sync.
+`plugins.py` discovers providers via `importlib.metadata` entry points, one group per family (`zbuilder.vm`, `zbuilder.dns`, `zbuilder.ipam`), declared in `pyproject.toml`. Loading stays lazy — only the selected provider's module is imported, so a missing cloud SDK breaks that provider alone. `plugins.names(group)` is the single source of truth for "which providers exist"; `cli.plugins` and `helpers.getProviders` both read it, so **adding a provider means dropping a module in the package and adding one line to `[project.entry-points."zbuilder.<family>"]`** — then `uv sync` to refresh the installed metadata, or discovery won't see it. An out-of-tree distribution registering the same groups is picked up the same way. A name registered in two families (`gcp`, `aws` are both vm and dns) resolves to vm in `getProviders`. `tests/test_plugins.py` asserts the entry points and the modules on disk stay in sync.
 
 VM providers call `zbuilder.dns.dnsUpdate/dnsRemove` and `zbuilder.ipam.ipamReserve/Locate/Release` directly; those look up the right DNS/IPAM provider by matching the host's zone against `providers.*.dns.zones` and the subnet against `providers.*.ipam.subnets` in the user config.
 
 `kvm` is the one provider whose SDK is **not** a hard dependency: `libvirt-python` is an sdist whose `setup.py` shells out to `pkg-config libvirt`, so uv cannot even resolve it without libvirt-dev installed — `uv lock` fails outright on a machine with no libvirt. It lives in `[project.optional-dependencies] kvm` and is kept out of resolution by a `[[tool.uv.dependency-metadata]]` block; `zbuilder/vm/kvm.py` therefore guards `import libvirt` (and `import pycdlib`) with a `try/except ImportError` and connects lazily, because `test_every_entry_point_loads` imports every registered provider module. Bump the pinned version in the dependency-metadata block whenever the extra's range moves. `pycdlib` is also in the dev group, so the cloud-init seed tests run everywhere.
-
-The vagrant provider is the odd one: it renders a large embedded Jinja `Vagrantfile` template (overridable by a `Vagrantfile.tmpl` in the cwd) and drives the `vagrant` binary via `runCmd`, rather than talking to an API.
 
 ### User configuration
 

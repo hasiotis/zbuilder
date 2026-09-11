@@ -27,14 +27,14 @@ uv sync --extra kvm      # in the zbuilder checkout
 
 ### The provider
 
-`CLOUD: kvmlocal` in `hosts` refers to a provider you have to declare once, in
+`CLOUD: kvm-local` in `hosts` refers to a provider you have to declare once, in
 `~/.config/zbuilder/zbuilder.yaml`:
 
 ```
-zbuilder config provider kvmlocal type=kvm
-zbuilder config provider kvmlocal uri=qemu:///system
-zbuilder config provider kvmlocal pool=default
-zbuilder config provider kvmlocal network=default
+zbuilder config provider kvm-local type=kvm
+zbuilder config provider kvm-local uri=qemu:///system
+zbuilder config provider kvm-local pool=default
+zbuilder config provider kvm-local network=default
 zbuilder config view
 ```
 
@@ -94,7 +94,7 @@ zbuilder destroy --limit demo
 group_vars, host_vars and templating all apply. A host is a zbuilder host
 because it defines `ZBUILDER_PROVIDER`; `localhost` does not, so it is ignored.
 
-* `CLOUD: kvmlocal` selects the `providers.kvmlocal` entry in
+* `CLOUD: kvm-local` selects the `providers.kvm-local` entry in
   `~/.config/zbuilder/zbuilder.yaml`, whose `type: kvm` picks the plugin.
 * `ipconfig: ip=.../24,gw=...` becomes a netplan v2 `network-config` in the
   NoCloud seed. Drop the key entirely and the guest falls back to DHCP, with
