@@ -46,6 +46,16 @@ dependencies = [
     "tabulate>=0.10.0",
 ]
 
+[project.optional-dependencies]
+# The kvm provider needs the libvirt bindings, which compile against
+# libvirt-dev. Keeping them out of the mandatory dependencies means an install
+# without libvirt headers still works; zbuilder/vm/kvm.py imports them lazily
+# and says what to install when they are missing.
+kvm = [
+    "libvirt-python>=11,<12",
+    "pycdlib>=1.14,<2",
+]
+
 [project.urls]
 Repository = "https://github.com/hasiotis/zbuilder"
 
@@ -60,6 +70,7 @@ azure = "zbuilder.vm.azure:vmProvider"
 do = "zbuilder.vm.do:vmProvider"
 ganeti = "zbuilder.vm.ganeti:vmProvider"
 gcp = "zbuilder.vm.gcp:vmProvider"
+kvm = "zbuilder.vm.kvm:vmProvider"
 proxmox = "zbuilder.vm.proxmox:vmProvider"
 vagrant = "zbuilder.vm.vagrant:vmProvider"
 
@@ -80,6 +91,9 @@ phpipam = "zbuilder.ipam.phpipam:ipamProvider"
 dev = [
     "pytest>=9.1.1,<10",
     "pytest-md-report>=0.8.0",
+    # Part of the kvm extra, but pure python, so the seed tests can run
+    # everywhere. libvirt-python deliberately stays out of the dev group.
+    "pycdlib>=1.14,<2",
 ]
 docs = [
     "sphinx>=7.2.6,<8",
@@ -87,6 +101,16 @@ docs = [
 
 [tool.uv]
 default-groups = ["dev"]
+
+# libvirt-python ships as an sdist whose setup.py shells out to `pkg-config
+# libvirt`, so uv cannot even read its metadata without libvirt-dev installed
+# and `uv lock` fails on a machine that has no libvirt at all - CI included.
+# Declaring the metadata here keeps resolution static; the package is still
+# built the normal way when somebody actually installs the kvm extra.
+[[tool.uv.dependency-metadata]]
+name = "libvirt-python"
+version = "11.10.0"
+requires-dist = []
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]

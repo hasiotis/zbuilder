@@ -311,8 +311,8 @@ def plugins(state):
     for plugin in zbuilder.plugins.names(zbuilder.plugins.VM):
         try:
             p = zbuilder.vm.vmProvider(plugin)
-            p.enabled()
-            click.echo(f"  - {plugin:8}: enabled")
+            if p.enabled():
+                click.echo(f"  - {plugin:8}: enabled")
         except Exception:
             pass
 
