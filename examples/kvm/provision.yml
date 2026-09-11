@@ -1,0 +1,45 @@
+---
+# Not run by zbuilder itself, this is the `zbuilder play provision.yml` half of
+# the demo: an ordinary playbook against hosts zbuilder has just created.
+- hosts: demo
+  remote_user: sysadmin
+  become: true
+  tasks:
+    - name: provision | Install a couple of packages
+      ansible.builtin.apt:
+        name:
+          - htop
+          - qemu-guest-agent
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: provision | Start the guest agent, so libvirt can see the guest
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        enabled: true
+        state: started
+
+    - name: provision | Format the extra disk
+      when: zb_disks | default([]) | length > 0
+      block:
+        - name: provision | Create a filesystem on the extra disk
+          community.general.filesystem:
+            fstype: ext4
+            dev: /dev/vdb
+
+        - name: provision | Mount the extra disk
+          ansible.posix.mount:
+            path: /data
+            src: /dev/vdb
+            fstype: ext4
+            state: mounted
+
+    - name: provision | Report what we ended up with
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} is {{ ansible_facts.distribution }}
+          {{ ansible_facts.distribution_version }} on
+          {{ ansible_facts.default_ipv4.address }} with
+          {{ ansible_facts.processor_vcpus }} vcpu and
+          {{ ansible_facts.memtotal_mb }}MB

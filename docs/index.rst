@@ -16,6 +16,7 @@ way it achieves high integration with ansible.
    ganeti
    aws
    proxmox
+   kvm
    phpipam
    powerdns
    bind
