@@ -29,12 +29,6 @@ dependencies = [
     "dnspython>=2,<3",
     "google-auth-oauthlib>=0.4,<1.5",
     "oauthlib>=3.2.1,<4",
-    "azure-mgmt-resource>=18.0,<27",
-    "azure-mgmt-network>=19.0,<33",
-    "azure-mgmt-compute>=21.0,<39",
-    "azure-mgmt-dns>=8.0,<10",
-    "azure-identity>=1.12,<2",
-    "python-digitalocean>=1.16,<2",
     "proxmoxer>=1.1,<3",
     "ansible>=14.3.1,<15",
     "google-api-python-client>=2.198.0,<3",
@@ -66,23 +60,16 @@ zbuilder = "zbuilder.cli:cli"
 # distribution can register providers under the same groups.
 [project.entry-points."zbuilder.vm"]
 aws = "zbuilder.vm.aws:vmProvider"
-azure = "zbuilder.vm.azure:vmProvider"
-do = "zbuilder.vm.do:vmProvider"
-ganeti = "zbuilder.vm.ganeti:vmProvider"
 gcp = "zbuilder.vm.gcp:vmProvider"
 kvm = "zbuilder.vm.kvm:vmProvider"
 proxmox = "zbuilder.vm.proxmox:vmProvider"
-vagrant = "zbuilder.vm.vagrant:vmProvider"
 
 [project.entry-points."zbuilder.dns"]
 ansible = "zbuilder.dns.ansible:dnsProvider"
 aws = "zbuilder.dns.aws:dnsProvider"
-azure = "zbuilder.dns.azure:dnsProvider"
 bind = "zbuilder.dns.bind:dnsProvider"
-do = "zbuilder.dns.do:dnsProvider"
 gcp = "zbuilder.dns.gcp:dnsProvider"
 powerdns = "zbuilder.dns.powerdns:dnsProvider"
-vagrant = "zbuilder.dns.vagrant:dnsProvider"
 
 [project.entry-points."zbuilder.ipam"]
 phpipam = "zbuilder.ipam.phpipam:ipamProvider"

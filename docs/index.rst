@@ -9,11 +9,7 @@ way it achieves high integration with ansible.
    :maxdepth: 1
 
    install
-   vagrant
    gcp
-   do
-   azure
-   ganeti
    aws
    proxmox
    kvm

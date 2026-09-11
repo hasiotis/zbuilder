@@ -48,11 +48,11 @@ def test_unknown_provider_is_reported():
         plugins.load(plugins.VM, "nosuchcloud")
 
     assert "nosuchcloud" in str(excinfo.value)
-    assert "vagrant" in str(excinfo.value)
+    assert "proxmox" in str(excinfo.value)
 
 
 def test_provider_knows_the_name_it_was_loaded_as():
-    assert zbuilder.vm.vmProvider("vagrant").factory == "vagrant"
+    assert zbuilder.vm.vmProvider("proxmox").factory == "proxmox"
 
 
 class minimalProvider(VMProvider):

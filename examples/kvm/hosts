@@ -24,7 +24,7 @@ all:
             - 5
       vars:
         ZBUILDER_PROVIDER:
-          CLOUD: kvmlocal
+          CLOUD: kvm-local
           VM_OPTIONS:
             pool: default
             network: default
