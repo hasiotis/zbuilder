@@ -1,18 +1,40 @@
+"""GCP provider, driving the google api client.
+
+The google client stack is an optional extra (`zbuilder[gcp]`) and is imported
+lazily: this module has to import on a machine without it, or provider
+discovery would break for everybody.
+"""
+
 import os
 import click
 import pickle
-import googleapiclient.discovery
 
 from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
-from google.oauth2 import service_account
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+
+try:
+    import googleapiclient.discovery
+    from google.oauth2 import service_account
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from google.auth.transport.requests import Request
+except ImportError:  # installed without the gcp extra
+    googleapiclient = None
 
 CONFIG_PATH = "~/.config/zbuilder/"
 
 
+def require(module, name):
+    """The gcp extra is optional, say so instead of raising ImportError"""
+    if module is None:
+        raise click.ClickException(
+            "The gcp provider needs [{}], install it with: pip install 'zbuilder[gcp]'".format(name)
+        )
+    return module
+
+
 def auth(cfg):
+    require(googleapiclient, "google-api-python-client")
+
     SCOPES = [
         "https://www.googleapis.com/auth/compute",
         "https://www.googleapis.com/auth/ndev.clouddns.readwrite",

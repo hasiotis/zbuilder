@@ -12,7 +12,13 @@ way it achieves high integration with ansible.
 
 ## Installation
 
-Install with:
+zbuilder depends on the libvirt python bindings, which compile against the
+libvirt headers, so install those first:
+```
+apt install libvirt-dev pkg-config gcc     # or: dnf install libvirt-devel
+```
+
+Then install with:
 ```
 pipx install --force zbuilder
 ```
@@ -23,10 +29,14 @@ or
 pip3 install --user --upgrade zbuilder
 ```
 
-The `kvm` provider needs the libvirt python bindings, which compile against
-`libvirt-dev`. Install that package first, then ask for the extra:
+The `gcp` provider needs the google client libraries, which ship as an extra:
 ```
-pipx install --force 'zbuilder[kvm]'
+pipx install --force 'zbuilder[gcp]'
+```
+
+The `proxmox` provider needs `proxmoxer`, which ships as an extra:
+```
+pipx install --force 'zbuilder[proxmox]'
 ```
 
 ## Providers

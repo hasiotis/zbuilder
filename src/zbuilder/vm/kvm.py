@@ -4,10 +4,6 @@ Everything happens over a single libvirt connection: disks are storage pool
 volumes, the cloud-init seed is uploaded through a libvirt stream. Nothing
 touches the local filesystem or shells out, so a remote hypervisor reached
 over `qemu+ssh://` works exactly like a local `qemu:///system`.
-
-The libvirt bindings compile against libvirt-dev, so they are an optional
-extra (`zbuilder[kvm]`) and are imported lazily: this module has to import on
-a machine without them, or provider discovery would break for everybody.
 """
 
 import io
@@ -16,6 +12,8 @@ import time
 import atexit
 import click
 import jinja2
+import libvirt
+import pycdlib
 
 import xml.etree.ElementTree as ET
 
@@ -23,16 +21,6 @@ from pathlib import Path
 from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
-
-try:
-    import libvirt
-except ImportError:  # installed without the kvm extra
-    libvirt = None
-
-try:
-    import pycdlib
-except ImportError:  # installed without the kvm extra
-    pycdlib = None
 
 
 GiB = 1024 * 1024 * 1024
@@ -133,15 +121,6 @@ VOLUME_XML = """
 {% endif %}
 </volume>
 """
-
-
-def _require(module, name):
-    """The kvm extra is optional, say so instead of raising ImportError"""
-    if module is None:
-        raise click.ClickException(
-            "The kvm provider needs [{}], install it with: pip install 'zbuilder[kvm]'".format(name)
-        )
-    return module
 
 
 def _render(template, **context):
@@ -272,8 +251,6 @@ def _ifaceMatch(opts):
 
 def _seedISO(host, opts):
     """The NoCloud seed of a host, as the bytes of an iso9660 image"""
-    _require(pycdlib, "pycdlib")
-
     iso = pycdlib.PyCdlib()
     iso.new(interchange_level=3, joliet=3, rock_ridge="1.09", vol_ident="CIDATA")
 
@@ -373,7 +350,6 @@ class vmProvider(VMProvider):
         that is down is reported by `status` instead of breaking every command.
         """
         if self._conn is None:
-            _require(libvirt, "libvirt-python")
             # The bindings print every error to stderr before raising, which
             # turns an expected miss into noise.
             libvirt.registerErrorHandler(lambda ctx, err: None, None)
@@ -759,10 +735,6 @@ class vmProvider(VMProvider):
                 snapshot.delete()
             except libvirt.libvirtError as e:
                 click.secho("    Failed: {}".format(e), fg="red")
-
-    def enabled(self):
-        """Usable only where the optional bindings could be installed"""
-        return libvirt is not None
 
     def config(self):
         return "uri: {}, pool: {}, network: {}".format(self.uri, self.pool, self.network)

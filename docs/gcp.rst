@@ -8,6 +8,11 @@ Make sure you have installed the following on your system:
 
 * gcloud (Google Cloud SDK)
 
+The google client libraries this provider needs are not installed by default,
+they ship as an optional extra::
+
+  pip install 'zbuilder[gcp]'
+
 
 Main configuration
 ------------------

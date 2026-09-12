@@ -1,10 +1,20 @@
+"""GCP DNS provider.
+
+Like the gcp vm provider, the google client stack is an optional extra
+(`zbuilder[gcp]`) imported lazily, so this module imports without it.
+"""
+
 import time
 import click
 
 
 from zbuilder.base import DNSProvider
-from zbuilder.vm.gcp import auth
-from google.cloud import dns
+from zbuilder.vm.gcp import auth, require
+
+try:
+    from google.cloud import dns
+except ImportError:  # installed without the gcp extra
+    dns = None
 
 
 DNS_TTL = 60 * 10  # 10 mins
@@ -14,6 +24,7 @@ class dnsProvider(DNSProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
+            require(dns, "google-cloud-dns")
             creds = auth(self.cfg)
 
             try:

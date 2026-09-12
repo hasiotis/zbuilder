@@ -1,0 +1,12 @@
+---
+# Run automatically by `zbuilder build`, straight after the instances come up
+# and their route53 records have converged.
+- hosts: all:!localhost
+  gather_facts: false
+  tasks:
+    - name: bootstrap | Wait for ssh to become available
+      local_action: wait_for port=22 host="{{ inventory_hostname }}" search_regex=OpenSSH delay=2 timeout=300
+
+    - name: bootstrap | Wait for cloud-init to finish
+      raw: cloud-init status --wait
+      changed_when: false

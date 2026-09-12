@@ -1,6 +1,14 @@
 Proxmox Provider
 ================
 
+Prerequisites
+-------------
+
+The proxmox provider talks to the PVE api through ``proxmoxer``, which ships
+as an optional extra::
+
+  pip install 'zbuilder[proxmox]'
+
 Main configuration
 ------------------
 
