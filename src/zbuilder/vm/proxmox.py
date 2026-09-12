@@ -1,3 +1,10 @@
+"""Proxmox provider, driving the PVE api through proxmoxer.
+
+proxmoxer is an optional extra (`zbuilder[proxmox]`) and is imported lazily:
+this module has to import on a machine without it, or provider discovery would
+break for everybody.
+"""
+
 import os
 import re
 import time
@@ -5,10 +12,14 @@ import click
 import requests
 import urllib.parse
 
-from proxmoxer import ProxmoxAPI
 from zbuilder.base import VMProvider
 from zbuilder.dns import dnsUpdate, dnsRemove
 from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
+
+try:
+    from proxmoxer import ProxmoxAPI
+except ImportError:  # installed without the proxmox extra
+    ProxmoxAPI = None
 
 NOTES_FORMAT = """Created with zbuilder
 
@@ -17,10 +28,20 @@ user: {}
 """
 
 
+def _require(module, name):
+    """The proxmox extra is optional, say so instead of raising ImportError"""
+    if module is None:
+        raise click.ClickException(
+            "The proxmox provider needs [{}], install it with: pip install 'zbuilder[proxmox]'".format(name)
+        )
+    return module
+
+
 class vmProvider(VMProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
+            _require(ProxmoxAPI, "proxmoxer")
             self.username = self.cfg["username"]
             password = self.cfg["password"]
             url = self.cfg["url"]
@@ -289,10 +310,19 @@ class vmProvider(VMProvider):
             else:
                 click.echo("  - Host does not exists [{}]".format(h))
 
+    def enabled(self):
+        """Usable only where the optional extra is installed"""
+        return ProxmoxAPI is not None
+
     def config(self):
         return "url: {v[url]}, username: {v[username]}".format(v=self.cfg)
 
     def status(self):
+        try:
+            _require(ProxmoxAPI, "proxmoxer")
+        except click.ClickException as e:
+            return e.message
+
         return "PASS"
 
     def params(self, params):

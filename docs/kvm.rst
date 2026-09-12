@@ -10,11 +10,12 @@ running zbuilder.
 Prerequisites
 -------------
 
-The libvirt bindings compile against the libvirt headers, so they are shipped
-as an optional extra. On the machine running zbuilder::
+The libvirt bindings are a hard dependency of zbuilder, and they compile
+against the libvirt headers, so those have to be in place before the install.
+On the machine running zbuilder::
 
   apt install libvirt-dev pkg-config gcc     # or: dnf install libvirt-devel
-  pip install 'zbuilder[kvm]'
+  pip install zbuilder
 
 On the hypervisor you need libvirt itself, a storage pool, and a network::
 

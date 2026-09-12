@@ -1,0 +1,38 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+
+  vars:
+    ZBUILDER_ENV: demo
+
+  children:
+    demo:
+      hosts:
+        # No `ansible_host` on purpose: the public address is only known after
+        # the instance boots. zbuilder publishes it to route53, then resolves
+        # the inventory hostname itself.
+        aws1.example.com:
+        aws2.example.com:
+          zb_disksize: 30
+      vars:
+        # Debian cloud images log you in as `admin`; ubuntu images as `ubuntu`,
+        # amazon linux as `ec2-user`.
+        ansible_user: admin
+        ZBUILDER_PROVIDER:
+          CLOUD: aws-demo
+          VM_OPTIONS:
+            # Has to match the region boto3 picks up from the environment, see
+            # the README. Only `zbuilder summary` reads it.
+            region: eu-west-1
+            # Debian 13 (trixie), amd64, in eu-west-1 — replace with the id the
+            # README's describe-images call prints for your region.
+            ami: ami-xxxxxxxxxxxxxxxxx
+            vmtype: t3.micro
+            # An existing EC2 key pair, by name. This is what you log in with.
+            key: zbuilder-demo
+            subnet: subnet-xxxxxxxxxxxxxxxxx
+            sg:
+              - sg-xxxxxxxxxxxxxxxxx
+            # Root volume in GB, 20 when unset.
+            disksize: "{{ zb_disksize | default(20) }}"

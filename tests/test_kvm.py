@@ -103,7 +103,6 @@ def test_network_config_falls_back_to_dhcp():
 
 
 def test_seed_is_a_nocloud_iso():
-    pytest.importorskip("pycdlib")
     import pycdlib
 
     iso = kvm._seedISO("host01.zbuilder.local", {"ZBUILDER_SYSUSER": "sysadmin"})
@@ -256,14 +255,6 @@ def test_params_tolerates_a_host_that_omits_them():
         "ipconfig": None,
         "disks": None,
     }
-
-
-def test_a_missing_extra_is_reported_as_an_install_hint(monkeypatch):
-    monkeypatch.setattr(kvm, "libvirt", None)
-
-    assert "zbuilder[kvm]" in kvm.vmProvider({}).status()
-    # ... and `zbuilder plugins` does not offer a provider that cannot run
-    assert kvm.vmProvider({}).enabled() is False
 
 
 class libvirtError(Exception):

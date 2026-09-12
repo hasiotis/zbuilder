@@ -1,0 +1,25 @@
+---
+# Not run by zbuilder itself, this is the `zbuilder play provision.yml` half of
+# the demo: an ordinary playbook against instances zbuilder has just created.
+- hosts: demo
+  become: true
+  tasks:
+    - name: provision | Install a couple of packages
+      ansible.builtin.apt:
+        name:
+          - htop
+          - unattended-upgrades
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: provision | Report what we ended up with
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} is {{ ansible_facts.distribution }}
+          {{ ansible_facts.distribution_version }} on
+          {{ ansible_facts.default_ipv4.address }} with
+          {{ ansible_facts.processor_vcpus }} vcpu,
+          {{ ansible_facts.memtotal_mb }}MB and a
+          {{ (ansible_facts.mounts | selectattr('mount', 'eq', '/') | first).size_total
+             | human_readable(unit='G') }} root

@@ -18,6 +18,10 @@ jobs:
         with:
           enable-cache: true
 
+      # libvirt-python builds against the libvirt headers at install time
+      - name: Install libvirt headers
+        run: sudo apt-get update && sudo apt-get install -y libvirt-dev pkg-config
+
       - name: Install dependencies
         run: uv sync
 

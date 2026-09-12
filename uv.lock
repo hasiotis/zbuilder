@@ -23,19 +23,19 @@ wheels = [
 
 [[package]]
 name = "ansible"
-version = "14.3.1"
+version = "14.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/78/db/0ecc5cfa006064fd4cd0c3b5b3b6b6950245548d2ea48a4d2a68cbfb33f7/ansible-14.3.1.tar.gz", hash = "sha256:98d4ad2b355feac8dc04d99e8377d6cb801b1d58bbfadd6d80534e4607fb5c4d", size = 50442504, upload-time = "2026-08-14T18:27:33.382Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/81/587e26b381e599195f1076d1c987312cd03e5ee14d9a23411ea01ef6e319/ansible-14.4.0.tar.gz", hash = "sha256:f0b3b8871d6f4e4edd7e47763b18144a32c215f735569be44c49a70e04893519", size = 50925367, upload-time = "2026-09-08T19:04:18.135Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/7d/cbd743c9c538b316b5adcf66e81224b608aa7927d85c325a9c349a8a59e5/ansible-14.3.1-py3-none-any.whl", hash = "sha256:efa64b9aa99549d5ad35fa4dadedc258371138db5dc174f47dc026630eda90c9", size = 50312524, upload-time = "2026-08-14T18:27:27.858Z" },
+    { url = "https://files.pythonhosted.org/packages/01/c7/f1037ff1dc73d00c6d073732d3d523037f20fb784368374e04e2f229f456/ansible-14.4.0-py3-none-any.whl", hash = "sha256:7aedc85a55a9d14933c155101d6ae2d8358e40142b0dba7eb42125a49222b0f4", size = 51039461, upload-time = "2026-09-08T19:04:12.776Z" },
 ]
 
 [[package]]
 name = "ansible-core"
-version = "2.21.3"
+version = "2.21.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cryptography" },
@@ -44,9 +44,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "resolvelib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/11/cb53834d320c38d739e756e2458852d6e74a6c7018a9ab9f6d4ab5e5196e/ansible_core-2.21.3.tar.gz", hash = "sha256:4194fbd82273cbacfd06d86d74d2d7168c3c4b8426c03e93562cd7217f811ae1", size = 3397615, upload-time = "2026-08-10T16:46:14.554Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/df/72/2152230f254bd9c6b892f95d6d291a96fd09b632ce01c6b406eda8c5cd75/ansible_core-2.21.4.tar.gz", hash = "sha256:81a9329f4f12cfa5008dcab5d1bf23ae69b7effc08c0f00048ab2461147ae95a", size = 3394492, upload-time = "2026-09-08T16:51:48.569Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/fa/938fe0504372377af2bef42abe0d8e463fdcd011ad803eaf300e4577dd7a/ansible_core-2.21.3-py3-none-any.whl", hash = "sha256:9e7dd367f7dc5d5e9fc5ae1baf8af9c4edc09e916a73a40108a3f32e3ad93f10", size = 2446988, upload-time = "2026-08-10T16:46:12.947Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/05/d4e28474dd027db4d60fef2422cf6bc80df100ab32e5fa5e7aad898ffd55/ansible_core-2.21.4-py3-none-any.whl", hash = "sha256:ebe74d9c8fadcb41ad2151e031bf1e785e3098aaa015019b4e19a0a96f0dcc4f", size = 2457154, upload-time = "2026-09-08T16:51:47.044Z" },
 ]
 
 [[package]]
@@ -73,30 +73,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.43.73"
+version = "1.43.93"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/e4/139572e2459b7e10cd3409888a7312b8b5054c85ea41b28af417002af1c4/boto3-1.43.73.tar.gz", hash = "sha256:6e6c755e5039f204882c01d7936a46abce539b3f5bbb534a23a3f2afbc86f576", size = 112665, upload-time = "2026-08-17T20:39:43.686Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c2/37/7a09d8320685b3b8c8a014e392e7595025d00965c46c5f410797905fab7a/boto3-1.43.93.tar.gz", hash = "sha256:196bfc8b4c9cd5505f9f7b963e30956db3a00fd47e20dd0ee3574a243c1fb212", size = 112752, upload-time = "2026-09-11T19:23:03.484Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/97/20/e4a415a5a3185bd13aec89603917203ff0b274caa9f0b0329d12aa397ff0/boto3-1.43.73-py3-none-any.whl", hash = "sha256:5b54da301c387abe30c5b3a5335652f1ebd73e814c725ba805d27a2d477ce547", size = 140024, upload-time = "2026-08-17T20:39:41.636Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/68/f8f661b9e68daba4f775bfa1e750732ec52fc89b32d55f300aef530e1d62/boto3-1.43.93-py3-none-any.whl", hash = "sha256:3c948fe231490d446bf90bf3322d1452632107329d3683b37d88b7399bf481a0", size = 140022, upload-time = "2026-09-11T19:23:01.995Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.43.73"
+version = "1.43.93"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/ea/c8482ada4f409c91e6f9d640ee15838975f2a7c481dff98419a6d176b81a/botocore-1.43.73.tar.gz", hash = "sha256:0fa1e63c24b3531be3e1bc1687a88b3be9e63a430153f24edd93efc162bb1c51", size = 15963105, upload-time = "2026-08-17T20:39:37.94Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/a0/2ce10897323d67dd85de6190fdee159013a75741d1dc48b74d4815ec0592/botocore-1.43.93.tar.gz", hash = "sha256:82da355d18a7f784347b00444be33942834651f31b6c5ffef49999cd47364c5e", size = 16103276, upload-time = "2026-09-11T19:22:58.933Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/9e/b0f2332029b4cc06281932f8e4908a9616ed756ad9da55fca07a949ea811/botocore-1.43.73-py3-none-any.whl", hash = "sha256:068433028e011ccbeab1dd7c46b1090c24e378397693c66e67ca571176498daa", size = 15653468, upload-time = "2026-08-17T20:39:34.332Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/7e/f858c401f32d980f924c8f8328b62fab463313834a9ad2326f44613b97ec/botocore-1.43.93-py3-none-any.whl", hash = "sha256:3ca57bb5d26d88b554a74de708a5c991f45306436c91aacca931252d1d4d54ff", size = 15794156, upload-time = "2026-09-11T19:22:55.964Z" },
 ]
 
 [[package]]
@@ -335,14 +335,11 @@ wheels = [
 
 [[package]]
 name = "click"
-version = "8.4.2"
+version = "8.5.0"
 source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz", hash = "sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34", size = 382235, upload-time = "2026-08-26T13:33:14.56Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/e2/79c688af8b210d232694e31e59da9f6ec747bae31c3f5946e4e9b98860d5/click-8.4.2-py3-none-any.whl", hash = "sha256:e6f9f66136c816745b9d65817da91d61d957fb16e02e4dcd0552553c5a197b76", size = 119243, upload-time = "2026-06-24T17:45:13.73Z" },
+    { url = "https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl", hash = "sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360", size = 125251, upload-time = "2026-08-26T13:33:12.928Z" },
 ]
 
 [[package]]
@@ -857,11 +854,11 @@ wheels = [
 
 [[package]]
 name = "pyjwt"
-version = "2.13.0"
+version = "2.14.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz", hash = "sha256:41571c89ca91598c79e8ef18a2d07367d4810fbbd6f637794879baf1b7703423", size = 107515, upload-time = "2026-05-21T19:54:36.618Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/c3/8a3b59c25070cc61dc517fbdfa5dc0904670c96f605cc69759dc09166b99/pyjwt-2.14.0.tar.gz", hash = "sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86", size = 113177, upload-time = "2026-09-11T13:11:54.638Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/5e/ecf12fdb62546d64385c158514e9b2b671f7832108ef2ecd2020ce0af2d1/pyjwt-2.13.0-py3-none-any.whl", hash = "sha256:66adcc2aff09b3f1bbd95fc1e1577df8ac8723c978552fd43304c8a290ac5728", size = 31274, upload-time = "2026-05-21T19:54:35.362Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/97/672cb32ce0dfea44b740cb7b4f97038463b9cf7c0ead1aacf595572851d6/pyjwt-2.14.0-py3-none-any.whl", hash = "sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc", size = 32896, upload-time = "2026-09-11T13:11:53.409Z" },
 ]
 
 [[package]]
@@ -1254,13 +1251,10 @@ dependencies = [
     { name = "delegator-py" },
     { name = "dnspython" },
     { name = "dpath" },
-    { name = "google-api-python-client" },
-    { name = "google-auth-oauthlib" },
-    { name = "google-cloud-dns" },
     { name = "jinja2" },
+    { name = "libvirt-python" },
     { name = "massedit" },
-    { name = "oauthlib" },
-    { name = "proxmoxer" },
+    { name = "pycdlib" },
     { name = "pyjwt" },
     { name = "requests" },
     { name = "retrying" },
@@ -1270,14 +1264,18 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-kvm = [
-    { name = "libvirt-python" },
-    { name = "pycdlib" },
+gcp = [
+    { name = "google-api-python-client" },
+    { name = "google-auth-oauthlib" },
+    { name = "google-cloud-dns" },
+    { name = "oauthlib" },
+]
+proxmox = [
+    { name = "proxmoxer" },
 ]
 
 [package.dev-dependencies]
 dev = [
-    { name = "pycdlib" },
     { name = "pytest" },
     { name = "pytest-md-report" },
 ]
@@ -1295,15 +1293,15 @@ requires-dist = [
     { name = "delegator-py", specifier = ">=0.1.1,<0.2" },
     { name = "dnspython", specifier = ">=2,<3" },
     { name = "dpath", specifier = ">=2.0,<3" },
-    { name = "google-api-python-client", specifier = ">=2.198.0,<3" },
-    { name = "google-auth-oauthlib", specifier = ">=0.4,<1.5" },
-    { name = "google-cloud-dns", specifier = ">=0.37.0,<0.38" },
+    { name = "google-api-python-client", marker = "extra == 'gcp'", specifier = ">=2.198.0,<3" },
+    { name = "google-auth-oauthlib", marker = "extra == 'gcp'", specifier = ">=0.4,<1.5" },
+    { name = "google-cloud-dns", marker = "extra == 'gcp'", specifier = ">=0.37.0,<0.38" },
     { name = "jinja2", specifier = ">=3.0,<4" },
-    { name = "libvirt-python", marker = "extra == 'kvm'", specifier = ">=11,<12" },
+    { name = "libvirt-python", specifier = ">=11,<12" },
     { name = "massedit", specifier = ">=0.71.0" },
-    { name = "oauthlib", specifier = ">=3.2.1,<4" },
-    { name = "proxmoxer", specifier = ">=1.1,<3" },
-    { name = "pycdlib", marker = "extra == 'kvm'", specifier = ">=1.14,<2" },
+    { name = "oauthlib", marker = "extra == 'gcp'", specifier = ">=3.2.1,<4" },
+    { name = "proxmoxer", marker = "extra == 'proxmox'", specifier = ">=1.1,<3" },
+    { name = "pycdlib", specifier = ">=1.14,<2" },
     { name = "pyjwt", specifier = ">=2.5.0,<3" },
     { name = "requests", specifier = ">=2,<3" },
     { name = "retrying", specifier = ">=1.3,<2" },
@@ -1311,11 +1309,10 @@ requires-dist = [
     { name = "setuptools", specifier = ">=84.0.0,<85" },
     { name = "tabulate", specifier = ">=0.10.0" },
 ]
-provides-extras = ["kvm"]
+provides-extras = ["gcp", "proxmox"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pycdlib", specifier = ">=1.14,<2" },
     { name = "pytest", specifier = ">=9.1.1,<10" },
     { name = "pytest-md-report", specifier = ">=0.8.0" },
 ]
