@@ -1,5 +1,5 @@
 AWS Cloud Provider
-=====================
+==================
 
 Initial zbuilder setup
 ----------------------
@@ -46,6 +46,13 @@ Define *amazon* as a provider of type aws::
 
   zbuilder config provider amazon type=aws
 
+Without credentials in the provider config, the usual boto3 lookup applies
+(environment variables, ``~/.aws/credentials``, instance role). To pin the
+provider to a specific key pair instead::
+
+  zbuilder config provider amazon aws_access_key_id=YOUR_KEY_ID
+  zbuilder config provider amazon aws_secret_access_key=YOUR_SECRET
+
 Let zbuilder know that aws provider will also handle the *aws.hasiotis.dev* zone::
 
   zbuilder config provider amazon.dns zones=aws.hasiotis.dev
@@ -56,7 +63,7 @@ For this to work you need to have your dns zone managed by aws route53
 Create your environment
 -----------------------
 
-Now create and environment from a template::
+Now create an environment from a template::
 
   mkdir ZBUILDER_AWS_DEMO
   cd ZBUILDER_AWS_DEMO

@@ -6,7 +6,7 @@ help:
 .PHONY: init ## Initialize for development
 init:
 	@prek install
-	@uv sync
+	@uv sync --extra gcp --extra proxmox --group dev --group docs
 
 
 .PHONY: clean ## Cleanup generated files

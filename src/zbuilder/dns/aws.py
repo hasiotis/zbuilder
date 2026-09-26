@@ -8,7 +8,7 @@ class dnsProvider(DNSProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
-            if "aws_access_key_id" and "aws_access_key_id" in cfg:
+            if "aws_access_key_id" in cfg and "aws_secret_access_key" in cfg:
                 self.route53 = boto3.client(
                     "route53",
                     aws_access_key_id=cfg["aws_access_key_id"],

@@ -1,7 +1,7 @@
 Welcome to zbuilder's documentation!
 ====================================
 
-ZBuilder is a tool to help you build VMs ready to be transfered to ansible.
+ZBuilder is a tool to help you build VMs ready to be transferred to ansible.
 By using ansible as a library, it has access to all ansible variables. This
 way it achieves high integration with ansible.
 
