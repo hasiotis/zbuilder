@@ -44,7 +44,7 @@ pipx install --force 'zbuilder[proxmox]'
 | Family | Providers |
 |---|---|
 | VM   | `aws`, `gcp`, `kvm`, `proxmox` |
-| DNS  | `ansible`, `aws`, `bind`, `gcp`, `powerdns` |
+| DNS  | `aws`, `bind`, `gcp`, `powerdns` |
 | IPAM | `phpipam` |
 
 See the [documentation](https://zbuilder.readthedocs.io/en/stable/) for the

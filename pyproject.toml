@@ -71,7 +71,6 @@ kvm = "zbuilder.vm.kvm:vmProvider"
 proxmox = "zbuilder.vm.proxmox:vmProvider"
 
 [project.entry-points."zbuilder.dns"]
-ansible = "zbuilder.dns.ansible:dnsProvider"
 aws = "zbuilder.dns.aws:dnsProvider"
 bind = "zbuilder.dns.bind:dnsProvider"
 gcp = "zbuilder.dns.gcp:dnsProvider"

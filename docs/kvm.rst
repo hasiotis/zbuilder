@@ -71,11 +71,10 @@ Check the connection with::
 
   zbuilder providers
 
-Since kvm is not a DNS provider we will use ansible for the DNS (poor man's
-DNS)::
+Since kvm is not a DNS provider, configure one (see :doc:`bind` or
+:doc:`powerdns`) whose ``dns.zones`` covers the domain of your hosts::
 
-  zbuilder config provider ansible type=ansible
-  zbuilder config provider ansible.dns zones=kvm.hasiotis.dev
+  zbuilder config provider bindns.dns zones=kvm.hasiotis.dev
   zbuilder config view
 
 Host definition
@@ -86,7 +85,7 @@ between the two providers::
 
   ZBUILDER_PROVIDER:
     CLOUD: kvmhost
-    DNS: ansible
+    DNS: bindns
     VM_OPTIONS:
       template: debian-13-base.qcow2
       memory: 2048
