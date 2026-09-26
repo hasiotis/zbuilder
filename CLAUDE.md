@@ -68,7 +68,7 @@ Three parallel plugin families, each with an identical dynamic-import loader:
 | Package | Loader | Module must export | Base class | Implementations |
 |---|---|---|---|---|
 | `zbuilder/vm/` | `vmProvider(factory, cfg)` | `vmProvider` class | `base.VMProvider` | gcp, aws, proxmox, kvm |
-| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, gcp, aws, ansible |
+| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, gcp, aws |
 | `zbuilder/ipam/` | `ipamProvider(factory, cfg)` | `ipamProvider` class | `base.IPAMProvider` | phpipam |
 
 The loader resolves `factory` through `plugins.load()`, instantiates the class with the provider config and stamps `factory` on it — nothing wraps or delegates, callers hold the provider itself.

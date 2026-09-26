@@ -32,10 +32,10 @@ Define *pve* as a provider of type proxmox::
   zbuilder config view
 
 
-Since proxmox is not a DNS provider we will use ansible for the DNS (poor man's DNS)::
+Since proxmox is not a DNS provider, configure one (see :doc:`bind` or
+:doc:`powerdns`) whose ``dns.zones`` covers the domain of your hosts::
 
-  zbuilder config provider ansible type=ansible
-  zbuilder config provider ansible.dns zones=proxmox.hasiotis.dev
+  zbuilder config provider bindns.dns zones=proxmox.hasiotis.dev
   zbuilder config view
 
 
