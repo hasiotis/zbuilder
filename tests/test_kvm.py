@@ -456,6 +456,9 @@ class FakeConn:
     def getVersion(self):
         return 11000000
 
+    def close(self):
+        return 0
+
 
 @pytest.fixture
 def hypervisor(monkeypatch):
