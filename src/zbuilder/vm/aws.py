@@ -9,7 +9,7 @@ class vmProvider(VMProvider):
     def __init__(self, cfg):
         super().__init__(cfg)
         if cfg:
-            if "aws_access_key_id" and "aws_access_key_id" in cfg:
+            if "aws_access_key_id" in cfg and "aws_secret_access_key" in cfg:
                 self.ec2 = boto3.resource(
                     "ec2",
                     aws_access_key_id=cfg["aws_access_key_id"],
@@ -109,7 +109,7 @@ class vmProvider(VMProvider):
         dnsRemove(hosts)
 
     def config(self):
-        return "aws_access_key_id: {}".format(self.cfg["aws_access_key_id"])
+        return "aws_access_key_id: {}".format(self.cfg.get("aws_access_key_id", "boto3 default credentials"))
 
     def status(self):
         return "PASS"

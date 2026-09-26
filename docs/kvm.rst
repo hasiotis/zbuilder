@@ -96,24 +96,24 @@ between the two providers::
       nameserver: 10.0.0.1
       searchdomain: kvm.hasiotis.dev
 
-===============  ======================================================
-VM option        Meaning
-===============  ======================================================
-``template``     volume in the pool used as the base image
-``memory``       MiB of RAM
-``vcpu``         number of cpus (``vcpus`` is accepted too)
-``size``         GiB of the root disk, defaults to the template's size
-``disks``        extra disks, in GiB, as a size or a list of sizes
-``full``         ``true`` for a full clone instead of a thin one
-``pool``         override the provider's storage pool
-``network``      override the provider's network
-``ipconfig``     ``ip=<addr>/<mask>,gw=<gw>``, ``ipam=<subnet>``, or unset
-``nameserver``   resolvers, space separated
-``searchdomain`` search domains, space separated
-``machine``      qemu machine type, defaults to ``q35``
-``cpu``          cpu mode, defaults to ``host-passthrough``
-``interface``    glob the guest matches its nic with, defaults to ``e*``
-===============  ======================================================
+================  ======================================================
+VM option         Meaning
+================  ======================================================
+``template``      volume in the pool used as the base image
+``memory``        MiB of RAM
+``vcpu``          number of cpus (``vcpus`` is accepted too)
+``size``          GiB of the root disk, defaults to the template's size
+``disks``         extra disks, in GiB, as a size or a list of sizes
+``full``          ``true`` for a full clone instead of a thin one
+``pool``          override the provider's storage pool
+``network``       override the provider's network
+``ipconfig``      ``ip=<addr>/<mask>,gw=<gw>``, ``ipam=<subnet>``, or unset
+``nameserver``    resolvers, space separated
+``searchdomain``  search domains, space separated
+``machine``       qemu machine type, defaults to ``q35``
+``cpu``           cpu mode, defaults to ``host-passthrough``
+``interface``     glob the guest matches its nic with, defaults to ``e*``
+================  ======================================================
 
 A host without an ``ipconfig`` is left on DHCP, and its address is read back
 from the libvirt lease or from the qemu guest agent. With ``ipam=<subnet>`` the

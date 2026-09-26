@@ -50,6 +50,14 @@ Define *google* as a provider of type gcp::
   zbuilder config provider google type=gcp
   zbuilder config provider google service-key=zbuilder-key.json
 
+Alternatively, authenticate as a user through an OAuth client instead of a
+service account. Place the client secret in ``~/.config/zbuilder/``; on the
+first run a browser login stores the token in ``creds-file``, in the same
+directory. When both are set they take precedence over ``service-key``::
+
+  zbuilder config provider google client-secret=client-secret.json
+  zbuilder config provider google creds-file=creds.json
+
 Let zbuilder know that google provider will also handle the *gcp.hasiotis.dev* zone::
 
   zbuilder config provider google.dns zones=gcp.hasiotis.dev
@@ -61,7 +69,7 @@ For this to work you need to have your dns zone managed by google cloud DNS.
 Create your environment
 -----------------------
 
-Now create and environment from a template::
+Now create an environment from a template::
 
   mkdir ZBUILDER_GCP_DEMO
   cd ZBUILDER_GCP_DEMO

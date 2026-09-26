@@ -27,7 +27,6 @@ Define *pve* as a provider of type proxmox::
   zbuilder config provider pve username=root@pam
   zbuilder config provider pve password=YOURPASSWORD
   zbuilder config provider pve url=yourhost.fqdn
-  zbuilder config provider pve ssl=true
   zbuilder config provider pve verify=true
   zbuilder config view
 
@@ -42,7 +41,7 @@ Since proxmox is not a DNS provider, configure one (see :doc:`bind` or
 Create your environment
 -----------------------
 
-Now create and environment from a proxmox template::
+Now create an environment from a proxmox template::
 
   mkdir ZBUILDER_PROXMOX_DEMO
   cd ZBUILDER_PROXMOX_DEMO
