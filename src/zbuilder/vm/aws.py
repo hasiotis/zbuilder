@@ -36,10 +36,13 @@ class vmProvider(VMProvider):
         for h, v in self._getVMs(hosts).items():
             if v["status"] is None:
                 click.echo("  - Creating host: {} ".format(h))
+                # Debian AMIs boot from /dev/xvda, ubuntu ones from /dev/sda1. A mapping for any other device
+                # name adds a second volume instead of resizing the root one.
+                rootDevice = self.ec2.Image(v["values"]["ami"]).root_device_name
                 self.ec2.create_instances(
                     BlockDeviceMappings=[
                         {
-                            "DeviceName": "/dev/sda1",
+                            "DeviceName": rootDevice,
                             "Ebs": {
                                 "DeleteOnTermination": True,
                                 "VolumeSize": v["values"].get("disksize", 20),
