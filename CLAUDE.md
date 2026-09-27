@@ -67,8 +67,8 @@ Three parallel plugin families, each with an identical dynamic-import loader:
 
 | Package | Loader | Module must export | Base class | Implementations |
 |---|---|---|---|---|
-| `zbuilder/vm/` | `vmProvider(factory, cfg)` | `vmProvider` class | `base.VMProvider` | gcp, aws, proxmox, kvm |
-| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, gcp, aws |
+| `zbuilder/vm/` | `vmProvider(factory, cfg)` | `vmProvider` class | `base.VMProvider` | aws, proxmox, kvm |
+| `zbuilder/dns/` | `dnsProvider(factory, cfg)` | `dnsProvider` class | `base.DNSProvider` | bind, powerdns, aws |
 | `zbuilder/ipam/` | `ipamProvider(factory, cfg)` | `ipamProvider` class | `base.IPAMProvider` | phpipam |
 
 The loader resolves `factory` through `plugins.load()`, instantiates the class with the provider config and stamps `factory` on it — nothing wraps or delegates, callers hold the provider itself.
@@ -77,21 +77,17 @@ The loader resolves `factory` through `plugins.load()`, instantiates the class w
 
 Providers with their own `__init__` must call `super().__init__(cfg)` — that is what sets `self.cfg`.
 
-`plugins.py` discovers providers via `importlib.metadata` entry points, one group per family (`zbuilder.vm`, `zbuilder.dns`, `zbuilder.ipam`), declared in `pyproject.toml`. Loading stays lazy — only the selected provider's module is imported, so a missing cloud SDK breaks that provider alone. `plugins.names(group)` is the single source of truth for "which providers exist"; `cli.plugins` and `helpers.getProviders` both read it, so **adding a provider means dropping a module in the package and adding one line to `[project.entry-points."zbuilder.<family>"]`** — then `uv sync` to refresh the installed metadata, or discovery won't see it. An out-of-tree distribution registering the same groups is picked up the same way. A name registered in two families (`gcp`, `aws` are both vm and dns) resolves to vm in `getProviders`. `tests/test_plugins.py` asserts the entry points and the modules on disk stay in sync.
+`plugins.py` discovers providers via `importlib.metadata` entry points, one group per family (`zbuilder.vm`, `zbuilder.dns`, `zbuilder.ipam`), declared in `pyproject.toml`. Loading stays lazy — only the selected provider's module is imported, so a missing cloud SDK breaks that provider alone. `plugins.names(group)` is the single source of truth for "which providers exist"; `cli.plugins` and `helpers.getProviders` both read it, so **adding a provider means dropping a module in the package and adding one line to `[project.entry-points."zbuilder.<family>"]`** — then `uv sync` to refresh the installed metadata, or discovery won't see it. An out-of-tree distribution registering the same groups is picked up the same way. A name registered in two families (`aws` is both vm and dns) resolves to vm in `getProviders`. `tests/test_plugins.py` asserts the entry points and the modules on disk stay in sync.
 
 VM providers call `zbuilder.dns.dnsUpdate/dnsRemove` and `zbuilder.ipam.ipamReserve/Locate/Release` directly; those look up the right DNS/IPAM provider by matching the host's zone against `providers.*.dns.zones` and the subnet against `providers.*.ipam.subnets` in the user config.
 
-Two providers keep their SDK out of the mandatory dependencies, and both guard the import with a `try/except ImportError` plus a `require()` helper that raises a `ClickException` naming the extra — the module itself must always import, because `test_every_entry_point_loads` imports every registered provider module.
-
-`gcp`: the google client stack (`google-api-python-client`, `google-cloud-dns`, `google-auth-oauthlib`, `oauthlib`) lives in `[project.optional-dependencies] gcp`. `zbuilder/vm/gcp.py` guards the imports and calls `require()` from `auth()`, which every code path goes through; `zbuilder/dns/gcp.py` imports `auth` and `require` from it and guards `google.cloud.dns` separately. Neither is in the dev group — the gcp providers have no tests beyond the import check.
-
-`proxmox`: `proxmoxer` lives in `[project.optional-dependencies] proxmox`. `zbuilder/vm/proxmox.py` guards `from proxmoxer import ProxmoxAPI` and calls `_require()` from `__init__` (only when a cfg is given, so `vmProvider("proxmox")` with no config still constructs); `status()` turns that exception into the table cell and `enabled()` keeps `zbuilder plugins` from offering it. `tests/test_proxmox.py` covers both.
+`proxmox` keeps its SDK out of the mandatory dependencies, guarding the import with a `try/except ImportError` plus a `require()` helper that raises a `ClickException` naming the extra — the module itself must always import, because `test_every_entry_point_loads` imports every registered provider module. `proxmoxer` lives in `[project.optional-dependencies] proxmox`. `zbuilder/vm/proxmox.py` guards `from proxmoxer import ProxmoxAPI` and calls `_require()` from `__init__` (only when a cfg is given, so `vmProvider("proxmox")` with no config still constructs); `status()` turns that exception into the table cell and `enabled()` keeps `zbuilder plugins` from offering it. `tests/test_proxmox.py` covers both.
 
 `kvm` is mandatory and awkward: `libvirt-python` is an sdist whose `setup.py` shells out to `pkg-config libvirt`, so uv cannot even resolve it without libvirt-dev installed — `uv lock` fails outright on a machine with no libvirt. A `[[tool.uv.dependency-metadata]]` block keeps resolution static, but the install still builds it, so **libvirt-dev has to be present before `uv sync`** — both CI workflows apt-install it first. Bump the pinned version in the dependency-metadata block whenever the dependency range moves. `zbuilder/vm/kvm.py` imports `libvirt` and `pycdlib` normally; only the connection is lazy, so a hypervisor that is down is reported by `status()`.
 
 ### User configuration
 
-`~/.config/zbuilder/zbuilder.yaml` (`cfg.CONFIG_PATH`), with `main:` and `providers:` sections, written by `zbuilder config main|provider` using dpath paths (`zbuilder config provider pve username=root@pam`). Provider credential files (GCP secrets/tokens) also live in that directory. `zbuilder init` copies a template from the git repo configured at `main.templates.path`.
+`~/.config/zbuilder/zbuilder.yaml` (`cfg.CONFIG_PATH`), with `main:` and `providers:` sections, written by `zbuilder config main|provider` using dpath paths (`zbuilder config provider pve username=root@pam`). `zbuilder init` copies a template from the git repo configured at `main.templates.path`.
 
 ## Tests
 

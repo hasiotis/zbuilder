@@ -40,15 +40,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# The gcp providers (vm and dns) pull in the whole google client stack, which
-# is a large dependency tree nobody outside GCP needs. zbuilder/vm/gcp.py and
-# zbuilder/dns/gcp.py import it lazily and say what to install when missing.
-gcp = [
-    "google-auth-oauthlib>=0.4,<1.5",
-    "oauthlib>=3.2.1,<4",
-    "google-api-python-client>=2.198.0,<3",
-    "google-cloud-dns>=0.37.0,<0.38",
-]
 # The proxmox provider talks to PVE through proxmoxer, which nobody outside a
 # proxmox cluster needs. zbuilder/vm/proxmox.py imports it lazily and says what
 # to install when it is missing.
@@ -66,14 +57,12 @@ zbuilder = "zbuilder.cli:cli"
 # distribution can register providers under the same groups.
 [project.entry-points."zbuilder.vm"]
 aws = "zbuilder.vm.aws:vmProvider"
-gcp = "zbuilder.vm.gcp:vmProvider"
 kvm = "zbuilder.vm.kvm:vmProvider"
 proxmox = "zbuilder.vm.proxmox:vmProvider"
 
 [project.entry-points."zbuilder.dns"]
 aws = "zbuilder.dns.aws:dnsProvider"
 bind = "zbuilder.dns.bind:dnsProvider"
-gcp = "zbuilder.dns.gcp:dnsProvider"
 powerdns = "zbuilder.dns.powerdns:dnsProvider"
 
 [project.entry-points."zbuilder.ipam"]

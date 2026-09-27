@@ -28,11 +28,6 @@ or
 pip3 install --user --upgrade zbuilder
 ```
 
-The `gcp` provider needs the google client libraries, which ship as an extra:
-```
-pipx install --force 'zbuilder[gcp]'
-```
-
 The `proxmox` provider needs `proxmoxer`, which ships as an extra:
 ```
 pipx install --force 'zbuilder[proxmox]'
@@ -42,8 +37,8 @@ pipx install --force 'zbuilder[proxmox]'
 
 | Family | Providers |
 |---|---|
-| VM   | `aws`, `gcp`, `kvm`, `proxmox` |
-| DNS  | `aws`, `bind`, `gcp`, `powerdns` |
+| VM   | `aws`, `kvm`, `proxmox` |
+| DNS  | `aws`, `bind`, `powerdns` |
 | IPAM | `phpipam` |
 
 Run `zbuilder providers` to see the settings each one accepts.

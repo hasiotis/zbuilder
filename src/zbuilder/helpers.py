@@ -183,7 +183,7 @@ def getProviders(cfg, state):
         try:
             cp = cfg["providers"][p]
             cp["state"] = state
-            # A name can be registered in more than one family (gcp is both a
+            # A name can be registered in more than one family (aws is both a
             # vm and a dns provider), vm wins as it is the richer one.
             if cp["type"] in zbuilder.plugins.names(zbuilder.plugins.VM):
                 curProvider = zbuilder.vm.vmProvider(cp["type"], cp)
