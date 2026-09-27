@@ -2,7 +2,6 @@
 DEMO/*
 build/
 dist/
-docs/_build
 results.xml
 .env
 .envrc

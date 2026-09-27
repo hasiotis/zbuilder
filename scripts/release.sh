@@ -1,7 +1,5 @@
 #!/bin/bash
 
-READTHEDOCS_URL="https://readthedocs.org/api/v3/projects/zbuilder/versions/master/builds/"
-
 OLD_VERSION=`uv version --short`
 uv version --bump patch
 NEW_VERSION=`uv version --short`
@@ -15,5 +13,3 @@ git push --tags
 uv build
 uv publish
 rm -rf dist/*
-
-http -b POST ${READTHEDOCS_URL} "Authorization:Token ${READTHEDOCS_TOKEN}" | jq -r .build.urls.build

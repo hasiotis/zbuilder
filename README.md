@@ -3,7 +3,6 @@
 [![PyPi version](https://badge.fury.io/py/zbuilder.svg)](https://pypi.org/project/zbuilder/)
 [![PyPi downloads](https://img.shields.io/pypi/dm/zbuilder.svg)](https://pypistats.org/packages/zbuilder)
 [![Build status](https://github.com/hasiotis/zbuilder/workflows/master/badge.svg)](https://github.com/hasiotis/zbuilder/actions?query=workflow%3A%22master%22)
-[![Documentation Status](https://readthedocs.org/projects/zbuilder/badge/?version=stable)](https://zbuilder.readthedocs.io/en/stable/?badge=stable)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/hasiotis/zbuilder/blob/master/LICENSE)
 
 ZBuilder is a tool to help you build VMs ready to be transferred to ansible.
@@ -47,8 +46,7 @@ pipx install --force 'zbuilder[proxmox]'
 | DNS  | `aws`, `bind`, `gcp`, `powerdns` |
 | IPAM | `phpipam` |
 
-See the [documentation](https://zbuilder.readthedocs.io/en/stable/) for the
-settings each one accepts, or run `zbuilder providers`.
+Run `zbuilder providers` to see the settings each one accepts.
 
 ## Development
 During development you can:
@@ -62,6 +60,5 @@ prek run --all-files         # lint and format
 
 ## Links
 
-[Documentation](https://zbuilder.readthedocs.io/en/stable/?badge=stable)
-| [Releases](https://pypi.org/project/zbuilder/)
+[Releases](https://pypi.org/project/zbuilder/)
 | [Code](https://github.com/hasiotis/zbuilder)

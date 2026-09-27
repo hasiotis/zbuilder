@@ -6,10 +6,10 @@ help:
 .PHONY: init ## Initialize for development
 init:
 	@prek install
-	@uv sync --extra gcp --extra proxmox --group dev --group docs
+	@uv sync --extra gcp --extra proxmox --group dev
 
 
 .PHONY: clean ## Cleanup generated files
 clean:
-	@rm -rf *.egg-info build dist docs/_build .coverage results.xml
+	@rm -rf *.egg-info build dist .coverage results.xml
 	@find . -type d -name __pycache__ -exec rm -r {} \+

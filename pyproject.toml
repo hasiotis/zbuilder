@@ -84,9 +84,6 @@ dev = [
     "pytest>=9.1.1,<10",
     "pytest-md-report>=0.8.0",
 ]
-docs = [
-    "sphinx>=7.2.6,<8",
-]
 
 [tool.uv]
 default-groups = ["dev"]

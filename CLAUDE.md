@@ -99,4 +99,4 @@ Two providers keep their SDK out of the mandatory dependencies, and both guard t
 
 ## Notes
 
-- `.envrc` (gitignored) holds live PyPI and ReadTheDocs tokens — do not print or commit it.
+- `.envrc` (gitignored) holds live PyPI tokens — do not print or commit it.
