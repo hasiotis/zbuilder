@@ -35,7 +35,7 @@ dependencies = [
     "tabulate>=0.10.0",
     # The kvm provider. libvirt-python compiles against libvirt-dev, which has
     # to be present before `uv sync` - see the dependency-metadata block below.
-    "libvirt-python>=11,<12",
+    "libvirt-python>=12,<13",
     "pycdlib>=1.14,<2",
 ]
 
@@ -84,7 +84,7 @@ default-groups = ["dev"]
 # built the normal way at install time, which does need the libvirt headers.
 [[tool.uv.dependency-metadata]]
 name = "libvirt-python"
-version = "11.10.0"
+version = "12.8.0"
 requires-dist = []
 
 [build-system]
@@ -93,6 +93,11 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+# ruff 0.16 widened its default rule set; keep the pre-0.16 defaults until the
+# codebase is cleaned up for the new ones.
+select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]
