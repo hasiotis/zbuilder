@@ -1,10 +1,9 @@
-import pytest
-
 from pathlib import Path
 
+import pytest
 from ansible import constants as C
-from zbuilder.helpers import getHostsWithVars
 
+from zbuilder.helpers import getHostsWithVars
 
 FIXTURES = Path(__file__).parent / "fixtures" / "inventory"
 

@@ -95,9 +95,6 @@ build-backend = "uv_build"
 line-length = 120
 
 [tool.ruff.lint]
-# ruff 0.16 widened its default rule set; keep the pre-0.16 defaults until the
-# codebase is cleaned up for the new ones.
-select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = [ "tests" ]

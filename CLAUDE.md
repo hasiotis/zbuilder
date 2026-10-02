@@ -32,7 +32,7 @@ Every VM-touching command in `cli.py` follows the same shape:
 
 ```python
 vmProviders = getHosts(state)
-for _, vmProvider in vmProviders.items():
+for vmProvider in vmProviders.values():
     vmProvider["cloud"].<action>(vmProvider["hosts"])
 ```
 

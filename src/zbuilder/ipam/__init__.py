@@ -5,9 +5,9 @@ import zbuilder.plugins
 
 
 def getProvider(subnet, cfg):
-    for p, v in cfg.items():
+    for v in cfg.values():
         if "ipam" in v and "subnets" in v["ipam"] and subnet in v["ipam"]["subnets"]:
-            return ipamProvider(cfg[p]["type"], cfg[p])
+            return ipamProvider(v["type"], v)
     return None
 
 
@@ -17,7 +17,7 @@ def ipamReserve(hostname, subnet):
     if provider:
         return provider.reserve(hostname, subnet)
     else:
-        click.echo("No IPAM provider found for subnet [{}]".format(subnet))
+        click.echo(f"No IPAM provider found for subnet [{subnet}]")
 
 
 def ipamLocate(hostname, subnet):
@@ -26,7 +26,7 @@ def ipamLocate(hostname, subnet):
     if provider:
         return provider.locate(hostname, subnet)
     else:
-        click.echo("No IPAM provider found for subnet [{}]".format(subnet))
+        click.echo(f"No IPAM provider found for subnet [{subnet}]")
 
 
 def ipamRelease(hostname, ip, subnet):
@@ -35,7 +35,7 @@ def ipamRelease(hostname, ip, subnet):
     if provider:
         provider.release(hostname, ip, subnet)
     else:
-        click.echo("No IPAM provider found for subnet [{}]".format(subnet))
+        click.echo(f"No IPAM provider found for subnet [{subnet}]")
 
 
 def ipamProvider(factory, cfg=None):

@@ -1,26 +1,25 @@
-# -*- coding: utf-8 -*-
 import os
+import sys
 import time
-import click
-import tabulate
-import dpath.util
-import distutils.dir_util
 
-import zbuilder.vm
+import click
+import distutils.dir_util
+import dpath.util
+import tabulate
+from click.shell_completion import get_completion_class
+
 import zbuilder.cfg
 import zbuilder.plugins
-
+import zbuilder.vm
 from zbuilder.helpers import (
+    fixKeys,
     getHosts,
     getProviders,
-    runPlaybook,
-    fixKeys,
-    runCmd,
     humanize_time,
+    runCmd,
+    runPlaybook,
 )
-from zbuilder.options import pass_state, common_options
-
-from click.shell_completion import get_completion_class
+from zbuilder.options import common_options, pass_state
 
 
 @click.group()
@@ -42,11 +41,11 @@ def init(state, template):
     tmpl_path = dpath.util.get(cfg, "/main/templates/path")
     TEMPLATE_PATH = os.path.join(os.path.expanduser(tmpl_path), template)
     if os.path.exists(TEMPLATE_PATH):
-        click.echo("Initializing {} based zbuilder environment".format(template))
+        click.echo(f"Initializing {template} based zbuilder environment")
         distutils.dir_util.copy_tree(TEMPLATE_PATH, os.getcwd())
     else:
-        click.echo("Template path dose not exist: [{}]".format(TEMPLATE_PATH))
-        exit(1)
+        click.echo(f"Template path dose not exist: [{TEMPLATE_PATH}]")
+        sys.exit(1)
 
 
 @cli.command()
@@ -57,7 +56,7 @@ def build(state):
     start_time = time.time()
     click.echo("Building VMs")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].build(vmProvider["hosts"])
     click.echo("Fixing ssh keys VMs")
     fixKeys(state)
@@ -65,7 +64,7 @@ def build(state):
         click.echo("Running bootstrap.yml")
         runPlaybook(state, "bootstrap.yml")
     end_time = time.time()
-    click.echo("Time elapsed: {}".format(humanize_time(end_time - start_time)))
+    click.echo(f"Time elapsed: {humanize_time(end_time - start_time)}")
 
 
 @cli.command()
@@ -75,7 +74,7 @@ def up(state):
     """Boot the VMs"""
     click.echo("Booting VMs")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].up(vmProvider["hosts"])
 
 
@@ -86,7 +85,7 @@ def halt(state):
     """Halt the VMs"""
     click.echo("Halting VMs")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].halt(vmProvider["hosts"])
 
 
@@ -97,7 +96,7 @@ def destroy(state):
     """Destroy the VMs"""
     click.echo("Destroying VMs")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         zbuilder_env = None
         for h in vmProvider["hosts"]:
             if "ZBUILDER_ENV" in vmProvider["hosts"][h]:
@@ -108,7 +107,7 @@ def destroy(state):
                     zbuilder_env = vmProvider["hosts"][h]["ZBUILDER_ENV"]
                     break
         if zbuilder_env:
-            if click.confirm("  The ZBUILDER_ENV is set to [{}] Do you want to continue?".format(zbuilder_env)):
+            if click.confirm(f"  The ZBUILDER_ENV is set to [{zbuilder_env}] Do you want to continue?"):
                 vmProvider["cloud"].destroy(vmProvider["hosts"])
             else:
                 click.echo("    Aborting!")
@@ -128,7 +127,6 @@ def fixkeys(state):
 @cli.group()
 def dns():
     """DNS management"""
-    pass
 
 
 @dns.command(name="update")
@@ -138,7 +136,7 @@ def dns_update(state):
     """Update DNS records"""
     click.echo("Updating DNS records")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].dnsupdate(vmProvider["hosts"])
 
 
@@ -149,14 +147,13 @@ def remove(state):
     """Remove DNS records"""
     click.echo("Removing DNS records")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].dnsremove(vmProvider["hosts"])
 
 
 @cli.group()
 def snapshot():
     """Manage VM snapshots"""
-    pass
 
 
 @snapshot.command()
@@ -166,7 +163,7 @@ def create(state):
     """Create VM snapshots"""
     click.echo("Creating VMs snapshots")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].snapCreate(vmProvider["hosts"])
 
 
@@ -177,7 +174,7 @@ def restore(state):
     """Restore VM snapshots"""
     click.echo("Restoring VMs snapshots")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].snapRestore(vmProvider["hosts"])
 
 
@@ -188,7 +185,7 @@ def delete(state):
     """Delete VM snapshots"""
     click.echo("Deleting VMs snapshots")
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         vmProvider["cloud"].snapDelete(vmProvider["hosts"])
 
 
@@ -207,7 +204,7 @@ def summary(state):
     """Display environment summary"""
     vmProviders = getHosts(state)
     data = []
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         for h, v in vmProvider["hosts"].items():
             data.append([vmProvider["cloud"].factory, h, vmProvider["cloud"].params(v)])
     click.echo(tabulate.tabulate(data, headers=["Provider", "Host", "Parameters"], tablefmt="psql"))
@@ -227,7 +224,6 @@ def providers(state):
 @cli.group()
 def config():
     """Zbuilder configuration"""
-    pass
 
 
 @config.command()
@@ -255,9 +251,9 @@ def main(state, args):
     sub_path, value = args[1].split("=")
     if "," in value:
         value = value.split(",")
-    cfg_path = "main/{}/{}".format(base_path, sub_path)
+    cfg_path = f"main/{base_path}/{sub_path}"
 
-    click.echo("Setting config /{} to {}".format(cfg_path, value))
+    click.echo(f"Setting config /{cfg_path} to {value}")
     dpath.util.new(cfg, cfg_path, value)
     zbuilder.cfg.save(cfg)
 
@@ -277,9 +273,9 @@ def provider(state, args):
         value = True
     if value in ["False", "false"]:
         value = False
-    cfg_path = "providers/{}/{}".format(base_path, sub_path)
+    cfg_path = f"providers/{base_path}/{sub_path}"
 
-    click.echo("Setting config /{} to {}".format(cfg_path, value))
+    click.echo(f"Setting config /{cfg_path} to {value}")
     dpath.util.new(cfg, cfg_path, value)
     zbuilder.cfg.save(cfg)
 
@@ -298,7 +294,7 @@ def update(state, yes):
         tmpl_path = dpath.util.get(cfg, "/main/templates/path")
         if tmpl_repo and tmpl_path:
             click.echo(" * Updating templates")
-            runCmd("git -C {path} pull || git clone {repo} {path}".format(repo=tmpl_repo, path=tmpl_path))
+            runCmd(f"git -C {tmpl_path} pull || git clone {tmpl_repo} {tmpl_path}")
     except KeyError:
         pass
 
@@ -313,7 +309,7 @@ def plugins(state):
             p = zbuilder.vm.vmProvider(plugin)
             if p.enabled():
                 click.echo(f"  - {plugin:8}: enabled")
-        except Exception:
+        except Exception:  # noqa: BLE001, S110 - a provider that can't even construct just isn't listed
             pass
 
 

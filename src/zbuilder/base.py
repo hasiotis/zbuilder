@@ -14,7 +14,7 @@ class UnsupportedAction(click.ClickException):
     """Raised when a provider does not implement an optional action"""
 
     def __init__(self, provider, action):
-        super().__init__("Provider [{}] does not implement action [{}]".format(provider, action))
+        super().__init__(f"Provider [{provider}] does not implement action [{action}]")
 
 
 class Provider(ABC):

@@ -10,10 +10,10 @@ Loading is lazy on purpose. Only the module of the provider actually in use is
 imported, so a missing cloud SDK breaks that provider alone.
 """
 
-import click
-
 from functools import cache
 from importlib.metadata import entry_points
+
+import click
 
 VM = "zbuilder.vm"
 DNS = "zbuilder.dns"

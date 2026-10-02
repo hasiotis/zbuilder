@@ -1,12 +1,11 @@
-import pytest
+from pathlib import Path
+
 import click
+import pytest
 
 import zbuilder.vm
-import zbuilder.plugins as plugins
-
-from pathlib import Path
-from zbuilder.base import VMProvider, DNSProvider, IPAMProvider, UnsupportedAction
-
+from zbuilder import plugins
+from zbuilder.base import DNSProvider, IPAMProvider, UnsupportedAction, VMProvider
 
 SRC = Path(__file__).parent.parent / "src" / "zbuilder"
 

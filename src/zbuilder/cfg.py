@@ -1,8 +1,7 @@
 import os
+from pathlib import Path
 
 import zbuilder.helpers
-
-from pathlib import Path
 
 CONFIG_PATH = "~/.config/zbuilder/zbuilder.yaml"
 CONFIG_EMPTY = """# ZBuilder configuration
@@ -14,8 +13,7 @@ providers: {}
 
 def initConfig(fname):
     Path(fname).parent.mkdir(parents=True, exist_ok=True)
-    Path(fname).touch()
-    Path(fname).open("w").write(CONFIG_EMPTY)
+    Path(fname).write_text(CONFIG_EMPTY)
 
 
 def load(touch=False):

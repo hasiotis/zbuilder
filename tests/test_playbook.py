@@ -1,10 +1,9 @@
-import pytest
-
 from pathlib import Path
 
+import pytest
 from ansible import constants as C
-from zbuilder.helpers import getHostsWithVars, runPlaybook
 
+from zbuilder.helpers import getHostsWithVars, runPlaybook
 
 FIXTURES = Path(__file__).parent / "fixtures" / "inventory"
 NOOP = str(FIXTURES / "noop.yml")
@@ -14,7 +13,7 @@ UBUNTU_HOSTS = ["ubuntu01.zbuilder.local", "ubuntu02.zbuilder.local"]
 CENTOS_HOSTS = ["centos01.zbuilder.local"]
 
 
-class State(object):
+class State:
     def __init__(self, limit=None):
         self.limit = limit
         self.verbose = 0

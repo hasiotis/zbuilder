@@ -1,5 +1,6 @@
-import click
 import boto3
+import click
+from botocore.exceptions import BotoCoreError, ClientError
 
 from zbuilder.base import DNSProvider
 
@@ -21,8 +22,8 @@ class dnsProvider(DNSProvider):
         response = self.route53.list_hosted_zones_by_name(DNSName=zone)
         if response["HostedZones"]:
             zoneID = response["HostedZones"][0]["Id"]
-            fqdn = "{}.{}".format(host, zone)
-            click.echo("  - Update record [{}] with ip [{}]".format(fqdn, ip))
+            fqdn = f"{host}.{zone}"
+            click.echo(f"  - Update record [{fqdn}] with ip [{ip}]")
 
             oldIP = None
             record_set = self.route53.list_resource_record_sets(
@@ -57,14 +58,14 @@ class dnsProvider(DNSProvider):
                         ChangeInfoID = response["ChangeInfo"]["Id"]
                         waiter = self.route53.get_waiter("resource_record_sets_changed")
                         waiter.wait(Id=ChangeInfoID)
-                except Exception as e:
-                    click.echo("    Error: [{}]".format(e))
+                except (BotoCoreError, ClientError) as e:
+                    click.echo(f"    Error: [{e}]")
 
     def remove(self, host, zone):
         response = self.route53.list_hosted_zones_by_name(DNSName=zone)
         if response["HostedZones"]:
             zoneID = response["HostedZones"][0]["Id"]
-            fqdn = "{}.{}".format(host, zone)
+            fqdn = f"{host}.{zone}"
             ip = None
             record_set = self.route53.list_resource_record_sets(
                 HostedZoneId=zoneID,
@@ -76,7 +77,7 @@ class dnsProvider(DNSProvider):
                 ip = rs["ResourceRecords"][0]["Value"]
 
             if ip is not None:
-                click.echo("  - Remove record [{}] with IP [{}]".format(fqdn, ip))
+                click.echo(f"  - Remove record [{fqdn}] with IP [{ip}]")
                 try:
                     response = self.route53.change_resource_record_sets(
                         HostedZoneId=zoneID,
@@ -95,7 +96,7 @@ class dnsProvider(DNSProvider):
                             ],
                         },
                     )
-                except Exception as e:
-                    click.echo("    Error: [{}]".format(e))
+                except (BotoCoreError, ClientError) as e:
+                    click.echo(f"    Error: [{e}]")
             else:
-                click.echo("  - DNS record [{}] does not exist".format(fqdn))
+                click.echo(f"  - DNS record [{fqdn}] does not exist")

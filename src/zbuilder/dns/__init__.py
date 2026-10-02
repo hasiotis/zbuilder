@@ -1,5 +1,7 @@
 import time
+
 import click
+import dns.exception
 import dns.resolver
 
 import zbuilder.cfg
@@ -8,34 +10,29 @@ import zbuilder.plugins
 
 def waitDNS(hostname, ip):
     synced = False
-    click.echo("  - Waiting for host [{}] DNS to sync".format(hostname))
+    click.echo(f"  - Waiting for host [{hostname}] DNS to sync")
     while not synced:
         try:
             answers = dns.resolver.query(hostname, "A")
             ttl = answers.rrset.ttl
             rip = answers[0].address
             if rip == ip:
-                click.echo("  - Host [{}] is synced with ip [{}]".format(hostname, rip))
+                click.echo(f"  - Host [{hostname}] is synced with ip [{rip}]")
                 synced = True
             else:
-                click.echo(
-                    "  - Host [{}] is not synced with ip [{} != {}], sleeping for [{}]".format(
-                        hostname, ip, rip, ttl + 1
-                    )
-                )
+                click.echo(f"  - Host [{hostname}] is not synced with ip [{ip} != {rip}], sleeping for [{ttl + 1}]")
                 time.sleep(ttl + 1)
         except dns.resolver.NXDOMAIN:
             click.echo("    Sleeping 20s due to NXDOMAIN")
             time.sleep(20)
-        except Exception as e:
-            click.echo(e)
-            exit()
+        except dns.exception.DNSException as e:
+            raise click.ClickException(str(e)) from e
 
 
 def getProvider(zone, cfg):
-    for p, v in cfg.items():
+    for v in cfg.values():
         if "dns" in v and "zones" in v["dns"] and zone == v["dns"]["zones"]:
-            return dnsProvider(cfg[p]["type"], cfg[p])
+            return dnsProvider(v["type"], v)
     return None
 
 
@@ -50,7 +47,7 @@ def dnsUpdate(ips):
             provider.update(host, zone, ip)
             waitList[hostname] = ip
         else:
-            click.echo("No DNS provider found for zone [{}]".format(zone))
+            click.echo(f"No DNS provider found for zone [{zone}]")
 
     for hostname, ip in waitList.items():
         waitDNS(hostname, ip)
@@ -65,7 +62,7 @@ def dnsRemove(hosts):
         if provider:
             provider.remove(host, zone)
         else:
-            click.echo("No DNS provider found for zone [{}]".format(zone))
+            click.echo(f"No DNS provider found for zone [{zone}]")
 
 
 def dnsProvider(factory, cfg=None):

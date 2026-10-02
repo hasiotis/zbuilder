@@ -6,10 +6,10 @@ therefore discoverable, on a machine without the kvm extra.
 """
 
 import io
+import xml.etree.ElementTree as ET
+
 import click
 import pytest
-
-import xml.etree.ElementTree as ET
 
 from zbuilder.vm import kvm
 
@@ -116,8 +116,8 @@ def test_seed_is_a_nocloud_iso():
 
     for name in ("user-data", "meta-data", "network-config"):
         joliet, rockRidge = io.BytesIO(), io.BytesIO()
-        image.get_file_from_iso_fp(joliet, joliet_path="/{}".format(name))
-        image.get_file_from_iso_fp(rockRidge, rr_path="/{}".format(name))
+        image.get_file_from_iso_fp(joliet, joliet_path=f"/{name}")
+        image.get_file_from_iso_fp(rockRidge, rr_path=f"/{name}")
         assert joliet.getvalue() == rockRidge.getvalue()
         assert joliet.getvalue()
 
@@ -305,7 +305,7 @@ class FakeVolume:
         return self._name
 
     def path(self):
-        return "/pool/{}".format(self._name)
+        return f"/pool/{self._name}"
 
     def info(self):
         return [0, self.capacity, self.capacity]
@@ -352,7 +352,7 @@ class FakePool:
 
     def storageVolLookupByName(self, name):
         if name not in self.volumes:
-            raise libvirtError("no such volume [{}]".format(name))
+            raise libvirtError(f"no such volume [{name}]")
         return self.volumes[name]
 
     def createXML(self, xml, flags=0):
@@ -441,7 +441,7 @@ class FakeConn:
         for vol in self.pool.volumes.values():
             if vol.path() == path:
                 return vol
-        raise libvirtError("no volume at [{}]".format(path))
+        raise libvirtError(f"no volume at [{path}]")
 
     def defineXML(self, xml):
         if self.defineFails:
@@ -506,7 +506,7 @@ def test_build_creates_the_disks_the_seed_and_a_running_domain(hypervisor):
 
 
 def test_a_thin_clone_is_created_at_the_requested_size(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
 
     provider.build({"host01.zbuilder.local": hostVars(size=20)})
 
@@ -515,7 +515,7 @@ def test_a_thin_clone_is_created_at_the_requested_size(hypervisor):
 
 def test_a_full_clone_is_resized_to_the_requested_size(hypervisor):
     """createXMLFrom hands back a copy at the template's capacity, not ours"""
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
 
     provider.build({"host01.zbuilder.local": hostVars(size=20, full=True)})
 
@@ -525,7 +525,7 @@ def test_a_full_clone_is_resized_to_the_requested_size(hypervisor):
 
 
 def test_a_host_without_a_size_inherits_the_template(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     conn.pool.volumes["debian-13-base.qcow2"].capacity = 3 * kvm.GiB
 
     provider.build({"host01.zbuilder.local": hostVars()})
@@ -545,7 +545,7 @@ def test_build_leaves_limited_out_hosts_alone(hypervisor):
 
 def test_build_deletes_the_volumes_it_made_when_the_domain_fails(hypervisor):
     """Undefining without deleting would leave the next build colliding"""
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     conn.defineFails = True
 
     provider.build({"host01.zbuilder.local": hostVars(disks=[50])})
@@ -557,7 +557,7 @@ def test_build_deletes_the_volumes_it_made_when_the_domain_fails(hypervisor):
 
 
 def test_build_reports_a_missing_template(hypervisor, capsys):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
 
     provider.build({"host01.zbuilder.local": hostVars(template="nosuch.qcow2")})
 
@@ -589,7 +589,7 @@ def test_a_dhcp_host_gets_its_address_from_the_lease(hypervisor):
 
 
 def test_up_starts_a_stopped_host(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     dom = FakeDomain("host01.zbuilder.local", state=FakeLibvirt.VIR_DOMAIN_SHUTOFF)
     conn.domains[dom.name()] = dom
 
@@ -599,7 +599,7 @@ def test_up_starts_a_stopped_host(hypervisor):
 
 
 def test_halt_shuts_a_running_host_down(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     dom = FakeDomain("host01.zbuilder.local", state=FakeLibvirt.VIR_DOMAIN_RUNNING)
     conn.domains[dom.name()] = dom
 
@@ -626,7 +626,7 @@ def test_destroy_deletes_the_disks_the_domain_points_at(hypervisor):
 
 
 def test_snapshot_create_replaces_the_previous_one(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     provider.build({"host01.zbuilder.local": hostVars()})
     dom = conn.domains["host01.zbuilder.local"]
 
@@ -638,7 +638,7 @@ def test_snapshot_create_replaces_the_previous_one(hypervisor):
 
 
 def test_snapshot_restore_boots_the_host_back_up(hypervisor):
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     provider.build({"host01.zbuilder.local": hostVars()})
     provider.snapCreate({"host01.zbuilder.local": hostVars()})
     dom = conn.domains["host01.zbuilder.local"]
@@ -654,7 +654,7 @@ def test_snapshot_restore_boots_the_host_back_up(hypervisor):
 
 def test_snapshots_refuse_a_raw_disk(hypervisor, capsys):
     """Internal snapshots need qcow2, say so instead of failing in libvirt"""
-    provider, conn, dns = hypervisor
+    provider, conn, _ = hypervisor
     conn.domains["host01.zbuilder.local"] = FakeDomain(
         "host01.zbuilder.local",
         xml=kvm._domainXML("host01", {}, [{"path": "/pool/root.raw", "target": "vda", "format": "raw"}]),

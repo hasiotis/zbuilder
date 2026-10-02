@@ -6,22 +6,21 @@ touches the local filesystem or shells out, so a remote hypervisor reached
 over `qemu+ssh://` works exactly like a local `qemu:///system`.
 """
 
+import atexit
 import io
 import re
 import time
-import atexit
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
 import click
 import jinja2
 import libvirt
 import pycdlib
 
-import xml.etree.ElementTree as ET
-
-from pathlib import Path
 from zbuilder.base import VMProvider
-from zbuilder.dns import dnsUpdate, dnsRemove
-from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
-
+from zbuilder.dns import dnsRemove, dnsUpdate
+from zbuilder.ipam import ipamLocate, ipamRelease, ipamReserve
 
 GiB = 1024 * 1024 * 1024
 SNAPSHOT = "zbuilder"
@@ -144,7 +143,7 @@ def _parseIpconfig(ipconfig):
 
     m = STATIC_RE.match(ipconfig)
     if not m:
-        raise click.ClickException("Malformed ipconfig [{}]".format(ipconfig))
+        raise click.ClickException(f"Malformed ipconfig [{ipconfig}]")
 
     return m.group("ip"), m.group("mask"), m.group("gw"), None
 
@@ -178,11 +177,11 @@ def _userData(host, opts):
     lines = [
         "#cloud-config",
         "hostname: {}".format(host.partition(".")[0]),
-        "fqdn: {}".format(host),
+        f"fqdn: {host}",
         "preserve_hostname: false",
         "ssh_pwauth: false",
         "users:",
-        "  - name: {}".format(user),
+        f"  - name: {user}",
         "    sudo: 'ALL=(ALL) NOPASSWD:ALL'",
         "    shell: /bin/bash",
         "    lock_passwd: true",
@@ -190,7 +189,7 @@ def _userData(host, opts):
 
     pubkey = _readPubkey(opts.get("ZBUILDER_PUBKEY"))
     if pubkey:
-        lines += ["    ssh_authorized_keys:", "      - {}".format(pubkey)]
+        lines += ["    ssh_authorized_keys:", f"      - {pubkey}"]
 
     return "\n".join(lines) + "\n"
 
@@ -219,7 +218,7 @@ def _networkConfig(opts):
     glob rather than named, because the predictable name of the single virtio
     nic differs between cloud images.
     """
-    lines = ["version: 2", "ethernets:", "  zbuilder0:", "    match:", "      name: '{}'".format(_ifaceMatch(opts))]
+    lines = ["version: 2", "ethernets:", "  zbuilder0:", "    match:", f"      name: '{_ifaceMatch(opts)}'"]
 
     if not opts.get("ip"):
         return "\n".join(lines + ["    dhcp4: true"]) + "\n"
@@ -356,7 +355,7 @@ class vmProvider(VMProvider):
             try:
                 self._conn = libvirt.open(self.uri)
             except libvirt.libvirtError as e:
-                raise click.ClickException("Can't connect to [{}]: {}".format(self.uri, e))
+                raise click.ClickException(f"Can't connect to [{self.uri}]: {e}")
             # virConnect.__del__ calls back into the libvirt module, which is
             # already torn down by the time the garbage collector runs at
             # interpreter shutdown ("'NoneType' object is not callable").
@@ -397,7 +396,7 @@ class vmProvider(VMProvider):
         try:
             return self.conn.storagePoolLookupByName(name)
         except libvirt.libvirtError as e:
-            raise click.ClickException("No such storage pool [{}]: {}".format(name, e))
+            raise click.ClickException(f"No such storage pool [{name}]: {e}")
 
     def _getVolume(self, pool, name):
         if not name:
@@ -416,7 +415,7 @@ class vmProvider(VMProvider):
         domains = self._domains() if domains is None else domains
         retValue = {}
         for h, v in hosts.items():
-            if not hosts[h]["enabled"]:
+            if not v["enabled"]:
                 continue
 
             ip, mask, gw, subnet = _parseIpconfig(v.get("ipconfig"))
@@ -446,25 +445,25 @@ class vmProvider(VMProvider):
         """The root volume of a host, cloned from its template, plus the extra ones"""
         capacity = int(opts["size"]) * GiB if opts.get("size") else template.info()[1]
         if opts.get("full") is True:
-            root = self._createVolume(pool, "{}.qcow2".format(host), capacity, clone=template)
+            root = self._createVolume(pool, f"{host}.qcow2", capacity, clone=template)
             # A full clone comes out at the capacity of the template: libvirt
             # copies the source volume and ignores the one in the XML, so
             # `size` only takes effect through a resize afterwards.
             if root.info()[1] < capacity:
                 root.resize(capacity)
         else:
-            root = self._createVolume(pool, "{}.qcow2".format(host), capacity, backing=template.path())
+            root = self._createVolume(pool, f"{host}.qcow2", capacity, backing=template.path())
 
         volumes = [root]
         for i, size in enumerate(_diskSizes(opts.get("disks"))):
-            volumes.append(self._createVolume(pool, "{}-disk{}.qcow2".format(host, i + 1), size * GiB))
+            volumes.append(self._createVolume(pool, f"{host}-disk{i + 1}.qcow2", size * GiB))
 
         return volumes
 
     def _createSeed(self, pool, host, opts):
         """Upload the cloud-init seed of a host as a volume of the pool"""
         iso = _seedISO(host, opts)
-        vol = self._createVolume(pool, "{}-seed.iso".format(host), len(iso), fmt="raw")
+        vol = self._createVolume(pool, f"{host}-seed.iso", len(iso), fmt="raw")
 
         stream = self.conn.newStream(0)
         vol.upload(stream, 0, len(iso))
@@ -513,7 +512,7 @@ class vmProvider(VMProvider):
                 return ip
             time.sleep(5)
 
-        click.secho("    No address found for [{}]".format(dom.name()), fg="yellow")
+        click.secho(f"    No address found for [{dom.name()}]", fg="yellow")
         return None
 
     def _waitShutoff(self, dom):
@@ -524,7 +523,7 @@ class vmProvider(VMProvider):
                 return True
             time.sleep(2)
 
-        click.secho("    Shutdown timed out, stopping [{}]".format(dom.name()), fg="yellow")
+        click.secho(f"    Shutdown timed out, stopping [{dom.name()}]", fg="yellow")
         dom.destroy()
         return False
 
@@ -545,7 +544,7 @@ class vmProvider(VMProvider):
                     ips[h] = ip
                 continue
 
-            click.echo("  - Creating host: {} ".format(h))
+            click.echo(f"  - Creating host: {h} ")
             pool = self._getPool(v)
             template = self._getVolume(pool, v.get("template"))
             if template is None:
@@ -574,7 +573,7 @@ class vmProvider(VMProvider):
             except libvirt.libvirtError as e:
                 # Undefining without deleting leaves the volumes behind, and
                 # the next build then collides with them.
-                click.secho("    Failed: {}".format(e), fg="red")
+                click.secho(f"    Failed: {e}", fg="red")
                 self._deleteVolumes(volumes)
                 if v["subnet"] and v["ip"]:
                     ipamRelease(h, v["ip"], v["subnet"])
@@ -590,40 +589,40 @@ class vmProvider(VMProvider):
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
-            click.echo("  - Starting host: {} ".format(h))
+            click.echo(f"  - Starting host: {h} ")
             if v["status"] == "stopped":
                 try:
                     domains[h].create()
                 except libvirt.libvirtError as e:
-                    click.secho("    Failed: {}".format(e), fg="red")
+                    click.secho(f"    Failed: {e}", fg="red")
 
     def halt(self, hosts):
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
-            click.echo("  - Halting host: {} ".format(h))
+            click.echo(f"  - Halting host: {h} ")
             if v["status"] == "running":
                 try:
                     domains[h].shutdown()
                     self._waitShutoff(domains[h])
                 except libvirt.libvirtError as e:
-                    click.secho("    Failed: {}".format(e), fg="red")
+                    click.secho(f"    Failed: {e}", fg="red")
 
     def destroy(self, hosts):
         updateHosts = {}
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
-            click.echo("  - Destroying host: {} ".format(h))
+            click.echo(f"  - Destroying host: {h} ")
             updateHosts[h] = {}
             dom = domains[h]
             try:
@@ -646,7 +645,7 @@ class vmProvider(VMProvider):
                 )
                 self._deleteVolumes(volumes)
             except libvirt.libvirtError as e:
-                click.secho("    Failed: {}".format(e), fg="red")
+                click.secho(f"    Failed: {e}", fg="red")
                 continue
 
             if v["subnet"] and v["ip"]:
@@ -674,77 +673,77 @@ class vmProvider(VMProvider):
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
             dom = domains[h]
             if _hasRawDisks(dom.XMLDesc()):
-                click.secho("  - Host [{}] has a raw disk, internal snapshots need qcow2".format(h), fg="red")
+                click.secho(f"  - Host [{h}] has a raw disk, internal snapshots need qcow2", fg="red")
                 continue
 
             snapshot = self._snapshot(dom)
             if snapshot:
-                click.echo("  - Deleting snapshot for vm: {} ".format(h))
+                click.echo(f"  - Deleting snapshot for vm: {h} ")
                 try:
                     snapshot.delete()
                 except libvirt.libvirtError as e:
-                    click.secho("    Failed: {}".format(e), fg="red")
+                    click.secho(f"    Failed: {e}", fg="red")
                     continue
 
-            click.echo("  - Creating snapshot for vm: {} ".format(h))
+            click.echo(f"  - Creating snapshot for vm: {h} ")
             xml = "<domainsnapshot><name>{}</name><description>Managed by zbuilder</description></domainsnapshot>"
             try:
                 dom.snapshotCreateXML(xml.format(SNAPSHOT), 0)
             except libvirt.libvirtError as e:
-                click.secho("    Failed: {}".format(e), fg="red")
+                click.secho(f"    Failed: {e}", fg="red")
 
     def snapRestore(self, hosts):
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
             dom = domains[h]
             snapshot = self._snapshot(dom)
             if not snapshot:
-                click.echo("  - No [{}] snapshot for vm: {}".format(SNAPSHOT, h))
+                click.echo(f"  - No [{SNAPSHOT}] snapshot for vm: {h}")
                 continue
 
-            click.echo("  - Restoring snapshot for vm: {} ".format(h))
+            click.echo(f"  - Restoring snapshot for vm: {h} ")
             try:
                 dom.revertToSnapshot(snapshot, 0)
                 if dom.state()[0] == libvirt.VIR_DOMAIN_SHUTOFF:
                     dom.create()
             except libvirt.libvirtError as e:
-                click.secho("    Failed: {}".format(e), fg="red")
+                click.secho(f"    Failed: {e}", fg="red")
 
     def snapDelete(self, hosts):
         domains = self._domains()
         for h, v in self._getVMs(hosts, domains).items():
             if not v["status"]:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
                 continue
 
             snapshot = self._snapshot(domains[h])
             if not snapshot:
                 continue
 
-            click.echo("  - Deleting snapshot for vm: {} ".format(h))
+            click.echo(f"  - Deleting snapshot for vm: {h} ")
             try:
                 snapshot.delete()
             except libvirt.libvirtError as e:
-                click.secho("    Failed: {}".format(e), fg="red")
+                click.secho(f"    Failed: {e}", fg="red")
 
     def config(self):
-        return "uri: {}, pool: {}, network: {}".format(self.uri, self.pool, self.network)
+        return f"uri: {self.uri}, pool: {self.pool}, network: {self.network}"
 
     def status(self):
         try:
             self.conn.getVersion()
         except click.ClickException as e:
             return e.message
-        except Exception as e:
+        except libvirt.libvirtError as e:
             return str(e)
 
         return "PASS"

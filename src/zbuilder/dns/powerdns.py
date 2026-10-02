@@ -12,7 +12,7 @@ class dnsProvider(DNSProvider):
             self.url = self.cfg["url"] + "api/v1"
 
     def _get_record(self, fqdn):
-        uri = "{}/servers/localhost/search-data".format(self.url)
+        uri = f"{self.url}/servers/localhost/search-data"
         params = {"q": fqdn, "object-type": "record", "max": 1}
         r = requests.get(uri, params=params, headers={"X-API-Key": self.apikey})
         if r.status_code == 404:
@@ -21,10 +21,10 @@ class dnsProvider(DNSProvider):
             return r.json()
 
     def update(self, host, zone, ip):
-        fqdn = "{}.{}".format(host, zone)
+        fqdn = f"{host}.{zone}"
         r = self._get_record(fqdn)
 
-        uri = "{}/servers/localhost/zones/{}".format(self.url, zone)
+        uri = f"{self.url}/servers/localhost/zones/{zone}"
         payload = {
             "rrsets": [
                 {
@@ -38,17 +38,17 @@ class dnsProvider(DNSProvider):
         }
 
         if not r:
-            click.echo("  - Creating record [{}] with ip [{}]".format(fqdn, ip))
+            click.echo(f"  - Creating record [{fqdn}] with ip [{ip}]")
         else:
-            click.echo("  - Updating record [{}] with ip [{}]".format(fqdn, ip))
+            click.echo(f"  - Updating record [{fqdn}] with ip [{ip}]")
 
         r = requests.patch(uri, json=payload, headers={"X-API-Key": self.apikey})
 
     def remove(self, host, zone):
-        fqdn = "{}.{}".format(host, zone)
+        fqdn = f"{host}.{zone}"
         r = self._get_record(fqdn)
 
-        uri = "{}/servers/localhost/zones/{}".format(self.url, zone)
+        uri = f"{self.url}/servers/localhost/zones/{zone}"
         payload = {
             "rrsets": [
                 {
@@ -61,13 +61,13 @@ class dnsProvider(DNSProvider):
         }
 
         if r:
-            click.echo("  - Removing record {}".format(fqdn))
+            click.echo(f"  - Removing record {fqdn}")
             r = requests.patch(uri, json=payload, headers={"X-API-Key": self.apikey})
         else:
-            click.echo("  - No such record {}".format(fqdn))
+            click.echo(f"  - No such record {fqdn}")
 
     def config(self):
-        return "url: {v[url]}".format(v=self.cfg)
+        return f"url: {self.cfg['url']}"
 
     def status(self):
         return "PASS"

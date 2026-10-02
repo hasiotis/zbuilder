@@ -22,27 +22,27 @@ class dnsProvider(DNSProvider):
             response = dns.query.tcp(update, srv)
             if response.rcode():
                 err = dns.rcode.to_text(response.rcode())
-                click.echo("      Failed to update DNS record [{}] on server [{}]".format(err, srv))
+                click.echo(f"      Failed to update DNS record [{err}] on server [{srv}]")
 
     def update(self, host, zone, ip):
         if ip is None:
             click.echo("  - Skipping due to empty ip")
             return
-        fqdn = "{}.{}".format(host, zone)
-        click.echo("  - Creating/Updating record [{}] with ip [{}]".format(fqdn, ip))
+        fqdn = f"{host}.{zone}"
+        click.echo(f"  - Creating/Updating record [{fqdn}] with ip [{ip}]")
         update = dns.update.Update(zone, keyring=self.keyring)
         update.replace(host, 300, "a", str(ip))
         self._dns_query(update)
 
     def remove(self, host, zone):
-        fqdn = "{}.{}".format(host, zone)
-        click.echo("  - Removing record {}".format(fqdn))
+        fqdn = f"{host}.{zone}"
+        click.echo(f"  - Removing record {fqdn}")
         update = dns.update.Update(zone, keyring=self.keyring)
         update.delete(host)
         self._dns_query(update)
 
     def config(self):
-        return "server: {}, keyname: {}".format(self.server, self.keyname)
+        return f"server: {self.server}, keyname: {self.keyname}"
 
     def status(self):
         return "PASS"

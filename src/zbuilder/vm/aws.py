@@ -2,7 +2,7 @@ import boto3
 import click
 
 from zbuilder.base import VMProvider
-from zbuilder.dns import dnsUpdate, dnsRemove
+from zbuilder.dns import dnsRemove, dnsUpdate
 
 
 class vmProvider(VMProvider):
@@ -21,7 +21,7 @@ class vmProvider(VMProvider):
     def _getVMs(self, hosts):
         retValue = {}
         for h, v in hosts.items():
-            if hosts[h]["enabled"]:
+            if v["enabled"]:
                 instances = list(self.ec2.instances.filter(Filters=[{"Name": "tag:Name", "Values": [h]}]))
                 retValue[h] = {"status": None}
                 for vm in instances:
@@ -35,7 +35,7 @@ class vmProvider(VMProvider):
         ips = {}
         for h, v in self._getVMs(hosts).items():
             if v["status"] is None:
-                click.echo("  - Creating host: {} ".format(h))
+                click.echo(f"  - Creating host: {h} ")
                 # Debian AMIs boot from /dev/xvda, ubuntu ones from /dev/sda1. A mapping for any other device
                 # name adds a second volume instead of resizing the root one.
                 rootDevice = self.ec2.Image(v["values"]["ami"]).root_device_name
@@ -63,10 +63,10 @@ class vmProvider(VMProvider):
                     KeyName=v["values"]["key"],
                     SecurityGroupIds=v["values"]["sg"],
                     SubnetId=v["values"]["subnet"],
-                    UserData="""#cloud-config
-                    fqdn: {}
+                    UserData=f"""#cloud-config
+                    fqdn: {h}
                     manage_etc_hosts: true
-                    """.format(h),
+                    """,
                 )
             else:
                 click.echo("  - Status of host: {} is {}".format(h, v["status"]))
@@ -89,11 +89,11 @@ class vmProvider(VMProvider):
         updateHosts = {}
         for h, v in self._getVMs(hosts).items():
             if v["status"] is not None:
-                click.echo("  - Destroying host: {} ".format(h))
+                click.echo(f"  - Destroying host: {h} ")
                 v["vm"].terminate()
                 updateHosts[h] = {}
             else:
-                click.echo("  - Host does not exists : {}".format(h))
+                click.echo(f"  - Host does not exists : {h}")
 
         dnsRemove(updateHosts)
 

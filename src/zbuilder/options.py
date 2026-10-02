@@ -1,7 +1,7 @@
 import click
 
 
-class State(object):
+class State:
     def __init__(self):
         self.verbose = False
         self.limit = None

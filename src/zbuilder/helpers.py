@@ -1,22 +1,23 @@
-import sys
-import click
-import time
 import socket
+import sys
+import time
+
+import click
 import delegator
 import ruamel.yaml
-import zbuilder.vm
+from ansible.cli.playbook import PlaybookCLI
+from ansible.errors import AnsibleError
+from ansible.parsing.vault import VaultSecretsContext
+from ansible.template import Templar
+from ansible.utils.collection_loader._collection_finder import _AnsibleCollectionFinder
+from ansible.utils.context_objects import GlobalCLIArgs
+from retrying import retry
+
+import zbuilder.cfg
 import zbuilder.dns
 import zbuilder.ipam
-import zbuilder.cfg
 import zbuilder.plugins
-
-from retrying import retry
-from ansible.errors import AnsibleError
-from ansible.template import Templar
-from ansible.cli.playbook import PlaybookCLI
-from ansible.parsing.vault import VaultSecretsContext
-from ansible.utils.context_objects import GlobalCLIArgs
-from ansible.utils.collection_loader._collection_finder import _AnsibleCollectionFinder
+import zbuilder.vm
 
 
 def resetVaultContext():
@@ -102,7 +103,7 @@ def nativeTypes(value):
 
 class ZBbuilderInventoryCLI(PlaybookCLI):
     def dumpVars(self):
-        super(ZBbuilderInventoryCLI, self).parse()
+        super().parse()
         return self._play_prereqs()
 
 
@@ -151,7 +152,7 @@ def getHosts(state):
         if "CLOUD" in hvars:
             curVMProvider = hvars["CLOUD"]
         else:
-            next
+            continue
 
         if curVMProvider not in vmProviders:
             provider_cfg = cfg["providers"][curVMProvider]
@@ -194,7 +195,7 @@ def getProviders(cfg, state):
             else:
                 raise click.ClickException("Unknown provider type [{}]".format(cp["type"]))
             providers.append([p, cp["type"], curProvider.status()])
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - any failure is reported in the status table
             providers.append([p, cp["type"], e])
 
     return providers
@@ -221,18 +222,17 @@ def load_yaml(fname):
         if hasattr(e, "problem_mark"):
             mark = e.problem_mark
             raise click.ClickException(
-                "Yaml error (%s) at position: [line:%s column:%s]" % (fname, mark.line + 1, mark.column + 1)
-            )
+                f"Yaml error ({fname}) at position: [line:{mark.line + 1} column:{mark.column + 1}]"
+            ) from e
     except Exception as e:
-        raise click.ClickException(e)
+        raise click.ClickException(str(e)) from e
 
     return value
 
 
 def humanize_time(secs):
-    mins, secs = divmod(secs, 60)
-    hours, mins = divmod(mins, 60)
-    return "%02d:%02d" % (mins, secs)
+    mins, secs = divmod(int(secs), 60)
+    return f"{mins:02d}:{secs:02d}"
 
 
 def dump_yaml(cfg, where=None):
@@ -264,7 +264,7 @@ def waitSSH(ip):
 
 def fixKeys(state):
     vmProviders = getHosts(state)
-    for _, vmProvider in vmProviders.items():
+    for vmProvider in vmProviders.values():
         for h, v in vmProvider["hosts"].items():
             if v["enabled"]:
                 ip = None
@@ -273,22 +273,22 @@ def fixKeys(state):
                 else:
                     try:
                         ip = getIP(h)
-                    except Exception:
-                        click.echo(click.style("  - Host: {} can't be resolved".format(h), fg="red"))
+                    except OSError:
+                        click.echo(click.style(f"  - Host: {h} can't be resolved", fg="red"))
                         continue
 
-                click.echo("  - Host: {}".format(h))
-                runCmd("ssh-keygen -R {}".format(h), verbose=state.verbose)
+                click.echo(f"  - Host: {h}")
+                runCmd(f"ssh-keygen -R {h}", verbose=state.verbose)
                 if ip is not None:
-                    runCmd("ssh-keygen -R {}".format(ip), verbose=state.verbose)
+                    runCmd(f"ssh-keygen -R {ip}", verbose=state.verbose)
                     waitSSH(ip)
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(h),
+                        f"ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {h} exit",
                         verbose=state.verbose,
                         ignoreError=True,
                     )
                     runCmd(
-                        "ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {} exit".format(ip),
+                        f"ssh -o StrictHostKeyChecking=no -o PasswordAuthentication=no {ip} exit",
                         verbose=state.verbose,
                         ignoreError=True,
                     )
@@ -296,7 +296,7 @@ def fixKeys(state):
 
 def runCmd(cmd, verbose=False, dry=False, ignoreError=False):
     if verbose:
-        click.echo("    CMD: [{}]".format(cmd))
+        click.echo(f"    CMD: [{cmd}]")
     if not dry:
         status = delegator.run(cmd)
         if verbose:

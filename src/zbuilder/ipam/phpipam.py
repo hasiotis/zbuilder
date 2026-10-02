@@ -4,7 +4,6 @@ import urllib3
 
 from zbuilder.base import IPAMProvider
 
-
 urllib3.disable_warnings()
 
 
@@ -21,7 +20,7 @@ class ipamProvider(IPAMProvider):
             self._refresh_token()
 
     def _refresh_token(self):
-        url = "{}/api/zbuilder/user/".format(self.server)
+        url = f"{self.server}/api/zbuilder/user/"
         try:
             r = requests.post(
                 url,
@@ -29,32 +28,32 @@ class ipamProvider(IPAMProvider):
                 verify=self.verify,
                 headers=self.headers,
             )
-        except Exception as e:
-            click.echo("Error {}".format(e))
+        except requests.exceptions.RequestException as e:
+            raise click.ClickException(f"Error {e}") from e
         if r.status_code == 200:
             j = r.json()
             if "data" in j:
                 self.headers["token"] = j["data"]["token"]
         else:
             j = r.json()
-            raise Exception(j["message"])
+            raise click.ClickException(j["message"])
 
     def _get_subnet(self, subnet):
-        url = "{}/api/zbuilder/subnets/cidr/{}".format(self.server, subnet)
+        url = f"{self.server}/api/zbuilder/subnets/cidr/{subnet}"
         r = requests.get(url, headers=self.headers, verify=self.verify)
         j = r.json()
         if j["data"]:
             return j["data"][0]["id"]
 
     def _get_subnet_gw(self, sid):
-        url = "{}/api/zbuilder/subnets/{}".format(self.server, sid)
+        url = f"{self.server}/api/zbuilder/subnets/{sid}"
         r = requests.get(url, headers=self.headers, verify=self.verify)
         j = r.json()
         if j["data"]:
             return j["data"]["gateway"]["ip_addr"]
 
     def _locate(self, sid, host):
-        url = "{}/api/zbuilder/subnets/{}/addresses".format(self.server, sid)
+        url = f"{self.server}/api/zbuilder/subnets/{sid}/addresses"
         r = requests.get(url, headers=self.headers, verify=self.verify)
         j = r.json()
         if j["success"]:
@@ -64,16 +63,16 @@ class ipamProvider(IPAMProvider):
 
     def release(self, host, ip, subnet):
         self._refresh_token()
-        url = "{}/api/zbuilder/addresses/search/{}".format(self.server, ip)
+        url = f"{self.server}/api/zbuilder/addresses/search/{ip}"
         r = requests.get(url, headers=self.headers, verify=self.verify)
         j = r.json()
         if j["code"] == 200 and j["data"][0]["hostname"] == host:
             ipid = j["data"][0]["id"]
             if j["data"][0]["tag"] == "3":
-                click.echo("      Not removing ip [%s] due to reservation" % ip)
+                click.echo(f"      Not removing ip [{ip}] due to reservation")
             else:
-                click.echo("      Releasing ip [{}] for host [{}]".format(ip, host))
-                url = "{}/api/zbuilder/addresses/{}/".format(self.server, ipid)
+                click.echo(f"      Releasing ip [{ip}] for host [{host}]")
+                url = f"{self.server}/api/zbuilder/addresses/{ipid}/"
                 r = requests.delete(url, headers=self.headers, verify=self.verify)
 
     def reserve(self, host, subnet):
@@ -82,12 +81,12 @@ class ipamProvider(IPAMProvider):
         gw = self._get_subnet_gw(sid)
         ip = self._locate(sid, host)
         if not ip:
-            url = "{}/api/zbuilder/subnets/{}/first_free/".format(self.server, sid)
+            url = f"{self.server}/api/zbuilder/subnets/{sid}/first_free/"
             r = requests.get(url, headers=self.headers, verify=self.verify)
             j = r.json()
             ip = j["data"]
-            click.echo("      Reserving ip [{}] for host [{}]".format(ip, host))
-            url = "{}/api/zbuilder/addresses".format(self.server)
+            click.echo(f"      Reserving ip [{ip}] for host [{host}]")
+            url = f"{self.server}/api/zbuilder/addresses"
             data = {"subnetId": sid, "ip": ip, "hostname": host}
             r = requests.post(url, json=data, headers=self.headers, verify=self.verify)
             j = r.json()
@@ -104,7 +103,7 @@ class ipamProvider(IPAMProvider):
         return ip, gw
 
     def config(self):
-        return "server: {v[server]}, username: {v[username]}".format(v=self.cfg)
+        return f"server: {self.cfg['server']}, username: {self.cfg['username']}"
 
     def status(self):
         return "PASS"

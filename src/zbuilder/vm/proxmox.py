@@ -8,13 +8,14 @@ break for everybody.
 import os
 import re
 import time
-import click
-import requests
 import urllib.parse
 
+import click
+import requests
+
 from zbuilder.base import VMProvider
-from zbuilder.dns import dnsUpdate, dnsRemove
-from zbuilder.ipam import ipamReserve, ipamRelease, ipamLocate
+from zbuilder.dns import dnsRemove, dnsUpdate
+from zbuilder.ipam import ipamLocate, ipamRelease, ipamReserve
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -32,7 +33,7 @@ def _require(module, name):
     """The proxmox extra is optional, say so instead of raising ImportError"""
     if module is None:
         raise click.ClickException(
-            "The proxmox provider needs [{}], install it with: pip install 'zbuilder[proxmox]'".format(name)
+            f"The proxmox provider needs [{name}], install it with: pip install 'zbuilder[proxmox]'"
         )
     return module
 
@@ -49,9 +50,9 @@ class vmProvider(VMProvider):
             try:
                 self.proxmox = ProxmoxAPI(url, user=self.username, password=password, verify_ssl=verify)
             except requests.exceptions.Timeout as e:
-                raise Exception(e.args[0].reason.args[1])
+                raise click.ClickException(e.args[0].reason.args[1]) from e
             except requests.exceptions.ConnectionError as e:
-                raise Exception(str(e))
+                raise click.ClickException(str(e)) from e
 
     def _waitTask(self, node, tid):
         results = None
@@ -67,7 +68,7 @@ class vmProvider(VMProvider):
         retValue = {}
         vms = {v["name"]: v for v in self.proxmox.cluster.resources.get(type="vm") if "name" in v}
         for h, v in hosts.items():
-            if hosts[h]["enabled"]:
+            if v["enabled"]:
                 ipconfig = v.get("ipconfig", "")
                 if ipconfig.startswith("ipam="):
                     m = re.match(r"ipam=(?P<subnet>.*)", ipconfig)
@@ -84,7 +85,7 @@ class vmProvider(VMProvider):
                 v["mask"] = mask
                 v["ip"] = ip
                 v["gw"] = gw
-                if h in vms.keys():
+                if h in vms:
                     retValue[h] = v
                     retValue[h].update(vms[h])
                 else:
@@ -102,7 +103,7 @@ class vmProvider(VMProvider):
                 click.echo("  - Status of host: {} is {}".format(h, v["status"]))
                 ips[h] = v["ip"]
             else:
-                click.echo("  - Creating host: {} ".format(h))
+                click.echo(f"  - Creating host: {h} ")
                 node = self.proxmox.nodes(v["node"])
                 nextid = self.proxmox.cluster.nextid.get()
                 template = None
@@ -176,33 +177,33 @@ class vmProvider(VMProvider):
         vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
-                click.echo("  - Starting host: {} ".format(h))
+                click.echo(f"  - Starting host: {h} ")
                 node = self.proxmox.nodes(v["node"])
                 vm = vms[h]
                 if v["status"] == "stopped":
                     taskid = node(vm["id"]).status.start().post()
                     result = self._waitTask(node, taskid)
                     if result != "OK":
-                        click.echo("Failed: {}".format(result))
+                        click.echo(f"Failed: {result}")
                         continue
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
     def halt(self, hosts):
         vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
-                click.echo("  - Halting host: {} ".format(h))
+                click.echo(f"  - Halting host: {h} ")
                 node = self.proxmox.nodes(v["node"])
                 vm = vms[h]
                 if v["status"] == "running":
                     taskid = node(vm["id"]).status.shutdown().post()
                     result = self._waitTask(node, taskid)
                     if result != "OK":
-                        click.echo("Failed: {}".format(result))
+                        click.echo(f"Failed: {result}")
                         continue
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
     def destroy(self, hosts):
         updateHosts = {}
@@ -210,7 +211,7 @@ class vmProvider(VMProvider):
 
         for h, v in self._getVMs(hosts).items():
             if v["status"]:
-                click.echo("  - Destroying host: {} ".format(h))
+                click.echo(f"  - Destroying host: {h} ")
                 updateHosts[h] = {}
                 node = self.proxmox.nodes(v["node"])
                 vm = vms[h]
@@ -219,19 +220,19 @@ class vmProvider(VMProvider):
                     taskid = node(vm["id"]).status.stop().post()
                     result = self._waitTask(node, taskid)
                     if result != "OK":
-                        click.echo("Failed: {}".format(result))
+                        click.echo(f"Failed: {result}")
                         continue
 
                 taskid = node.delete(vm["id"])
                 result = self._waitTask(node, taskid)
                 if result != "OK":
-                    click.echo("Failed: {}".format(result))
+                    click.echo(f"Failed: {result}")
                     continue
 
                 if v["ipconfig"].startswith("ipam="):
                     ipamRelease(h, v["ip"], v["subnet"])
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
         dnsRemove(updateHosts)
 
@@ -244,7 +245,7 @@ class vmProvider(VMProvider):
 
     def dnsremove(self, hosts):
         ips = {}
-        for h, v in self._getVMs(hosts).items():
+        for h in self._getVMs(hosts):
             if hosts[h]["enabled"]:
                 ips[h] = None
         dnsRemove(ips)
@@ -258,19 +259,19 @@ class vmProvider(VMProvider):
                 snapshots = node(vm["id"]).snapshot.get()
                 for curSnapshot in snapshots:
                     if curSnapshot["name"] == "zbuilder":
-                        click.echo("  - Deleting snapshot for vm: {} ".format(h))
+                        click.echo(f"  - Deleting snapshot for vm: {h} ")
                         taskid = node(vm["id"]).snapshot("zbuilder").delete()
                         result = self._waitTask(node, taskid)
                         if result != "OK":
-                            click.echo("    Failed: {}".format(result))
-                click.echo("  - Creating snapshot for vm: {} ".format(h))
+                            click.echo(f"    Failed: {result}")
+                click.echo(f"  - Creating snapshot for vm: {h} ")
                 taskid = node(vm["id"]).snapshot.post(snapname="zbuilder", description="Managed by zbuilder")
                 result = self._waitTask(node, taskid)
                 if result != "OK":
-                    click.echo("Failed: {}".format(result))
+                    click.echo(f"Failed: {result}")
                     continue
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
     def snapRestore(self, hosts):
         vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
@@ -281,17 +282,17 @@ class vmProvider(VMProvider):
                 snapshots = node(vm["id"]).snapshot.get()
                 for curSnapshot in snapshots:
                     if curSnapshot["name"] == "zbuilder":
-                        click.echo("  - Restoring snapshot for vm: {} ".format(h))
+                        click.echo(f"  - Restoring snapshot for vm: {h} ")
                         taskid = node(vm["id"]).snapshot("zbuilder").rollback.post()
                         result = self._waitTask(node, taskid)
                         if result != "OK":
-                            click.echo("    Failed: {}".format(result))
+                            click.echo(f"    Failed: {result}")
                         taskid = node(vm["id"]).status.start().post()
                         result = self._waitTask(node, taskid)
                         if result != "OK":
-                            click.echo("Failed: {}".format(result))
+                            click.echo(f"Failed: {result}")
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
     def snapDelete(self, hosts):
         vms = {i["name"]: i for i in self.proxmox.cluster.resources.get(type="vm") if "name" in i}
@@ -302,20 +303,20 @@ class vmProvider(VMProvider):
                 snapshots = node(vm["id"]).snapshot.get()
                 for curSnapshot in snapshots:
                     if curSnapshot["name"] == "zbuilder":
-                        click.echo("  - Deleting snapshot for vm: {} ".format(h))
+                        click.echo(f"  - Deleting snapshot for vm: {h} ")
                         taskid = node(vm["id"]).snapshot("zbuilder").delete()
                         result = self._waitTask(node, taskid)
                         if result != "OK":
-                            click.echo("    Failed: {}".format(result))
+                            click.echo(f"    Failed: {result}")
             else:
-                click.echo("  - Host does not exists [{}]".format(h))
+                click.echo(f"  - Host does not exists [{h}]")
 
     def enabled(self):
         """Usable only where the optional extra is installed"""
         return ProxmoxAPI is not None
 
     def config(self):
-        return "url: {v[url]}, username: {v[username]}".format(v=self.cfg)
+        return f"url: {self.cfg['url']}, username: {self.cfg['username']}"
 
     def status(self):
         try:
