@@ -57,3 +57,4 @@ prek run --all-files         # lint and format
 
 [Releases](https://pypi.org/project/zbuilder/)
 | [Code](https://github.com/hasiotis/zbuilder)
+| [Examples](https://github.com/hasiotis/zbuilder/tree/master/examples)
