@@ -7,5 +7,6 @@ there.
 | example | what it builds |
 |---|---|
 | [`kvm-local/`](kvm-local/) | Two Debian 13 guests on a local libvirt hypervisor, cloud-init seeded |
+| [`kvm-remote/`](kvm-remote/) | Four Debian/Ubuntu guests on a remote libvirt host over ssh, bridged, with phpIPAM addresses and PowerDNS records |
 | [`aws/`](aws/) | Two Debian 13 EC2 instances, published in route53 as they come up |
 | [`proxmox/`](proxmox/) | Two Debian 13 guests cloned from a cloud-init template on a PVE node |

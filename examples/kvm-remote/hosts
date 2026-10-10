@@ -1,0 +1,46 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+
+  vars:
+    ZBUILDER_PUBKEY: "~/.ssh/id_ed25519.pub"
+    ZBUILDER_SYSUSER: sysadmin
+    ZBUILDER_ENV: demo
+
+  children:
+    debian:
+      hosts:
+        debian01.kvm.loc:
+        debian02.kvm.loc:
+          zb_disks: [ 5 ]
+      vars:
+        ZBUILDER_PROVIDER:
+          CLOUD: kvm-remote
+          VM_OPTIONS:
+            template: debian-13-base.qcow2
+            vcpu: 2
+            memory: 2048
+            size: 20
+            disks: "{{ zb_disks | default([]) }}"
+            nameserver: 192.168.33.2
+            searchdomain: kvm.loc
+            ipconfig: ipam=192.168.33.0/24
+
+    ubuntu:
+      hosts:
+        ubuntu01.kvm.loc:
+        ubuntu02.kvm.loc:
+          zb_disks: [ 5 ]
+      vars:
+        ZBUILDER_PROVIDER:
+          CLOUD: kvm-remote
+          VM_OPTIONS:
+            template: ubuntu-26.04-base.qcow2
+            vcpu: 2
+            memory: 2048
+            size: 20
+            disks: "{{ zb_disks | default([]) }}"
+            nameserver: 192.168.33.2
+            searchdomain: kvm.loc
+            ipconfig: ipam=192.168.33.0/24
