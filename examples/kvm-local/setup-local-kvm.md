@@ -17,6 +17,17 @@ virsh pool-list
 virsh net-list
 ```
 
+`libvirt-daemon-system` creates the `default` network but not a `default`
+storage pool (virt-manager normally creates that on first use). On a fresh host
+define it yourself:
+
+```
+virsh pool-define-as default dir --target /var/lib/libvirt/images
+virsh pool-build default
+virsh pool-start default
+virsh pool-autostart default
+```
+
 ## 2. The template volumes
 
 `VM_OPTIONS.template` is a **volume in the pool**, not a path. Every guest's
