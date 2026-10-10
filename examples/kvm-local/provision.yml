@@ -1,7 +1,7 @@
 ---
 # Not run by zbuilder itself, this is the `zbuilder play provision.yml` half of
 # the demo: an ordinary playbook against hosts zbuilder has just created.
-- hosts: demo
+- hosts: debian:ubuntu
   remote_user: sysadmin
   become: true
   tasks:
